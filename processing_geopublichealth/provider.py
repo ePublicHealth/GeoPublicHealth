@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -24,7 +24,7 @@
 from PyQt4.QtGui import QIcon
 from processing.core.AlgorithmProvider import AlgorithmProvider
 
-from GeoHealth.processing_geohealth.blurring import BlurringGeoAlgorithm
+from GeoPublicHealth.processing_geopublichealth.blurring import BlurringGeoAlgorithm
 
 
 class Provider(AlgorithmProvider):
@@ -47,13 +47,13 @@ class Provider(AlgorithmProvider):
         AlgorithmProvider.unload(self)
     
     def getName(self):
-        return 'GeoHealth'
+        return 'GeoPublicHealth'
     
     def getDescription(self):
-        return 'GeoHealth'
+        return 'GeoPublicHealth'
     
     def getIcon(self):
-        return QIcon(':/plugins/GeoHealth/resources/icon-32.png')
+        return QIcon(':/plugins/GeoPublicHealth/resources/icon-32.png')
     
     def _loadAlgorithms(self):
         self.algs = self.alglist

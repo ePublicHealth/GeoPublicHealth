@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -24,7 +24,7 @@
 from PyQt4.QtGui import QDialog
 from PyQt4.QtCore import pyqtSignal
 
-from GeoHealth.ui.main_blurring import Ui_Form
+from GeoPublicHealth.ui.main_blurring import Ui_Form
 
 
 class MainBlurringDialog(QDialog, Ui_Form):

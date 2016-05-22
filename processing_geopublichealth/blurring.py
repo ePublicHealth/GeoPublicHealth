@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -26,10 +26,10 @@ from PyQt4.QtCore import QVariant
 from qgis.utils import QGis
 from qgis.core import QgsVectorFileWriter, QgsField
 
-from GeoHealth.core.blurring.blur import Blur
-from GeoHealth.core.blurring.layer_index import LayerIndex
-from GeoHealth.core.tools import tr
-from GeoHealth.processing_geohealth import *
+from GeoPublicHealth.core.blurring.blur import Blur
+from GeoPublicHealth.core.blurring.layer_index import LayerIndex
+from GeoPublicHealth.core.tools import tr
+from GeoPublicHealth.processing_geopublichealth import *
 
 
 class BlurringGeoAlgorithm(GeoAlgorithm):
@@ -86,7 +86,7 @@ class BlurringGeoAlgorithm(GeoAlgorithm):
             ' -> "Help"<br />')
     
     def getIcon(self):
-        return QIcon(':/plugins/GeoHealth/resources/blur.png')
+        return QIcon(':/plugins/GeoPublicHealth/resources/blur.png')
 
     def processAlgorithm(self, progress):
 

@@ -27,7 +27,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName(_fromUtf8("Dialog"))
         Dialog.resize(994, 767)
-        Dialog.setWindowTitle(_fromUtf8("GeoHealth"))
+        Dialog.setWindowTitle(_fromUtf8("GeoPublicHealth"))
         self.horizontalLayout_2 = QtGui.QHBoxLayout(Dialog)
         self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
@@ -119,4 +119,4 @@ class Ui_Dialog(object):
 
 from qgis import gui
 from PyQt4 import QtWebKit
-from GeoHealth.resources import resources_rc
+from GeoPublicHealth.resources import resources_rc

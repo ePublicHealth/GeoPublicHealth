@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- GeoHealth
+ GeoPublicHealth
                                  A QGIS plugin
- GeoHealth
+ GeoPublicHealth
                              -------------------
         begin                : 2014-08-20
         copyright            : (C) 2014 by Etienne Trimaille
@@ -21,9 +21,9 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-from geohealth import GeoHealth
+from geopublichealth import GeoPublicHealth
 
 
 def classFactory(iface):
 
-    return GeoHealth(iface)
+    return GeoPublicHealth(iface)

@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -27,7 +27,7 @@ from qgis.core import QgsProviderRegistry
 from qgis.utils import iface
 
 
-from GeoHealth.core.tools import tr
+from GeoPublicHealth.core.tools import tr
 
 
 class OpenCsv(QWidget):

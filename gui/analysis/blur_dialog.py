@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -35,17 +35,17 @@ from PyQt4.QtGui import QWidget, QDialogButtonBox, QFileDialog, QApplication
 from PyQt4.QtCore import pyqtSignal, QSettings, QVariant
 from processing.tools.system import getTempFilenameInTempFolder
 
-from GeoHealth.core.blurring.layer_index import LayerIndex
-from GeoHealth.core.blurring.blur import Blur
-from GeoHealth.core.tools import \
+from GeoPublicHealth.core.blurring.layer_index import LayerIndex
+from GeoPublicHealth.core.blurring.blur import Blur
+from GeoPublicHealth.core.tools import \
     get_last_input_path, set_last_input_path, tr, display_message_bar
-from GeoHealth.core.exceptions import \
-    GeoHealthException, \
+from GeoPublicHealth.core.exceptions import \
+    GeoPublicHealthException, \
     NoLayerProvidedException,\
     NoFileNoDisplayException, \
     DifferentCrsException,\
     CreatingShapeFileException
-from GeoHealth.ui.analysis.blur import Ui_Blur
+from GeoPublicHealth.ui.analysis.blur import Ui_Blur
 
 
 class BlurWidget(QWidget, Ui_Blur):
@@ -201,7 +201,7 @@ class BlurWidget(QWidget, Ui_Blur):
 
             self.signalAskCloseWindow.emit()
 
-        except GeoHealthException, e:
+        except GeoPublicHealthException, e:
             self.label_progress.setText('')
             display_message_bar(msg=e.msg, level=e.level, duration=e.duration)
 

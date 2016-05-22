@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -39,7 +39,7 @@ def set_last_input_path(directory):
 
 def tr(msg):
     # noinspection PyCallByClass,PyArgumentList
-    return QApplication.translate('GeoHealth', msg)
+    return QApplication.translate('GeoPublicHealth', msg)
 
 
 def display_message_bar(

@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -27,11 +27,11 @@ from PyQt4.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from PyQt4.QtGui import QIcon, QAction
 from processing.core.Processing import Processing
 
-from GeoHealth.gui.main_window import MainDialog
-from GeoHealth.processing_geohealth.provider import Provider
+from GeoPublicHealth.gui.main_window import MainDialog
+from GeoPublicHealth.processing_geopublichealth.provider import Provider
 
 
-class GeoHealth:
+class GeoPublicHealth:
 
     def __init__(self, iface):
 
@@ -42,7 +42,7 @@ class GeoHealth:
         locale_path = join(
             self.plugin_dir,
             'i18n',
-            'GeoHealth_{}.qm'.format(locale))
+            'GeoPublicHealth_{}.qm'.format(locale))
 
         if exists(locale_path):
             self.translator = QTranslator()
@@ -53,7 +53,7 @@ class GeoHealth:
                 QCoreApplication.installTranslator(self.translator)
 
         self.plugin_menu = None
-        self.geohealth_menu = None
+        self.geopublichealth_menu = None
         self.main_action = None
         self.xy_action = None
         self.blur_action = None
@@ -70,8 +70,8 @@ class GeoHealth:
         self.plugin_menu = self.iface.pluginMenu()
 
         # Main window
-        icon = QIcon(':/plugins/GeoHealth/resources/icon-32.png')
-        self.main_action = QAction(icon, 'GeoHealth', self.iface.mainWindow())
+        icon = QIcon(':/plugins/GeoPublicHealth/resources/icon-32.png')
+        self.main_action = QAction(icon, 'GeoPublicHealth', self.iface.mainWindow())
         self.plugin_menu.addAction(self.main_action)
         # noinspection PyUnresolvedReferences
         self.main_action.triggered.connect(self.open_main_window)

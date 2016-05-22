@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -26,8 +26,8 @@ from qgis.core import QgsMapLayerRegistry, QgsVectorLayer
 from PyQt4.QtGui import QWidget, QDialogButtonBox, QFileDialog
 from PyQt4.QtCore import pyqtSignal
 
-from GeoHealth.ui.import_ui.open_shapefile import Ui_Form
-from GeoHealth.core.tools import tr
+from GeoPublicHealth.ui.import_ui.open_shapefile import Ui_Form
+from GeoPublicHealth.core.tools import tr
 
 
 class OpenShapefileWidget(QWidget, Ui_Form):

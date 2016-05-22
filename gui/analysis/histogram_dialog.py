@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -30,8 +30,8 @@ from matplotlib.backends.backend_qt4agg import \
     FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from GeoHealth.core.graph_toolbar import CustomNavigationToolbar
-from GeoHealth.ui.analysis.histogram import Ui_Histogram
+from GeoPublicHealth.core.graph_toolbar import CustomNavigationToolbar
+from GeoPublicHealth.ui.analysis.histogram import Ui_Histogram
 
 
 class HistogramDialog(QDialog, Ui_Histogram):

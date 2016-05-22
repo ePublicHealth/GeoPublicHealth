@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -25,7 +25,7 @@ from os.path import dirname, abspath, join
 
 PATH = dirname(abspath(__file__))
 
-from GeoHealth.core.tools import tr
+from GeoPublicHealth.core.tools import tr
 
 
 def html_table(title, intro, inputs, outputs, more):

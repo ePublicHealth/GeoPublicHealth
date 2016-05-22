@@ -173,7 +173,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../../../../../plugins/GeoHealth/resources/resources.qrc"/>
+  <include location="../../../../../../plugins/GeoPublicHealth/resources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -22,7 +22,7 @@
 """
 
 from PyQt4.QtGui import QWidget
-from GeoHealth.ui.about import Ui_About
+from GeoPublicHealth.ui.about import Ui_About
 
 
 class AboutWidget(QWidget, Ui_About):

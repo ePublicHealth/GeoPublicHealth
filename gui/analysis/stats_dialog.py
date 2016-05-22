@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -32,13 +32,13 @@ from PyQt4.QtGui import \
     QWidget, QDialogButtonBox, QApplication, QTableWidgetItem, QFileDialog
 from PyQt4.QtCore import pyqtSignal, QSize
 
-from GeoHealth.ui.analysis.stats import Ui_Stats
-from GeoHealth.core.graph_toolbar import CustomNavigationToolbar
-from GeoHealth.core.stats import Stats
-from GeoHealth.core.tools import \
+from GeoPublicHealth.ui.analysis.stats import Ui_Stats
+from GeoPublicHealth.core.graph_toolbar import CustomNavigationToolbar
+from GeoPublicHealth.core.stats import Stats
+from GeoPublicHealth.core.tools import \
     tr, display_message_bar, get_last_input_path, set_last_input_path
-from GeoHealth.core.exceptions import \
-    GeoHealthException, NoLayerProvidedException, DifferentCrsException
+from GeoPublicHealth.core.exceptions import \
+    GeoPublicHealthException, NoLayerProvidedException, DifferentCrsException
 
 
 class StatsWidget(QWidget, Ui_Stats):
@@ -192,7 +192,7 @@ class StatsWidget(QWidget, Ui_Stats):
 
             self.draw_plot(self.tab)
 
-        except GeoHealthException, e:
+        except GeoPublicHealthException, e:
             self.label_progressStats.setText('')
             display_message_bar(msg=e.msg, level=e.level, duration=e.duration)
 

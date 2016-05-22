@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -21,8 +21,8 @@
  ***************************************************************************/
 """
 
-from GeoHealth.ui.analysis.incidence import Ui_Incidence
-from GeoHealth.gui.analysis.parent_incidence_density_dialog import IncidenceDensityDialog
+from GeoPublicHealth.ui.analysis.incidence import Ui_Incidence
+from GeoPublicHealth.gui.analysis.parent_incidence_density_dialog import IncidenceDensityDialog
 
 
 class IncidenceDialog(IncidenceDensityDialog, Ui_Incidence):

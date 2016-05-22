@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -25,8 +25,8 @@ from qgis.core import QgsMapLayerRegistry, QgsRasterLayer, QgsProviderRegistry
 
 from PyQt4.QtGui import QWidget, QDialogButtonBox, QFileDialog
 
-from GeoHealth.ui.import_ui.open_raster import Ui_Form
-from GeoHealth.core.tools import tr
+from GeoPublicHealth.ui.import_ui.open_raster import Ui_Form
+from GeoPublicHealth.core.tools import tr
 
 
 class OpenRasterWidget(QWidget, Ui_Form):

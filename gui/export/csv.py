@@ -2,7 +2,7 @@
 """
 /***************************************************************************
 
-                                 GeoHealth
+                                 GeoPublicHealth
                                  A QGIS plugin
 
                               -------------------
@@ -27,8 +27,8 @@ from PyQt4.QtCore import pyqtSignal
 
 from qgis.gui import QgsMapLayerProxyModel
 
-from GeoHealth.ui.export.export_csv import Ui_Form
-from GeoHealth.core.tools import tr
+from GeoPublicHealth.ui.export.export_csv import Ui_Form
+from GeoPublicHealth.core.tools import tr
 
 
 class CsvExport(QWidget, Ui_Form):
