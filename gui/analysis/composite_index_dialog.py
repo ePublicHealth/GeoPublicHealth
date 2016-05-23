@@ -121,8 +121,6 @@ class CommonCompositeIndexDialog(QDialog):
         self.canvas = FigureCanvas(self.figure)
         self.canvas.setMinimumSize(QSize(300, 0))
         self.toolbar = CustomNavigationToolbar(self.canvas, self)
-        self.layout_plot.addWidget(self.toolbar)
-        self.layout_plot.addWidget(self.canvas)
 
         self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 

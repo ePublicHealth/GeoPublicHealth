@@ -222,13 +222,6 @@
      </property>
     </widget>
    </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <layout class="QVBoxLayout" name="layout_plot"/>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
  <customwidgets>

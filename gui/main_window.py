@@ -126,7 +126,7 @@ class MainDialog(QDialog, Ui_Dialog):
                             }
                         ]
                     }, {
-                        'label': 'Coposite Index',
+                        'label': 'Composite Index',
                         'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
                         'content': [
                             {
@@ -134,7 +134,7 @@ class MainDialog(QDialog, Ui_Dialog):
                                 'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
                                 'content': {
                                     'widget': CompositeIndexDialog(),
-                                    'help': help_incidence()
+                                    'help': help_composite_index()
                                 }
                             }, {
                                 'label': 'Case and aggregation layers',

@@ -126,12 +126,6 @@ class Ui_Composite_Index(object):
         self.button_box_ok.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.button_box_ok.setObjectName(_fromUtf8("button_box_ok"))
         self.verticalLayout.addWidget(self.button_box_ok)
-        self.horizontalLayout_2 = QtGui.QHBoxLayout()
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.layout_plot = QtGui.QVBoxLayout()
-        self.layout_plot.setObjectName(_fromUtf8("layout_plot"))
-        self.horizontalLayout_2.addLayout(self.layout_plot)
-        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(Composite_Index)
         QtCore.QObject.connect(self.cbx_aggregation_layer, QtCore.SIGNAL(_fromUtf8("layerChanged(QgsMapLayer*)")), self.cbx_indicator_field.setLayer)
