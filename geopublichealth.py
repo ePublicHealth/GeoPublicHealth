@@ -62,6 +62,7 @@ class GeoPublicHealth:
         self.main_action = None
         self.xy_action = None
         self.blur_action = None
+        self.composite_index_action = None
         self.incidence_action = None
         self.density_action = None
         self.histogram_action = None

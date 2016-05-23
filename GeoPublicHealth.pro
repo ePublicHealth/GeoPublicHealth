@@ -27,6 +27,7 @@ SOURCES = \
     ui/about.py \
     ui/main.py \
     ui/analysis/blur.py \
+    ui/analysis/composite_index.py \
     ui/analysis/density.py \
     ui/analysis/density_with_point.py \
     ui/analysis/histogram.py \

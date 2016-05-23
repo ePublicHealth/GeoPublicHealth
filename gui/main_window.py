@@ -37,6 +37,7 @@ from GeoPublicHealth.gui.import_gui.raster import OpenRasterWidget
 from GeoPublicHealth.gui.import_gui.open_xls_dbf import OpenXlsDbfFileWidget
 from GeoPublicHealth.gui.analysis.blur_dialog import BlurWidget
 from GeoPublicHealth.gui.analysis.stats_dialog import StatsWidget
+from GeoPublicHealth.gui.analysis.composite_index_dialog import CompositeIndexDialog
 from GeoPublicHealth.gui.analysis.incidence_dialog import IncidenceDialog
 from GeoPublicHealth.gui.analysis.incidence_point_dialog import IncidencePointDialog
 from GeoPublicHealth.gui.analysis.density_dialog import DensityDialog
@@ -101,7 +102,7 @@ class MainDialog(QDialog, Ui_Dialog):
                     }
                 ]
             }, {
-                'label': 'Analyse',
+                'label': 'Analyze',
                 'icon': ':/plugins/GeoPublicHealth/resources/gears.png',
                 'content': [
                     {
@@ -121,6 +122,26 @@ class MainDialog(QDialog, Ui_Dialog):
                                 'content': {
                                     'widget': StatsWidget(),
                                     'help': help_stats_blurring()
+                                }
+                            }
+                        ]
+                    }, {
+                        'label': 'Coposite Index',
+                        'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                        'content': [
+                            {
+                                'label': 'Polygon layer only',
+                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                                'content': {
+                                    'widget': CompositeIndexDialog(),
+                                    'help': help_incidence()
+                                }
+                            }, {
+                                'label': 'Case and aggregation layers',
+                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                                'content': {
+                                    'widget': IncidencePointDialog(),
+                                    'help': help_incidence_point()
                                 }
                             }
                         ]
