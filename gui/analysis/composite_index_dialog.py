@@ -36,7 +36,9 @@ from PyQt4.QtCore import QSize, QVariant, Qt, pyqtSignal
 from PyQt4.QtGui import QFileDialog
 
 from qgis.utils import QGis
-from qgis.gui import QgsMapLayerProxyModel
+from qgis.gui import \
+    QgsMapLayerProxyModel,\
+    QgsFieldProxyModel
 from qgis.core import \
     QgsField,\
     QgsVectorGradientColorRampV2,\
@@ -126,6 +128,7 @@ class CommonCompositeIndexDialog(QDialog):
         self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
         if not self.use_point_layer:
+            self.cbx_indicator_field.setFilters(QgsFieldProxyModel.Numeric)
             self.cbx_indicator_field.setLayer(self.cbx_aggregation_layer.currentLayer())
             self.cbx_aggregation_layer.layerChanged.connect(self.cbx_indicator_field.setLayer)
             self.cbx_aggregation_layer.layerChanged.connect(self.reset_field_indicator)
