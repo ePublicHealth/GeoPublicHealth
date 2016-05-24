@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>651</width>
-    <height>695</height>
+    <width>814</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -53,31 +53,21 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="9" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>New column</string>
+        <string>Composite Index</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="le_new_column">
-       <property name="maxLength">
-        <number>10</number>
-       </property>
-       <property name="placeholderText">
-        <string>UHN</string>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>Output</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="10" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
         <widget class="QLineEdit" name="le_output_filepath">
@@ -95,8 +85,51 @@
        </item>
       </layout>
      </item>
-     <item row="7" column="1">
+     <item row="11" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="QRadioButton" name="radioButton_vector_positive">
+       <property name="text">
+        <string>Higher the value of the indicator better the conditions for the population</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup_2</string>
+       </attribute>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QRadioButton" name="radioButton_vector_negative">
+       <property name="text">
+        <string>Higher the value of the indicator worse the conditions for the population</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">buttonGroup_2</string>
+       </attribute>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLineEdit" name="le_new_column">
+       <property name="maxLength">
+        <number>10</number>
+       </property>
+       <property name="placeholderText">
+        <string>UHN</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QListWidget" name="cbx_list_indicators"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="QCommandLinkButton" name="command_link_button">
+       <property name="text">
+        <string>Add to Index</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -266,4 +299,7 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="buttonGroup_2"/>
+ </buttongroups>
 </ui>

@@ -136,13 +136,6 @@ class MainDialog(QDialog, Ui_Dialog):
                                     'widget': CompositeIndexDialog(),
                                     'help': help_composite_index()
                                 }
-                            }, {
-                                'label': 'Case and aggregation layers',
-                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
-                                'content': {
-                                    'widget': IncidencePointDialog(),
-                                    'help': help_incidence_point()
-                                }
                             }
                         ]
                     }, {
