@@ -106,26 +106,6 @@ class MainDialog(QDialog, Ui_Dialog):
                 'icon': ':/plugins/GeoPublicHealth/resources/gears.png',
                 'content': [
                     {
-                        'label': 'Blur',
-                        'icon': ':/plugins/GeoPublicHealth/resources/blur.png',
-                        'content': [
-                            {
-                                'label': 'Blur',
-                                'icon': ':/plugins/GeoPublicHealth/resources/blur.png',
-                                'content': {
-                                    'widget': BlurWidget(),
-                                    'help': help_blur()
-                                }
-                            }, {
-                                'label': 'Stats',
-                                'icon': ':/plugins/GeoPublicHealth/resources/sigma.png',
-                                'content': {
-                                    'widget': StatsWidget(),
-                                    'help': help_stats_blurring()
-                                }
-                            }
-                        ]
-                    }, {
                         'label': 'Composite Index',
                         'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
                         'content': [
@@ -178,7 +158,27 @@ class MainDialog(QDialog, Ui_Dialog):
                                 }
                             }
                         ]
-                    }
+                    }, {
+                        'label': 'Blur',
+                        'icon': ':/plugins/GeoPublicHealth/resources/blur.png',
+                        'content': [
+                            {
+                                'label': 'Blur',
+                                'icon': ':/plugins/GeoPublicHealth/resources/blur.png',
+                                'content': {
+                                    'widget': BlurWidget(),
+                                    'help': help_blur()
+                                }
+                            }, {
+                                'label': 'Stats',
+                                'icon': ':/plugins/GeoPublicHealth/resources/sigma.png',
+                                'content': {
+                                    'widget': StatsWidget(),
+                                    'help': help_stats_blurring()
+                                }
+                            }
+                        ]
+                    }, 
                 ]
             },
             {
