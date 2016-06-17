@@ -42,6 +42,7 @@ from GeoPublicHealth.gui.analysis.incidence_dialog import IncidenceDialog
 from GeoPublicHealth.gui.analysis.incidence_point_dialog import IncidencePointDialog
 from GeoPublicHealth.gui.analysis.density_dialog import DensityDialog
 from GeoPublicHealth.gui.analysis.density_point_dialog import DensityPointDialog
+from GeoPublicHealth.gui.analysis.autocorrelation_dialog import AutocorrelationDialog
 from GeoPublicHealth.gui.export.csv import CsvExport
 from GeoPublicHealth.gui.about import AboutWidget
 
@@ -155,6 +156,19 @@ class MainDialog(QDialog, Ui_Dialog):
                                 'content': {
                                     'widget': DensityPointDialog(),
                                     'help': help_density_point()
+                                }
+                            }
+                        ]
+                    }, {
+                        'label': 'Autocorrelation',
+                        'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                        'content': [
+                            {
+                                'label': 'Polygon layer only',
+                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                                'content': {
+                                    'widget': AutocorrelationDialog(),
+                                    'help': help_autocorrelation()
                                 }
                             }
                         ]

@@ -26,6 +26,7 @@ SOURCES = \
     gui/main_window.py \
     ui/about.py \
     ui/main.py \
+    ui/analysis/autocorrelation.py \
     ui/analysis/blur.py \
     ui/analysis/composite_index.py \
     ui/analysis/density.py \
