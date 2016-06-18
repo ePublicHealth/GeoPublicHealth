@@ -120,12 +120,6 @@ class CommonCompositeIndexDialog(QDialog):
         self.cbx_mode.addItem(
             'Equal interval', QgsGraduatedSymbolRendererV2.EqualInterval)
 
-        # Setup the graph.
-        self.figure = Figure()
-        self.canvas = FigureCanvas(self.figure)
-        self.canvas.setMinimumSize(QSize(300, 0))
-        self.toolbar = CustomNavigationToolbar(self.canvas, self)
-
         self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
         self.cbx_list_indicators.itemDoubleClicked.connect(self.remove_item) 
