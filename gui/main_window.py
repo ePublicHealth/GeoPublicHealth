@@ -108,11 +108,11 @@ class MainDialog(QDialog, Ui_Dialog):
                 'content': [
                     {
                         'label': 'Composite Index',
-                        'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                        'icon': ':/plugins/GeoPublicHealth/resources/composite_index.png',
                         'content': [
                             {
                                 'label': 'Polygon layer only',
-                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                                'icon': ':/plugins/GeoPublicHealth/resources/composite_index.png',
                                 'content': {
                                     'widget': CompositeIndexDialog(),
                                     'help': help_composite_index()
@@ -161,11 +161,11 @@ class MainDialog(QDialog, Ui_Dialog):
                         ]
                     }, {
                         'label': 'Autocorrelation',
-                        'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                        'icon': ':/plugins/GeoPublicHealth/resources/autocorrelation.png',
                         'content': [
                             {
                                 'label': 'Polygon layer only',
-                                'icon': ':/plugins/GeoPublicHealth/resources/incidence.png',
+                                'icon': ':/plugins/GeoPublicHealth/resources/autocorrelation.png',
                                 'content': {
                                     'widget': AutocorrelationDialog(),
                                     'help': help_autocorrelation()
