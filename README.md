@@ -106,8 +106,8 @@ Original GeoHealth Plugin:
 GeoPublicHealth:
   * ePublicHealth
   * Dr. Carlos Castillo-Salgado
-  * Manuel Vidaurre, ePublicHealth
-  * Pai (Supharerk Thawillarp) -- QGIS2to3 Migration work
+  * [Manuel Vidaurre](https://github.com/mvidaurre), ePublicHealth
+  * [Pai (Supharerk Thawillarp)](https://github.com/raynus) -- QGIS2to3 Migration work
   * This project was designed and extended by the Johns Hopkins/Bloomberg School of Public Health [Global Public Health Observatory](http://gpho.info/)
 
 ## License
