@@ -1,25 +1,21 @@
-# GeoPublicHealth 0.97
+# GeoPublicHealth 0.98
 
 GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology.
 
-## Install in Windows
+## Install 
+
+### In Windows
   
-For windows 
 1. Go to https://qgis.org/en/site/forusers/download.html and download OSGeo4W that correspond to your chip architecture (32 or 64)
 1. To get the Latest release (richest on features) choose Advanced Install and select **qgis-pr-full**
 
-
-- QGIS 3.24.3-Tisler
-- Python 3.9
-- Pysal 2.5.0, Pyproj 3.2, libpysal 4.6.2, numb 0.55.2 and geopandas 0.8.1
-
-## Install in Mac
+### In Mac
   1. Go to https://qgis.org/en/site/forusers/download.html and download for macOS that correspond to your OS version
   1. To get the Latest release (richest on features)
   1. Run the installer and follow instructions
   1. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
 
-### Installing GeoPublicHealth Plugin
+### Installing GeoPublicHealth Plugin in Windows or Mac
   1. Start QGIS and launch the plugins manager by going to the **Plugins menu and selecting Manage and Install Plugins….**
   1. In the **Settings** tab of the plugins settings dialog, scroll down and click on the **Add…** button.
   1. Give the plugin repository the name **epipublichealth** and then add the full URL **https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml** in the URL field.
@@ -35,6 +31,11 @@ For windows
   1. Write or copy and paste `pip.main(['install', 'pip', '--upgrade'])` and click enter - this will upgrade the **pip** to the latest version
   1. Write or copy and paste `pip.main(['install', 'libpysal', '--upgrade'])` and click enter - this will upgrade the **libpysal** to the latest version
   1. Write or copy and paste `pip.main(['install', 'numba', '--upgrade'])` and click enter - this will upgrade the **numba** to the latest version
+
+### Installed Versions
+- QGIS 3.24.3-Tisler
+- Python 3.9
+- Pysal 2.5.0, Pyproj 3.2, libpysal 4.6.2, numb 0.55.2 and geopandas 0.8.1
 
 ## Contributing
 Please review the [Contribution Guidelines](CONTRIBUTING.md)
@@ -91,7 +92,7 @@ Include details about your configuration and environment:
   * Pai (Supharerk Thawillarp) -- QGIS2to3 Migration work
 =======
 
-# GeoPublicHealth 0.97
+# GeoPublicHealth 0.98
 
 ## History
 Dr. Carlos Castillo-Salgado has taught in The Bloomberg School of Public Health of Johns Hopkins University the 340.701.11 Epidemiologic Applications of GIS the last 15 years and also in his work as Chief of the Special Program for Health Analysis for the Panamerican Health Organization, Regional Office of the World Health Organization for the Regional Office of the Americas. In this capacity, he led the development of [SIGEpi](http://ais.paho.org/sigepi/index.asp?xml=sigepi/index.htm&lang=en) as a pioneer GIS for Epidemiology and Public Health. Using the QGIS, the GeoPublicHealth will integrate several of the methods and techniques used in SIGEpi but enhance those with the capacities of QGIS. In February 2020, [Pai (Supharerk Thawillarp)](https://github.com/raynus) did the migration work for the plugin from QGIS 2 systems to QGIS 3.

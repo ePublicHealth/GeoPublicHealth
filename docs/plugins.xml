@@ -12,12 +12,12 @@
             <homepage>
                 <![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]>
             </homepage>
-            <file_name>GeoPublicHealth.zip</file_name>
+            <file_name>geopublichealth3.zip</file_name>
             <icon>
                 https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/master/resources/icon-32.png
             </icon>
             <author_name>
-                <![CDATA[Manuel Vidaurre, Javier Cervantes, Etienne Trimaille, Dr Carlos Castillo-Salgado]]>
+                <![CDATA[Manuel Vidaurre, Javier Cervantes, Pai (Supharerk Thawillarp), Etienne Trimaille, Dr Carlos Castillo-Salgado]]>
             </author_name>
             <download_url>
                 https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.zip
@@ -26,7 +26,7 @@
                 <![CDATA[mvidaurre]]>
             </uploaded_by>
             <create_date>2016-04-24T15:31:19.824333</create_date>
-            <update_date>2022-06-03T23:19:39.981391</update_date>
+            <update_date>2022-06-05T23:31:a9.974521</update_date>
             <experimental>True</experimental>
             <deprecated>False</deprecated>
             <tracker>
