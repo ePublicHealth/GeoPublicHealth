@@ -1,8 +1,7 @@
-*.pyc
-.idea
-index.html
-blurringTrad.py
-plugin_upload.py
-help/
-README.txt
-.DS_Store
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+*.log
+.vscode/**
+.tx/**
