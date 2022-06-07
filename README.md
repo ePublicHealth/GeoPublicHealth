@@ -6,8 +6,25 @@ GeoPublicHealth aims to provide a simplified interface for users in epidemiology
 
 ### In Windows
   
-1. Go to https://qgis.org/en/site/forusers/download.html and download OSGeo4W that correspond to your chip architecture (32 or 64)
-1. To get the Latest release (richest on features) choose Advanced Install and select **qgis-pr-full**
+1. Go to https://qgis.org/en/site/forusers/download.html and download OSGeo4W
+1. To get the Latest release (richest on features) choose **Advance Install** 
+1. Select **Install from Internet** and click on **Next>**
+1. Select the root installing directory (highly recommended to maintain defaults) and click on **Next>**
+1. Select the local package directory (highly recommended to maintain defaults) and click on **Next>**
+1. Select the method for the Internet Connection (highly recommended to maintain defaults) and click on **Next>**
+1. Choose a Download Site (highly recommended to maintain default https://download.osgeo.org) and click on **Next>**
+1. Search for **qgis**
+1. Select for **Installing** the **qgis: QGIS Desktop** version should be **3.24.3-1**
+1. Search for **gdal**
+1. Select for **Installing** the **gdal: The GDAL/OGR library and command line tools** version should be **3.4.3-2**
+1. Search for **gdal**
+1. Select for **Installing** the **python3-libpysal: Core components of PySAL a library for spatial analisys functions** version should be 4.3.0-1
+1. Select for **Installing** the **python3-pysal: A library for spatial analisys functions** version should be 2.3.0-2 and click on **Next>**
+1. Maintain checked the additional unmeet dependencies
+1. Accept the Terms and Conditions and click on **Next>**
+
+You can see a [video of this proccess here](videos/install.qgis.gdal.pysal.win.2022.06.mp4)
+
 
 ### In Mac
   1. Go to https://qgis.org/en/site/forusers/download.html and download for macOS that correspond to your OS version
@@ -16,7 +33,15 @@ GeoPublicHealth aims to provide a simplified interface for users in epidemiology
   1. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
 
 ### Installing GeoPublicHealth Plugin in Windows or Mac
-  1. Start QGIS and launch the plugins manager by going to the **Plugins menu and selecting Manage and Install Plugins….**
+  1. Start QGIS
+  ---- This section is only for MacOS users
+  1. In the **Plugins** menu select **Python Console** - This will open the console in QGIS
+  1. In the prompt of the console (after the **>>>**) write or copy and paste `import pip` and click enter - this will load the **pip** module in QGIS
+  1. Write or copy and paste `pip.main(['install', 'pip', '--upgrade'])` and click enter - this will upgrade the **pip** to the latest version
+  1. Write or copy and paste `pip.main(['install', 'libpysal', '--upgrade'])` and click enter - this will upgrade the **libpysal** to the latest version
+  1. Write or copy and paste `pip.main(['install', 'numba', '--upgrade'])` and click enter - this will upgrade the **numba** to the latest version
+  ----
+  1. Launch the plugins manager by going to the **Plugins menu and selecting Manage and Install Plugins….**
   1. In the **Settings** tab of the plugins settings dialog, scroll down and click on the **Add…** button.
   1. Give the plugin repository the name **epipublichealth** and then add the full URL **https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml** in the URL field.
   1. Please be sure that `Show also experimental plugins` is checked [x]
@@ -26,11 +51,9 @@ GeoPublicHealth aims to provide a simplified interface for users in epidemiology
   1. Click on the **Install plugin** button
   1. Close the Plugins dialog 
   1. Check in the **Plugins** menu that the **GeoPublicHealth** plugin is a new option there
-  1. In the **Plugins** menu select **Python Console** - This will open the console in QGIS
-  1. In the prompt of the console (after the **>>>**) write or copy and paste `import pip` and click enter - this will load the **pip** module in QGIS
-  1. Write or copy and paste `pip.main(['install', 'pip', '--upgrade'])` and click enter - this will upgrade the **pip** to the latest version
-  1. Write or copy and paste `pip.main(['install', 'libpysal', '--upgrade'])` and click enter - this will upgrade the **libpysal** to the latest version
-  1. Write or copy and paste `pip.main(['install', 'numba', '--upgrade'])` and click enter - this will upgrade the **numba** to the latest version
+
+You can see a [video of this proccess for Windows Users here](videos/install.plugin.geopublichealth.win.2022.06.mp4)
+
 
 ### Installed Versions
 - QGIS 3.24.3-Tisler
