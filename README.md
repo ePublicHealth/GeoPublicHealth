@@ -34,13 +34,17 @@ You can see a [video of this proccess here](videos/install.qgis.gdal.pysal.win.2
 
 ### Installing GeoPublicHealth Plugin in Windows or Mac
   1. Start QGIS
-  ---- This section is only for MacOS users
+  
+  ---- 
+  This section is only for MacOS users
+  
   1. In the **Plugins** menu select **Python Console** - This will open the console in QGIS
   1. In the prompt of the console (after the **>>>**) write or copy and paste `import pip` and click enter - this will load the **pip** module in QGIS
   1. Write or copy and paste `pip.main(['install', 'pip', '--upgrade'])` and click enter - this will upgrade the **pip** to the latest version
   1. Write or copy and paste `pip.main(['install', 'libpysal', '--upgrade'])` and click enter - this will upgrade the **libpysal** to the latest version
   1. Write or copy and paste `pip.main(['install', 'numba', '--upgrade'])` and click enter - this will upgrade the **numba** to the latest version
   ----
+  
   1. Launch the plugins manager by going to the **Plugins menu and selecting Manage and Install Plugins….**
   1. In the **Settings** tab of the plugins settings dialog, scroll down and click on the **Add…** button.
   1. Give the plugin repository the name **epipublichealth** and then add the full URL **https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml** in the URL field.
