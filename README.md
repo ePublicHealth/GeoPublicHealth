@@ -56,8 +56,8 @@ You can see a [video of this proccess here](videos/install.qgis.gdal.pysal.win.2
   1. Close the Plugins dialog 
   1. Check in the **Plugins** menu that the **GeoPublicHealth** plugin is a new option there
 
-You can see a [video of this proccess for Windows Users here](videos/install.plugin.geopublichealth.win.2022.06.mp4)
-
+* You can see a [video of this proccess for Windows Users here](videos/install.plugin.geopublichealth.win.2022.06.mp4)
+* You can see a [video of this proccess for Mac Users here](videos/install.qgis.and.geopublichealth.mac.2022.09.mp4)
 
 ### Installed Versions
 - QGIS 3.24.3-Tisler
