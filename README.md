@@ -17,7 +17,7 @@ GeoPublicHealth aims to provide a simplified interface for users in epidemiology
 1. Select for **Installing** the **qgis: QGIS Desktop** version should be **3.24.3-1**
 1. Search for **gdal**
 1. Select for **Installing** the **gdal: The GDAL/OGR library and command line tools** version should be **3.4.3-2**
-1. Search for **gdal**
+1. Search for **pysak**
 1. Select for **Installing** the **python3-libpysal: Core components of PySAL a library for spatial analisys functions** version should be 4.3.0-1
 1. Select for **Installing** the **python3-pysal: A library for spatial analisys functions** version should be 2.3.0-2 and click on **Next>**
 1. Maintain checked the additional unmeet dependencies
