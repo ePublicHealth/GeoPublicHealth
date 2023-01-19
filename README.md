@@ -6,8 +6,8 @@ GeoPublicHealth aims to provide a simplified interface for users in epidemiology
 
 ### In Windows
   
-1. Go to https://qgis.org/en/site/forusers/download.html and download OSGeo4W
-1. To get the Latest release (richest on features) choose **Advance Install** 
+1. Go to https://download.qgis.org/downloads/QGIS-OSGeo4W-3.24.2-1.msi for the specific version of OSGeo4W
+1. Run the file and choose **Advance Install** 
 1. Select **Install from Internet** and click on **Next>**
 1. Select the root installing directory (highly recommended to maintain defaults) and click on **Next>**
 1. Select the local package directory (highly recommended to maintain defaults) and click on **Next>**
@@ -27,8 +27,7 @@ You can see a [video of this proccess here](videos/install.qgis.gdal.pysal.win.2
 
 
 ### In Mac
-  1. Go to https://qgis.org/en/site/forusers/download.html and download for macOS that correspond to your OS version
-  1. To get the Latest release (richest on features)
+  1. Go to https://download.qgis.org/downloads/macos/pr/qgis_pr_final-3_24_1_20220318_151239.dmg for download the specific version
   1. Run the installer and follow instructions
   1. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
 
