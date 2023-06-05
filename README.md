@@ -1,8 +1,8 @@
-# GeoPublicHealth 0.98
+# GeoPublicHealth 0.100.1
 
 GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology. To use the plugin, you MUST to install first QGIS.
 
-## Install QGIS 3.24.3-1
+## Install QGIS 3.30
 
 ### In Windows
   
@@ -27,9 +27,10 @@ You can see a [video of this process here](videos/install.qgis.gdal.pysal.win.20
 
 
 ### In Mac
-  1. Go to https://download.qgis.org/downloads/macos/pr/qgis_pr_final-3_24_1_20220318_151239.dmg for download the specific version
-  1. Run the installer and follow instructions
-  1. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
+  1. Go to [https://www.qgis.org](https://www.qgis.org/en/site/forusers/download.html) for download the specific version 3.30
+  2. Run the installer and follow instructions
+  3. macOS High Sierra (10.13) or newer is required. QGIS is not yet notarized as required by macOS Catalina (10.15) security rules. On first launch, please **control-click on the icon and choose Open from the context menu**, after which a confirmation dialog is shown and you need to click the Open button.
+  4. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
 
 ### Installing GeoPublicHealth Plugin in Windows or Mac
   1. Start QGIS
