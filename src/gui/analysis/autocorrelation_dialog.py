@@ -27,29 +27,29 @@
 """
 from tempfile import NamedTemporaryFile
 from qgis.PyQt.QtWidgets import (
-    QDialog, QDialogButtonBox, QTableWidgetItem,
-    QMessageBox, QApplication, QFileDialog
+    QDialog, QDialogButtonBox, QApplication, QFileDialog
 )
-from qgis.PyQt.QtCore import Qt, pyqtSignal, QVariant
+from qgis.PyQt.QtCore import QVariant, Qt, pyqtSignal
 from qgis.PyQt.QtGui import QColor
+
 from qgis.utils import Qgis
 from qgis.core import (
     QgsField, QgsRendererCategory, QgsCategorizedSymbolRenderer,
     QgsGradientColorRamp, QgsGraduatedSymbolRenderer, QgsSymbol,
     QgsVectorFileWriter, QgsFeature, QgsVectorLayer, QgsProject,
-    QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes,
+    QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes
 )
 from qgis.gui import QgsFieldComboBox, QgsMapLayerComboBox
+
 import numpy as np
 import libpysal
 from libpysal.weights import Queen, Rook
 from esda.moran import Moran_Local
+
 from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
 from GeoPublicHealth.src.core.tools import display_message_bar, tr
 from GeoPublicHealth.src.core.exceptions import (
-    GeoPublicHealthException, NoLayerProvidedException,
-    DifferentCrsException, FieldExistingException,
-    FieldException, NotANumberException
+    GeoPublicHealthException, NoLayerProvidedException, FieldExistingException, NotANumberException
 )
 from GeoPublicHealth.src.core.stats import Stats
 from GeoPublicHealth.src.utilities.resources import get_ui_class
@@ -96,94 +96,111 @@ class CommonAutocorrelationDialog(QDialog):
 
     def run_stats(self):
         try:
-            self.button_box_ok.setDisabled(True)
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            QApplication.processEvents()
-
+            self.prepare_run()
             self.admin_layer = self.cbx_aggregation_layer.currentLayer()
             input_name = self.admin_layer.name()
             field = self.cbx_indicator_field.currentField()
-
             self.layer = QgsProject.instance().mapLayersByName(input_name)[0]
             self.output_file_path = self.le_output_filepath.text()
-
-            if not self.admin_layer:
-                raise NoLayerProvidedException
-
+            self.check_layer_and_file_path()
             crs_admin_layer = self.admin_layer.crs()
-
-            if not self.output_file_path:
-                with NamedTemporaryFile(delete=False, suffix='-geopublichealth.shp') as temp_file:
-                    self.output_file_path = temp_file.name
-            else:
-                with open(self.output_file_path, 'w'):
-                    pass
-
             admin_layer_provider = self.layer.dataProvider()
             fields = admin_layer_provider.fields()
-
-            if admin_layer_provider.fields().indexFromName(self.name_field) != -1:
-                raise FieldExistingException(field=self.name_field)
-
-            fields.append(QgsField('LISA_P', QVariant.Double))
-            fields.append(QgsField('LISA_Z', QVariant.Double))
-            fields.append(QgsField('LISA_Q', QVariant.Int))
-            fields.append(QgsField('LISA_I', QVariant.Double))
-            fields.append(QgsField('LISA_C', QVariant.Double))
-
-            file_writer = QgsVectorFileWriter(
-                self.output_file_path,
-                'utf-8',
-                fields,
-                QgsWkbTypes.Polygon,
-                self.admin_layer.crs(),
-                'ESRI Shapefile')
-
-            if self.cbx_contiguity.currentIndex() == 0:  # queen
-                w = Queen.from_shapefile(self.admin_layer.source())
-            else:  # 1 for rook
-                w = Rook.from_shapefile(self.admin_layer.source())
-
-            f = libpysal.io.open(self.admin_layer.source().replace('.shp', '.dbf'))
-            y = np.array(f.by_col[str(field)])
-            lm = Moran_Local(y, w, transformation="r", permutations=999)
-
+            self.check_existing_field(fields)
+            self.append_new_fields(fields)
+            file_writer = self.prepare_file_writer(fields, crs_admin_layer)
+            w = self.get_weights()
+            y = self.get_indicator_values(field)
+            lm = self.calculate_moran_local(y, w)
             sig_q = lm.q * (lm.p_sim <= 0.05)
-            outFeat = QgsFeature()
-
-            for i, feature in enumerate(self.admin_layer.getFeatures()):
-                attributes = feature.attributes()
-                attributes.append(float(lm.p_sim[i]))
-                attributes.append(float(lm.z_sim[i]))
-                attributes.append(int(lm.q[i]))
-                attributes.append(float(lm.Is[i]))
-                attributes.append(int(sig_q[i]))
-
-                new_feature = QgsFeature()
-                new_geom = QgsGeometry(feature.geometry())
-                new_feature.setAttributes(attributes)
-                new_feature.setGeometry(new_geom)
-                file_writer.addFeature(new_feature)
-
+            self.create_output_features(file_writer, lm, sig_q)
             del file_writer
-
-            self.output_layer = QgsVectorLayer(
-                self.output_file_path,
-                f"LISA Moran's I - {field}",
-                'ogr')
+            self.output_layer = self.create_output_layer(field)
             QgsProject.instance().addMapLayer(self.output_layer)
-
             self.add_symbology()
-
             self.signalStatus.emit(3, tr('Successful process'))
-
         except GeoPublicHealthException as e:
             display_message_bar(msg=e.msg, level=e.level, duration=e.duration)
-
         finally:
-            self.button_box_ok.setDisabled(False)
-            QApplication.restoreOverrideCursor()
-            QApplication.processEvents()
+            self.end_run()
+
+    def prepare_run(self):
+        self.button_box_ok.setDisabled(True)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.processEvents()
+
+    def end_run(self):
+        self.button_box_ok.setDisabled(False)
+        QApplication.restoreOverrideCursor()
+        QApplication.processEvents()
+
+    def check_layer_and_file_path(self):
+        if not self.admin_layer:
+            raise NoLayerProvidedException
+
+        if not self.output_file_path:
+            with NamedTemporaryFile(delete=False, suffix='-geopublichealth.shp') as temp_file:
+                self.output_file_path = temp_file.name
+        else:
+            with open(self.output_file_path, 'w'):
+                pass
+
+    def check_existing_field(self, fields):
+        if fields.indexFromName(self.name_field) != -1:
+            raise FieldExistingException(field=self.name_field)
+
+    def append_new_fields(self, fields):
+        fields.append(QgsField('LISA_P', QVariant.Double))
+        fields.append(QgsField('LISA_Z', QVariant.Double))
+        fields.append(QgsField('LISA_Q', QVariant.Int))
+        fields.append(QgsField('LISA_I', QVariant.Double))
+        fields.append(QgsField('LISA_C', QVariant.Double))
+
+    def prepare_file_writer(self, fields, crs_admin_layer):
+        return QgsVectorFileWriter(
+            self.output_file_path,
+            'utf-8',
+            fields,
+            QgsWkbTypes.Polygon,
+            crs_admin_layer,
+            'ESRI Shapefile')
+
+    def get_weights(self):
+        if self.cbx_contiguity.currentIndex() == 0:  # queen
+            w = Queen.from_shapefile(self.admin_layer.source())
+        else:  # 1 for rook
+            w = Rook.from_shapefile(self.admin_layer.source())
+        return w
+
+    def get_indicator_values(self, field):
+        f = libpysal.io.open(self.admin_layer.source().replace('.shp', '.dbf'))
+        y = np.array(f.by_col[str(field)])
+        return y
+
+    def calculate_moran_local(self, y, w):
+        return Moran_Local(y, w, transformation="r", permutations=999)
+
+    def create_output_features(self, file_writer, lm, sig_q):
+        for i, feature in enumerate(self.admin_layer.getFeatures()):
+            attributes = feature.attributes()
+            attributes.append(float(lm.p_sim[i]))
+            attributes.append(float(lm.z_sim[i]))
+            attributes.append(int(lm.q[i]))
+            attributes.append(float(lm.Is[i]))
+            attributes.append(int(sig_q[i]))
+
+            new_feature = QgsFeature()
+            new_geom = QgsGeometry(feature.geometry())
+            new_feature.setAttributes(attributes)
+            new_feature.setGeometry(new_geom)
+            file_writer.addFeature(new_feature)
+
+    def create_output_layer(self, field):
+        output_layer = QgsVectorLayer(
+            self.output_file_path,
+            "LISA Moran's I - " + field,
+            'ogr')
+        return output_layer
 
     def add_symbology(self):
         categories = []
@@ -193,12 +210,12 @@ class CommonAutocorrelationDialog(QDialog):
             category = QgsRendererCategory(lisaCategory, sym, label)
             categories.append(category)
 
-        self.newlayer = QgsVectorLayer(
+        new_layer = QgsVectorLayer(
             self.output_layer.source(),
-            f"{self.output_layer.name()} significance test",
+            self.output_layer.name() + " significance test",
             self.output_layer.providerType())
         self.output_layer.setOpacity(0.4)
-        QgsProject.instance().addMapLayer(self.newlayer)
+        QgsProject.instance().addMapLayer(new_layer)
 
         renderer = QgsCategorizedSymbolRenderer(
             'LISA_Q',
@@ -211,15 +228,15 @@ class CommonAutocorrelationDialog(QDialog):
         color_ramp = QgsGradientColorRamp(QColor(0, 0, 0), QColor(255, 0, 0))
 
         renderer = QgsGraduatedSymbolRenderer.createRenderer(
-            self.newlayer,
+            new_layer,
             'LISA_C',
             4,
             QgsGraduatedSymbolRenderer.Jenks,
             symbol,
             color_ramp)
 
-        self.newlayer.setRenderer(renderer)
-        self.newlayer.setOpacity(0.4)
+        new_layer.setRenderer(renderer)
+        new_layer.setOpacity(0.4)
 
 class AutocorrelationDialog(CommonAutocorrelationDialog, FORM_CLASS):
     def __init__(self, parent=None):
@@ -232,4 +249,3 @@ class AutocorrelationDialog(CommonAutocorrelationDialog, FORM_CLASS):
 
     def run_stats(self):
         CommonAutocorrelationDialog.run_stats(self)
-
