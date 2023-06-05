@@ -25,6 +25,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import os.path
 from tempfile import NamedTemporaryFile
 from qgis.PyQt.QtWidgets import (
     QDialog, QDialogButtonBox, QApplication, QFileDialog
@@ -90,6 +91,7 @@ class CommonAutocorrelationDialog(QDialog):
         }
 
     def open_file_browser(self):
+        """Method to open file browser and get output file path."""
         output_file, __ = QFileDialog.getSaveFileName(
             self.parent, tr('Save shapefile'), filter='SHP (*.shp)')
         self.le_output_filepath.setText(output_file)
@@ -142,8 +144,12 @@ class CommonAutocorrelationDialog(QDialog):
             with NamedTemporaryFile(delete=False, suffix='-geopublichealth.shp') as temp_file:
                 self.output_file_path = temp_file.name
         else:
-            with open(self.output_file_path, 'w'):
-                pass
+         if os.path.exists(self.output_file_path):
+            base, extension = os.path.splitext(self.output_file_path)
+            counter = 1
+            while os.path.exists(self.output_file_path):
+                self.output_file_path = f"{base}_{counter}{extension}"
+                counter += 1
 
     def check_existing_field(self, fields):
         if fields.indexFromName(self.name_field) != -1:
