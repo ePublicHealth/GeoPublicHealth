@@ -89,18 +89,23 @@ class CommonCompositeIndexDialog(QDialog):
 
     def setup_ui(self):
         """
-        Set up the UI for the dialog
+        Set up the UI for the dialog.
         """
-        # Connect signals to slots
-        self.button_browse.clicked.connect(self.open_file_browser)
-        self.command_link_button.clicked.connect(self.add_indicator)
-        self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(self.run_stats)
-        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(self.close_window)
+        try:
+            # Connect signals to slots
+            self.button_browse.clicked.connect(self.open_file_browser)
+            self.command_link_button.clicked.connect(self.add_indicator)
+            self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(self.run_stats)
+            self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(self.close_window)
 
-        # Set initial state
-        self.setup_indicator_list()
-        self.setup_aggregation_layer()
-        self.setup_indicator_field()
+            # Set initial state
+            self.setup_indicator_list()
+            self.setup_aggregation_layer()
+            self.setup_indicator_field()
+        except Exception as e:
+            print(f"Error during setup_ui: {e}")
+
+
 
     def close_window(self):
         """
@@ -282,20 +287,33 @@ class CommonCompositeIndexDialog(QDialog):
         return values
 
     def calculate_attributes_and_composite_index(self, feature, stats):
+        """
+        Calculates the attributes and composite index value for a given feature using selected indicators and their stats.
+
+        :param feature: A QgsFeature object representing the feature to calculate attributes and composite index value for.
+        :type feature: QgsFeature
+
+        :param stats: A dictionary containing the stats for each selected indicator.
+        :type stats: dict
+
+        :return: A tuple containing the attributes as a list of floats and the composite index value as a float.
+        :rtype: tuple
+        """
         attributes = feature.attributes()
         composite_index_value = 0.0
-        for indicator_selected in self.selected_indicators:
-            indicator_selected_name = str(indicator_selected[0])
-            index = self.admin_layer.fields().indexFromName(indicator_selected_name)
+
+        for indicator in self.selected_indicators:
+            name = str(indicator[0])
+            index = self.admin_layer.fields().indexFromName(name)
             value = float(feature[index]) if feature[index] else 0.0
+            zscore = (value - stats[name].average()) / stats[name].standard_deviation()
 
-            zscore = (value - stats[indicator_selected_name].average()) / stats[indicator_selected_name].standard_deviation()
             attributes.append(float(zscore))
-
-            composite_index_value += self.calculate_composite_index_value(indicator_selected, zscore)
+            composite_index_value += self.calculate_composite_index_value(indicator, zscore)
 
         attributes.append(float(composite_index_value))
         return attributes, composite_index_value
+
 
     def calculate_composite_index_value(self, indicator_selected, zscore):
         return -zscore if indicator_selected[1] == '+' else zscore
