@@ -96,9 +96,9 @@ class IncidenceDensityDialog(QDialog):
 
         # Add items in symbology
         self.cbx_mode.addItem(
-            'Equal interval', QgsGraduatedSymbolRenderer.EqualInterval)
-        self.cbx_mode.addItem(
             'Quantile (equal count)', QgsGraduatedSymbolRenderer.Quantile)
+        self.cbx_mode.addItem(
+            'Equal interval', QgsGraduatedSymbolRenderer.EqualInterval)
         self.cbx_mode.addItem(
             'Natural breaks', QgsGraduatedSymbolRenderer.Jenks)
         self.cbx_mode.addItem(
