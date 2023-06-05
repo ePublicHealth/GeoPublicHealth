@@ -33,10 +33,8 @@ from qgis.utils import Qgis
 from qgis.core import (
     QgsField, QgsGradientColorRamp, QgsGraduatedSymbolRenderer,
     QgsSymbol, QgsVectorFileWriter, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes
-)
-from qgis.core import (
-    QgsClassificationMethod, QgsClassificationEqualInterval, QgsRendererRange, QgsGraduatedSymbolRenderer
+    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes,
+    QgsRendererCategory, QgsCategorizedSymbolRenderer
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -58,13 +56,23 @@ class CommonCompositeIndexDialog(QDialog):
     signalStatus = pyqtSignal(int, str, name='signalStatus')
 
     def __init__(self, parent=None):
-        """Constructor.
+        """
+        Constructor for base class of Incidence and Density dialogs.
 
-        Base class for Incidence and Density dialogs.
+        Parameters:
+        - parent: Parent widget for the dialog.
 
-        use_area : If you use the area of the polygon or the population field.
-        use_point_layer : If you a point a layer, or a field in the polygon
-         layer.
+        Attributes:
+        - parent: Parent widget for the dialog.
+        - name_field: Name field of the layer.
+        - admin_layer: Administrative layer.
+        - figure: The figure object for the dialog.
+        - canvas: The canvas object for the dialog.
+        - toolbar: The toolbar object for the dialog.
+        - output_file_path: The output file path for the dialog.
+        - output_layer: The output layer for the dialog.
+        - use_area: Boolean for whether to use the area of the polygon or the population field.
+        - use_point_layer: Boolean for whether to use a point layer or a field in the polygon layer.
         """
         super().__init__(parent)
         self.parent = parent
@@ -75,17 +83,15 @@ class CommonCompositeIndexDialog(QDialog):
         self.toolbar = None
         self.output_file_path = None
         self.output_layer = None
-
-        # Settings
         self.use_area = None
         self.use_point_layer = None
+
 
     def setup_ui(self):
         """
         Set up the UI for the dialog
         """
-
-        # connect signals to slots
+        # Connect signals to slots
         self.button_browse.clicked.connect(self.open_file_browser)
         self.command_link_button.clicked.connect(self.add_indicator)
         self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(self.run_stats)
