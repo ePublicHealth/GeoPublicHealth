@@ -33,8 +33,7 @@ from qgis.utils import Qgis
 from qgis.core import (
     QgsField, QgsGradientColorRamp, QgsGraduatedSymbolRenderer,
     QgsSymbol, QgsVectorFileWriter, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes,
-    QgsRendererCategory, QgsCategorizedSymbolRenderer
+    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -42,8 +41,8 @@ from matplotlib.figure import Figure
 from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
 from GeoPublicHealth.src.core.tools import display_message_bar, tr
 from GeoPublicHealth.src.core.exceptions import (
-    GeoPublicHealthException, NoLayerProvidedException, DifferentCrsException,
-    FieldExistingException, FieldException, NotANumberException
+    GeoPublicHealthException, NoLayerProvidedException,
+    FieldExistingException, FieldException
 )
 from GeoPublicHealth.src.core.stats import Stats
 from GeoPublicHealth.src.utilities.resources import get_ui_class
@@ -327,11 +326,25 @@ class CommonCompositeIndexDialog(QDialog):
         return new_feature
 
     def add_output_layer_to_project(self):
-        self.output_layer = QgsVectorLayer(
-            self.output_file_path,
-            self.name_field,
-            'ogr')
+        self.output_layer = QgsVectorLayer(self.output_file_path, self.name_field, 'ogr')
+        unique_layer_name = self.get_unique_layer_name(self.name_field)
+        self.output_layer.setName(unique_layer_name)
+
+        # Check if a layer with the same name already exists
+        existing_layers = QgsProject.instance().mapLayersByName(unique_layer_name)
+        if existing_layers:
+            unique_layer_name = self.get_unique_layer_name(unique_layer_name)
+            self.output_layer.setName(unique_layer_name)
+
         QgsProject.instance().addMapLayer(self.output_layer)
+
+    def get_unique_layer_name(self, base_name):
+        layer_name = base_name
+        suffix = 1
+        while QgsProject.instance().mapLayersByName(layer_name):
+            layer_name = f"{base_name}_{suffix}"
+            suffix += 1
+        return layer_name
 
     def draw_plot(self, data):
         """Function to draw the plot and display it in the canvas.
