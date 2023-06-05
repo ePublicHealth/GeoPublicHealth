@@ -25,57 +25,33 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import print_function
-
-from builtins import str
 from tempfile import NamedTemporaryFile
-from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem, QMessageBox, QApplication
-from qgis.PyQt.QtCore import QSize, QVariant, Qt, pyqtSignal
-from qgis.PyQt.QtWidgets import QFileDialog
+from qgis.PyQt.QtWidgets import (
+    QDialog, QDialogButtonBox, QTableWidgetItem,
+    QMessageBox, QApplication, QFileDialog
+)
+from qgis.PyQt.QtCore import Qt, pyqtSignal, QVariant
 from qgis.PyQt.QtGui import QColor
-
 from qgis.utils import Qgis
-
-from qgis.core import (\
-    QgsField,\
-    QgsRendererCategory,\
-    QgsCategorizedSymbolRenderer,\
-    QgsGradientColorRamp,\
-    QgsGraduatedSymbolRenderer,\
-    QgsSymbol,\
-    QgsVectorFileWriter,\
-    QgsFeature,\
-    QgsVectorLayer,\
-    QgsProject,\
-    QgsGeometry,\
-    QgsMapLayerProxyModel,\
-    QgsFieldProxyModel,QgsWkbTypes,QgsProcessingUtils,QgsProcessingContext,QgsCoordinateTransformContext)
-
-
-from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-
+from qgis.core import (
+    QgsField, QgsRendererCategory, QgsCategorizedSymbolRenderer,
+    QgsGradientColorRamp, QgsGraduatedSymbolRenderer, QgsSymbol,
+    QgsVectorFileWriter, QgsFeature, QgsVectorLayer, QgsProject,
+    QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes,
+)
+from qgis.gui import QgsFieldComboBox, QgsMapLayerComboBox
+import numpy as np
+import libpysal
+from libpysal.weights import Queen, Rook
+from esda.moran import Moran_Local
 from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
 from GeoPublicHealth.src.core.tools import display_message_bar, tr
-from GeoPublicHealth.src.core.exceptions import \
-    GeoPublicHealthException,\
-    NoLayerProvidedException,\
-    DifferentCrsException,\
-    FieldExistingException,\
-    FieldException,\
-    NotANumberException
-import pysal
-import libpysal
-from esda.moran import Moran_Local
-from libpysal.weights import Queen, Rook
+from GeoPublicHealth.src.core.exceptions import (
+    GeoPublicHealthException, NoLayerProvidedException,
+    DifferentCrsException, FieldExistingException,
+    FieldException, NotANumberException
+)
 from GeoPublicHealth.src.core.stats import Stats
-import processing
-import numpy as np
-
-from qgis.gui import QgsFieldComboBox
-from qgis.gui import QgsMapLayerComboBox
-
 from GeoPublicHealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('analysis', 'autocorrelation.ui')
@@ -86,24 +62,6 @@ class CommonAutocorrelationDialog(QDialog):
     signalStatus = pyqtSignal(int, str, name='signalStatus')
 
     def __init__(self, parent=None):
-        """
-        Constructor for base class of Incidence and Density dialogs.
-
-        Parameters:
-        - parent: Parent widget for the dialog.
-
-        Attributes:
-        - parent: Parent widget for the dialog.
-        - name_field: Name field of the layer.
-        - admin_layer: Administrative layer.
-        - figure: The figure object for the dialog.
-        - canvas: The canvas object for the dialog.
-        - toolbar: The toolbar object for the dialog.
-        - output_file_path: The output file path for the dialog.
-        - output_layer: The output layer for the dialog.
-        - use_area: Boolean for whether to use the area of the polygon or the population field.
-        - use_point_layer: Boolean for whether to use a point layer or a field in the polygon layer.
-        """
         super().__init__(parent)
         self.parent = parent
         self.name_field = None
@@ -115,77 +73,51 @@ class CommonAutocorrelationDialog(QDialog):
         self.output_layer = None
         self.use_area = None
 
-
     def setup_ui(self):
-        # Connect slot.
-        # noinspection PyUnresolvedReferences
         self.button_browse.clicked.connect(self.open_file_browser)
-
-        self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(
-            self.run_stats)
-        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.hide)
-        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
-
+        self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(self.run_stats)
+        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(self.hide)
+        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(self.signalAskCloseWindow.emit)
         self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
-
-
         self.cbx_indicator_field.setFilters(QgsFieldProxyModel.Numeric)
         self.cbx_indicator_field.setLayer(self.cbx_aggregation_layer.currentLayer())
         self.cbx_aggregation_layer.layerChanged.connect(self.cbx_indicator_field.setLayer)
-
         self.lisa = {
-            1 : ("#b92815", "High - High"),
-            2 : ("#3f70df", "Low - High"),
-            3 : ("#aecbdd", "Low - Low"),
-            4 : ("#e79e2c", "High - Low")
+            1: ("#b92815", "High - High"),
+            2: ("#3f70df", "Low - High"),
+            3: ("#aecbdd", "Low - Low"),
+            4: ("#e79e2c", "High - Low")
         }
 
     def open_file_browser(self):
         output_file, __ = QFileDialog.getSaveFileName(
             self.parent, tr('Save shapefile'), filter='SHP (*.shp)')
-            #Fix the filename bug
         self.le_output_filepath.setText(output_file)
 
     def run_stats(self):
-        """Main function which do the process."""
-
-        # Get the common fields..currentField()
-        self.admin_layer = self.cbx_aggregation_layer.currentLayer()
-        input_name =  self.admin_layer.name()
-        field = self.cbx_indicator_field.currentField()
-
-        self.layer=QgsProject.instance().mapLayersByName(input_name)[0]
-        # Output.
-        self.output_file_path = self.le_output_filepath.text()
-
         try:
             self.button_box_ok.setDisabled(True)
-            # noinspection PyArgumentList
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            # noinspection PyArgumentList
             QApplication.processEvents()
+
+            self.admin_layer = self.cbx_aggregation_layer.currentLayer()
+            input_name = self.admin_layer.name()
+            field = self.cbx_indicator_field.currentField()
+
+            self.layer = QgsProject.instance().mapLayersByName(input_name)[0]
+            self.output_file_path = self.le_output_filepath.text()
 
             if not self.admin_layer:
                 raise NoLayerProvidedException
 
-            if not self.admin_layer and self.use_point_layer:
-                raise NoLayerProvidedException
-
             crs_admin_layer = self.admin_layer.crs()
 
-            # Output
             if not self.output_file_path:
-                temp_file = NamedTemporaryFile(
-                    delete=False,
-                    suffix='-geopublichealth.shp')
-                self.output_file_path = temp_file.name
-                temp_file.flush()
-                temp_file.close()
+                with NamedTemporaryFile(delete=False, suffix='-geopublichealth.shp') as temp_file:
+                    self.output_file_path = temp_file.name
             else:
-                with open(self.output_file_path, 'w') as document: pass
-
+                with open(self.output_file_path, 'w'):
+                    pass
 
             admin_layer_provider = self.layer.dataProvider()
             fields = admin_layer_provider.fields()
@@ -199,17 +131,6 @@ class CommonAutocorrelationDialog(QDialog):
             fields.append(QgsField('LISA_I', QVariant.Double))
             fields.append(QgsField('LISA_C', QVariant.Double))
 
-
-
-            # The QgsVectorFileWriter was Deprecated since 3.10 However,.......
-            #The create() function DOEST NOT Flush the feature unless QGIS close.
-            #options = QgsVectorFileWriter.SaveVectorOptions()
-            #options.driverName = "ESRI Shapefile"
-            #file_writer=QgsVectorFileWriter.create(self.output_file_path,fields,QgsWkbTypes.Polygon,self.admin_layer.crs(),QgsCoordinateTransformContext(),options)
-
-            #It's currently a bug https://github.com/qgis/QGIS/issues/35021
-            # So I will keep it for now
-
             file_writer = QgsVectorFileWriter(
                 self.output_file_path,
                 'utf-8',
@@ -218,30 +139,17 @@ class CommonAutocorrelationDialog(QDialog):
                 self.admin_layer.crs(),
                 'ESRI Shapefile')
 
-            if self.cbx_contiguity.currentIndex()  == 0: # queen
-                # fix_print_with_import
+            if self.cbx_contiguity.currentIndex() == 0:  # queen
+                w = Queen.from_shapefile(self.admin_layer.source())
+            else:  # 1 for rook
+                w = Rook.from_shapefile(self.admin_layer.source())
 
-                print('Info: Local Moran\'s using queen contiguity')
-                #Pysal 2.0 change
-                #https://github.com/pysal/pysal/blob/master/MIGRATING.md
-
-
-                w=Queen.from_shapefile(self.admin_layer.source())
-            else: # 1 for rook
-                # fix_print_with_import
-                print('Info: Local Moran\'s using rook contiguity')
-                w=Rook.from_shapefile(self.admin_layer.source())
-
-
-            f = libpysal.io.open(self.admin_layer.source().replace('.shp','.dbf'))
+            f = libpysal.io.open(self.admin_layer.source().replace('.shp', '.dbf'))
             y = np.array(f.by_col[str(field)])
-            lm = Moran_Local(y, w, transformation = "r", permutations = 999)
+            lm = Moran_Local(y, w, transformation="r", permutations=999)
 
-            sig_q = lm.q * (lm.p_sim <= 0.05) # could make significance level an option
+            sig_q = lm.q * (lm.p_sim <= 0.05)
             outFeat = QgsFeature()
-            i = 0
-
-            count = self.admin_layer.featureCount()
 
             for i, feature in enumerate(self.admin_layer.getFeatures()):
                 attributes = feature.attributes()
@@ -261,10 +169,9 @@ class CommonAutocorrelationDialog(QDialog):
 
             self.output_layer = QgsVectorLayer(
                 self.output_file_path,
-                "LISA Moran's I - " + field,
+                f"LISA Moran's I - {field}",
                 'ogr')
             QgsProject.instance().addMapLayer(self.output_layer)
-
 
             self.add_symbology()
 
@@ -275,9 +182,7 @@ class CommonAutocorrelationDialog(QDialog):
 
         finally:
             self.button_box_ok.setDisabled(False)
-            # noinspection PyArgumentList
             QApplication.restoreOverrideCursor()
-            # noinspection PyArgumentList
             QApplication.processEvents()
 
     def add_symbology(self):
@@ -290,12 +195,11 @@ class CommonAutocorrelationDialog(QDialog):
 
         self.newlayer = QgsVectorLayer(
             self.output_layer.source(),
-            self.output_layer.name() + " significance test",
+            f"{self.output_layer.name()} significance test",
             self.output_layer.providerType())
         self.output_layer.setOpacity(0.4)
         QgsProject.instance().addMapLayer(self.newlayer)
 
-        # noinspection PyArgumentList
         renderer = QgsCategorizedSymbolRenderer(
             'LISA_Q',
             categories)
@@ -304,8 +208,7 @@ class CommonAutocorrelationDialog(QDialog):
 
         symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Polygon))
 
-        color_ramp = QgsGradientColorRamp(QColor(0,0,0), QColor(255,0,0))
-        # noinspection PyArgumentList
+        color_ramp = QgsGradientColorRamp(QColor(0, 0, 0), QColor(255, 0, 0))
 
         renderer = QgsGraduatedSymbolRenderer.createRenderer(
             self.newlayer,
@@ -316,16 +219,11 @@ class CommonAutocorrelationDialog(QDialog):
             color_ramp)
 
         self.newlayer.setRenderer(renderer)
-        #The input val of seOPacity is 0-1 not 0-100 as setLyerTransvarency
-        #https://gis.stackexchange.com/questions/150858/setting-transparency-of-layer-group-with-python-in-qgis
         self.newlayer.setOpacity(0.4)
-
 
 class AutocorrelationDialog(CommonAutocorrelationDialog, FORM_CLASS):
     def __init__(self, parent=None):
-        """Constructor."""
-        CommonAutocorrelationDialog.__init__(self, parent)
-        # noinspection PyArgumentList
+        super().__init__(parent)
         FORM_CLASS.setupUi(self, self)
 
         self.use_area = False
@@ -333,5 +231,5 @@ class AutocorrelationDialog(CommonAutocorrelationDialog, FORM_CLASS):
         self.setup_ui()
 
     def run_stats(self):
-        """Main function which do the process."""
         CommonAutocorrelationDialog.run_stats(self)
+
