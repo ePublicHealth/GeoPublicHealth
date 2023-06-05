@@ -119,7 +119,7 @@ Include details about your configuration and environment:
   * Pai (Supharerk Thawillarp) -- QGIS2to3 Migration work
 =======
 
-# GeoPublicHealth 0.98
+# GeoPublicHealth 0.101
 
 ## History
 Dr. Carlos Castillo-Salgado has taught in The Bloomberg School of Public Health of Johns Hopkins University the 340.701.11 Epidemiologic Applications of GIS the last 15 years and also in his work as Chief of the Special Program for Health Analysis for the Panamerican Health Organization, Regional Office of the World Health Organization for the Regional Office of the Americas. In this capacity, he led the development of [SIGEpi](http://ais.paho.org/sigepi/index.asp?xml=sigepi/index.htm&lang=en) as a pioneer GIS for Epidemiology and Public Health. Using the QGIS, the GeoPublicHealth will integrate several of the methods and techniques used in SIGEpi but enhance those with the capacities of QGIS. In February 2020, [Pai (Supharerk Thawillarp)](https://github.com/raynus) did the migration work for the plugin from QGIS 2 systems to QGIS 3.
