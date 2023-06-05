@@ -347,27 +347,28 @@ class CommonCompositeIndexDialog(QDialog):
         ax.grid()
         self.canvas.draw()
 
-    def add_symbology(self):
+    def add_symbology(self) -> None:
         """
-        Function to add symbology to the output layer
+        Adds symbology to the output layer
         """
 
+        # Get low and high colors, mode, and number of classes
         low_color = self.color_low_value.color()
         high_color = self.color_high_value.color()
         mode = self.cbx_mode.itemData(self.cbx_mode.currentIndex())
-        classes = self.spinBox_classes.value()
+        num_classes = self.spinBox_classes.value()
 
         # Construct default symbol and color ramp
-        symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Polygon))
+        default_symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Polygon))
         color_ramp = QgsGradientColorRamp(low_color, high_color)
 
         # Create renderer and assign to output layer
         renderer = QgsGraduatedSymbolRenderer.createRenderer(
             self.output_layer,
             self.name_field,
-            classes,
+            num_classes,
             mode,
-            symbol,
+            default_symbol,
             color_ramp)
 
         self.output_layer.setRenderer(renderer)
