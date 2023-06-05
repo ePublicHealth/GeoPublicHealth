@@ -1,12 +1,12 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="" ?>
     <plugins>
-        <pyqgis_plugin name="GeoPublicHealth" version="0.100.1" plugin_id="1970">
+        <pyqgis_plugin name="GeoPublicHealth" version="0.101" plugin_id="1970">
             <description>
                 <![CDATA[GeoPublicHealth offers a simplified interface for users in public health and epidemiology]]>
             </description>
             <about></about>
-            <version>0.100.1</version>
+            <version>0.101</version>
             <qgis_minimum_version>3.12.0</qgis_minimum_version>
             <qgis_maximum_version>3.32.0</qgis_maximum_version>
             <homepage>

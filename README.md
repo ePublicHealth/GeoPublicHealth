@@ -1,4 +1,4 @@
-# GeoPublicHealth 0.100.1
+# GeoPublicHealth 0.101
 
 GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology. To use the plugin, you MUST to install first QGIS.
 
