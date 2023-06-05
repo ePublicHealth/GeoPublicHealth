@@ -124,26 +124,26 @@ class MainDialog(QDialog, FORM_CLASS):
                     }
                 ]
             }, {
-                'label': 'Analyse',
+                'label': 'Analyze',
                 'icon': resource('gears.png'),
                 'content': [
-                    {
-                        'label': 'Blur',
-                        'icon': resource('blur.png'),
+                     {
+                        'label': 'Incidence',
+                        'icon': resource('incidence.png'),
                         'content': [
                             {
-                                'label': 'Blur',
-                                'icon': resource('blur.png'),
+                                'label': 'Polygon layer only',
+                                'icon': resource('incidence.png'),
                                 'content': {
-                                    'widget': BlurWidget(),
-                                    'help': help_blur()
+                                    'widget': IncidenceDialog(),
+                                    'help': help_incidence()
                                 }
                             }, {
-                                'label': 'Stats',
-                                'icon': resource('sigma.png'),
+                                'label': 'Case and aggregation layers',
+                                'icon': resource('incidence.png'),
                                 'content': {
-                                    'widget': StatsWidget(),
-                                    'help': help_stats_blurring()
+                                    'widget': IncidencePointDialog(),
+                                    'help': help_incidence_point()
                                 }
                             }
                         ]
@@ -174,22 +174,22 @@ class MainDialog(QDialog, FORM_CLASS):
                             }
                         ]
                     }, {
-                        'label': 'Incidence',
-                        'icon': resource('incidence.png'),
+                        'label': 'Blur',
+                        'icon': resource('blur.png'),
                         'content': [
                             {
-                                'label': 'Polygon layer only',
-                                'icon': resource('incidence.png'),
+                                'label': 'Blur',
+                                'icon': resource('blur.png'),
                                 'content': {
-                                    'widget': IncidenceDialog(),
-                                    'help': help_incidence()
+                                    'widget': BlurWidget(),
+                                    'help': help_blur()
                                 }
                             }, {
-                                'label': 'Case and aggregation layers',
-                                'icon': resource('incidence.png'),
+                                'label': 'Stats',
+                                'icon': resource('sigma.png'),
                                 'content': {
-                                    'widget': IncidencePointDialog(),
-                                    'help': help_incidence_point()
+                                    'widget': StatsWidget(),
+                                    'help': help_stats_blurring()
                                 }
                             }
                         ]
