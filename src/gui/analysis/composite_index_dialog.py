@@ -26,17 +26,18 @@
  ***************************************************************************/
 """
 
-from builtins import str, range
 from tempfile import NamedTemporaryFile
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem, QMessageBox, QApplication, QFileDialog
-from PyQt5.QtCore import QSize, QVariant, Qt, pyqtSignal
-
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QMessageBox, QApplication, QFileDialog
+from PyQt5.QtCore import Qt, pyqtSignal, QVariant
 from qgis.utils import Qgis
-
-from qgis.core import (QgsField, QgsGradientColorRamp, QgsGraduatedSymbolRenderer,
+from qgis.core import (
+    QgsField, QgsGradientColorRamp, QgsGraduatedSymbolRenderer,
     QgsSymbol, QgsVectorFileWriter, QgsFeature, QgsVectorLayer,
-    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes)
-
+    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes
+)
+from qgis.core import (
+    QgsClassificationMethod, QgsClassificationEqualInterval, QgsRendererRange, QgsGraduatedSymbolRenderer
+)
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
@@ -44,7 +45,8 @@ from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
 from GeoPublicHealth.src.core.tools import display_message_bar, tr
 from GeoPublicHealth.src.core.exceptions import (
     GeoPublicHealthException, NoLayerProvidedException, DifferentCrsException,
-    FieldExistingException, FieldException, NotANumberException)
+    FieldExistingException, FieldException, NotANumberException
+)
 from GeoPublicHealth.src.core.stats import Stats
 from GeoPublicHealth.src.utilities.resources import get_ui_class
 
@@ -64,8 +66,8 @@ class CommonCompositeIndexDialog(QDialog):
         use_point_layer : If you a point a layer, or a field in the polygon
          layer.
         """
+        super().__init__(parent)
         self.parent = parent
-        QDialog.__init__(self, parent)
         self.name_field = None
         self.admin_layer = None
         self.figure = None
@@ -171,12 +173,8 @@ class CommonCompositeIndexDialog(QDialog):
         try:
             self.set_application_state(is_busy=True)
 
-            if not self.admin_layer:
-                raise NoLayerProvidedException
-
-            if not self.use_point_layer and not self.use_area:
-                if not self.cbx_list_indicators:
-                    raise FieldException(field_1='List Indicators should not be empty')
+            self.check_admin_layer()
+            self.check_indicators()
 
             fields = self.admin_layer.fields()
 
@@ -196,6 +194,23 @@ class CommonCompositeIndexDialog(QDialog):
         finally:
             self.set_application_state(is_busy=False)
 
+    def check_admin_layer(self):
+        """
+        Check if the admin layer is provided.
+        Raises NoLayerProvidedException if not provided.
+        """
+        if not self.admin_layer:
+            raise NoLayerProvidedException
+
+    def check_indicators(self):
+        """
+        Check the validity of the indicators.
+        Raises FieldException if the list of indicators is empty.
+        """
+        if not self.use_point_layer and not self.use_area:
+            if not self.cbx_list_indicators.count():
+                raise FieldException(field_1='List Indicators should not be empty')
+            
     def setup_fields_and_output(self):
         self.admin_layer = self.cbx_aggregation_layer.currentLayer()
         self.selected_indicators = self.indicators_list()
@@ -309,18 +324,20 @@ class CommonCompositeIndexDialog(QDialog):
         self.canvas.draw()
 
     def add_symbology(self):
+        """
+        Function to add symbology to the output layer
+        """
+
         low_color = self.color_low_value.color()
         high_color = self.color_high_value.color()
-        index = self.cbx_mode.currentIndex()
-        mode = self.cbx_mode.itemData(index)
+        mode = self.cbx_mode.itemData(self.cbx_mode.currentIndex())
         classes = self.spinBox_classes.value()
 
-        # Compute renderer
-        # noinspection PyArgumentList
+        # Construct default symbol and color ramp
         symbol = QgsSymbol.defaultSymbol(QgsWkbTypes.geometryType(QgsWkbTypes.Polygon))
-
         color_ramp = QgsGradientColorRamp(low_color, high_color)
-        # noinspection PyArgumentList
+
+        # Create renderer and assign to output layer
         renderer = QgsGraduatedSymbolRenderer.createRenderer(
             self.output_layer,
             self.name_field,
@@ -328,6 +345,7 @@ class CommonCompositeIndexDialog(QDialog):
             mode,
             symbol,
             color_ramp)
+
         self.output_layer.setRenderer(renderer)
 
 class CompositeIndexDialog(CommonCompositeIndexDialog, FORM_CLASS):
