@@ -26,42 +26,26 @@
  ***************************************************************************/
 """
 
-from builtins import str
-from builtins import range
+from builtins import str, range
 from tempfile import NamedTemporaryFile
-from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem, QMessageBox, QApplication
-from qgis.PyQt.QtCore import QSize, QVariant, Qt, pyqtSignal
-from qgis.PyQt.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QTableWidgetItem, QMessageBox, QApplication, QFileDialog
+from PyQt5.QtCore import QSize, QVariant, Qt, pyqtSignal
 
 from qgis.utils import Qgis
 
-from qgis.core import (\
-    QgsField,\
-    QgsGradientColorRamp,\
-    QgsGraduatedSymbolRenderer,\
-    QgsSymbol,\
-    QgsVectorFileWriter,\
-    QgsFeature,\
-    QgsVectorLayer,\
-    QgsProject,\
-    QgsGeometry,\
-    QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes)
+from qgis.core import (QgsField, QgsGradientColorRamp, QgsGraduatedSymbolRenderer,
+    QgsSymbol, QgsVectorFileWriter, QgsFeature, QgsVectorLayer,
+    QgsProject, QgsGeometry, QgsMapLayerProxyModel, QgsFieldProxyModel, QgsWkbTypes)
 
-from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
 from GeoPublicHealth.src.core.tools import display_message_bar, tr
-from GeoPublicHealth.src.core.exceptions import \
-    GeoPublicHealthException,\
-    NoLayerProvidedException,\
-    DifferentCrsException,\
-    FieldExistingException,\
-    FieldException,\
-    NotANumberException
+from GeoPublicHealth.src.core.exceptions import (
+    GeoPublicHealthException, NoLayerProvidedException, DifferentCrsException,
+    FieldExistingException, FieldException, NotANumberException)
 from GeoPublicHealth.src.core.stats import Stats
-
 from GeoPublicHealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('analysis', 'composite_index.ui')
@@ -95,33 +79,56 @@ class CommonCompositeIndexDialog(QDialog):
         self.use_point_layer = None
 
     def setup_ui(self):
-        # Connect slot.
-        # noinspection PyUnresolvedReferences
+        """
+        Set up the UI for the dialog
+        """
+
+        # connect signals to slots
         self.button_browse.clicked.connect(self.open_file_browser)
         self.command_link_button.clicked.connect(self.add_indicator)
-        self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(
-            self.run_stats)
-        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.hide)
-        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
+        self.button_box_ok.button(QDialogButtonBox.Ok).clicked.connect(self.run_stats)
+        self.button_box_ok.button(QDialogButtonBox.Cancel).clicked.connect(self.close_window)
 
-        # Add items in symbology
-        self.cbx_mode.addItem(
-            'Quantile (equal count)', QgsGraduatedSymbolRenderer.Quantile)
-        self.cbx_mode.addItem(
-            'Natural breaks', QgsGraduatedSymbolRenderer.Jenks)
-        self.cbx_mode.addItem(
-            'Standard deviation', QgsGraduatedSymbolRenderer.StdDev)
-        self.cbx_mode.addItem(
-            'Pretty breaks', QgsGraduatedSymbolRenderer.Pretty)
-        self.cbx_mode.addItem(
-            'Equal interval', QgsGraduatedSymbolRenderer.EqualInterval)
+        # Set initial state
+        self.setup_indicator_list()
+        self.setup_aggregation_layer()
+        self.setup_indicator_field()
 
-        self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+    def close_window(self):
+        """
+        Close the window
+        """
+        self.hide()
+        self.signalAskCloseWindow.emit()
+
+    def setup_indicator_list(self):
+        """
+        Setup the list of indicators
+        """
+
+        modes = {
+            'Quantile (equal count)': QgsGraduatedSymbolRenderer.Quantile,
+            'Natural breaks': QgsGraduatedSymbolRenderer.Jenks,
+            'Standard deviation': QgsGraduatedSymbolRenderer.StdDev,
+            'Pretty breaks': QgsGraduatedSymbolRenderer.Pretty,
+            'Equal interval': QgsGraduatedSymbolRenderer.EqualInterval,
+        }
+
+        for text, mode in modes.items():
+            self.cbx_mode.addItem(text, mode)
 
         self.cbx_list_indicators.itemDoubleClicked.connect(self.remove_item)
 
+    def setup_aggregation_layer(self):
+        """
+        Setup the aggregation layer
+        """
+        self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
+
+    def setup_indicator_field(self):
+        """
+        Setup the indicator field
+        """
         self.cbx_indicator_field.setFilters(QgsFieldProxyModel.Numeric)
         self.cbx_indicator_field.setLayer(self.cbx_aggregation_layer.currentLayer())
         self.cbx_aggregation_layer.layerChanged.connect(self.cbx_indicator_field.setLayer)
@@ -132,153 +139,51 @@ class CommonCompositeIndexDialog(QDialog):
         self.cbx_indicator_field.setCurrentIndex(0)
 
     def remove_item(self):
-        self.cbx_list_indicators.takeItem( self.cbx_list_indicators.currentRow())
+        self.cbx_list_indicators.takeItem(self.cbx_list_indicators.currentRow())
 
     def add_indicator(self):
-        present = False
-        for index in range(self.cbx_list_indicators.count()):
-            if self.cbx_list_indicators.item(index).text() == self.vector_indicator():
-                present = True
-        if not present:
+        if not any(self.cbx_list_indicators.item(index).text() == self.vector_indicator()
+                   for index in range(self.cbx_list_indicators.count())):
             self.cbx_list_indicators.addItem(self.vector_indicator())
 
     def vector_indicator(self):
-        return self.cbx_indicator_field.currentField() + " | " + self.vector_direction()
+        return f"{self.cbx_indicator_field.currentField()} | {self.vector_direction()}"
 
     def vector_direction(self):
-        if self.radioButton_vector_positive.isChecked():
-            return "+"
-        else:
-            return "-"
+        return '+' if self.radioButton_vector_positive.isChecked() else '-'
 
     def open_file_browser(self):
+        """Method to open file browser and get output file path."""
         output_file, __ = QFileDialog.getSaveFileName(
             self.parent, tr('Save shapefile'), filter='SHP (*.shp)')
-        self.le_output_filepath.setText(output_file[0])
+        self.le_output_filepath.setText(output_file)
 
     def indicators_list(self):
-        items = []
-        for index in range(self.cbx_list_indicators.count()):
-            items.append(self.cbx_list_indicators.item(index))
-        return [i.text().split(" | ") for i in items]
-
+        items = [self.cbx_list_indicators.item(index).text()
+                 for index in range(self.cbx_list_indicators.count())]
+        return [item.split(" | ") for item in items]
 
     def run_stats(self):
-        """Main function which do the process."""
+        """Main function which does the process."""
 
-        # Get the common fields.
-        self.admin_layer = self.cbx_aggregation_layer.currentLayer()
-
-        selected_indicators = self.indicators_list()
-
-        if not self.name_field:
-            self.name_field = self.le_new_column.placeholderText()
-
-        # Output.
-        self.output_file_path = self.le_output_filepath.text()
+        self.setup_fields_and_output()
 
         try:
-            self.button_box_ok.setDisabled(True)
-            # noinspection PyArgumentList
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            # noinspection PyArgumentList
-            QApplication.processEvents()
+            self.set_application_state(is_busy=True)
 
             if not self.admin_layer:
                 raise NoLayerProvidedException
 
-            if not self.admin_layer and self.use_point_layer:
-                raise NoLayerProvidedException
-
-            crs_admin_layer = self.admin_layer.crs()
-
             if not self.use_point_layer and not self.use_area:
                 if not self.cbx_list_indicators:
-                    raise FieldException(field_1='List Indicators should not empty')
+                    raise FieldException(field_1='List Indicators should not be empty')
 
-            # Output
-            if not self.output_file_path:
-                temp_file = NamedTemporaryFile(
-                    delete=False,
-                    suffix='-geopublichealth.shp')
-                self.output_file_path = temp_file.name
-                temp_file.flush()
-                temp_file.close()
-
-            admin_layer_provider = self.admin_layer.dataProvider()
             fields = self.admin_layer.fields()
 
-            if admin_layer_provider.fields().indexFromName(self.name_field) != -1:
-                raise FieldExistingException(field=self.name_field)
+            self.add_fields_to_layer(fields)
+            self.calculate_composite_index(fields)
 
-            for indicator_selected in selected_indicators:
-                fields.append(QgsField("Z" + indicator_selected[0], QVariant.Double))
-
-            fields.append(QgsField(self.name_field, QVariant.Double))
-
-            file_writer = QgsVectorFileWriter(
-                self.output_file_path,
-                'utf-8',
-                fields,
-                QgsWkbTypes.Polygon,
-                self.admin_layer.crs(),
-                'ESRI Shapefile')
-
-            count = self.admin_layer.featureCount()
-            stats = {}
-
-            for indicator_selected in selected_indicators:
-                values = []
-                indicator_selected_name = str(indicator_selected[0])
-
-                for i, feature in enumerate(self.admin_layer.getFeatures()):
-                    index = self.admin_layer.fields().indexFromName(indicator_selected_name)
-
-                    if feature[index]:
-                        value = float(feature[index])
-                    else:
-                        value = 0.0
-                    values.append(value)
-
-                stats[indicator_selected_name] = Stats(values)
-
-            for i, feature in enumerate(self.admin_layer.getFeatures()):
-                attributes = feature.attributes()
-
-                composite_index_value = 0.0
-                for indicator_selected in selected_indicators:
-                    indicator_selected_name = str(indicator_selected[0])
-                    index = self.admin_layer.fields().indexFromName(indicator_selected_name)
-
-                    if feature[index]:
-                        value = float(feature[index])
-                    else:
-                        value = 0.0
-
-                    zscore = (value - stats[indicator_selected_name].average()) / stats[indicator_selected_name].standard_deviation()
-                    attributes.append(float(zscore))
-
-
-
-                    if indicator_selected[1] == '+':
-                        composite_index_value -= zscore
-                    else:
-                        composite_index_value += zscore
-
-                attributes.append(float(composite_index_value))
-                new_feature = QgsFeature()
-                new_geom = QgsGeometry(feature.geometry())
-                new_feature.setAttributes(attributes)
-                new_feature.setGeometry(new_geom)
-                file_writer.addFeature(new_feature)
-
-            del file_writer
-
-            self.output_layer = QgsVectorLayer(
-                self.output_file_path,
-                self.name_field,
-                'ogr')
-            QgsProject.instance().addMapLayer(self.output_layer)
+            self.add_output_layer_to_project()
 
             if self.symbology.isChecked():
                 self.add_symbology()
@@ -289,11 +194,105 @@ class CommonCompositeIndexDialog(QDialog):
             display_message_bar(msg=e.msg, level=e.level, duration=e.duration)
 
         finally:
-            self.button_box_ok.setDisabled(False)
-            # noinspection PyArgumentList
-            QApplication.restoreOverrideCursor()
-            # noinspection PyArgumentList
-            QApplication.processEvents()
+            self.set_application_state(is_busy=False)
+
+    def setup_fields_and_output(self):
+        self.admin_layer = self.cbx_aggregation_layer.currentLayer()
+        self.selected_indicators = self.indicators_list()
+        self.name_field = self.le_new_column.placeholderText() if not self.name_field else self.name_field
+        self.output_file_path = self.get_output_file_path()
+
+    def set_application_state(self, is_busy):
+        self.button_box_ok.setDisabled(is_busy)
+        QApplication.setOverrideCursor(Qt.WaitCursor if is_busy else Qt.ArrowCursor)
+        QApplication.processEvents()
+
+    def get_output_file_path(self):
+        if self.le_output_filepath.text():
+            return self.le_output_filepath.text()
+
+        with NamedTemporaryFile(delete=False, suffix='-geopublichealth.shp') as temp_file:
+            return temp_file.name
+
+    def add_fields_to_layer(self, fields):
+        admin_layer_provider = self.admin_layer.dataProvider()
+        if admin_layer_provider.fields().indexFromName(self.name_field) != -1:
+            raise FieldExistingException(field=self.name_field)
+
+        for indicator_selected in self.selected_indicators:
+            fields.append(QgsField("Z" + indicator_selected[0], QVariant.Double))
+
+        fields.append(QgsField(self.name_field, QVariant.Double))
+
+    def calculate_composite_index(self, fields):
+        file_writer = QgsVectorFileWriter(
+            self.output_file_path,
+            'utf-8',
+            fields,
+            QgsWkbTypes.Polygon,
+            self.admin_layer.crs(),
+            'ESRI Shapefile')
+
+        stats = self.calculate_stats()
+
+        for feature in self.admin_layer.getFeatures():
+            attributes, composite_index_value = self.calculate_attributes_and_composite_index(feature, stats)
+            new_feature = self.create_new_feature(feature, attributes)
+            file_writer.addFeature(new_feature)
+
+        del file_writer
+
+    def calculate_stats(self):
+        stats = {}
+        for indicator_selected in self.selected_indicators:
+            values = self.get_feature_values(indicator_selected)
+            stats[str(indicator_selected[0])] = Stats(values)
+
+        return stats
+
+    def get_feature_values(self, indicator_selected):
+        values = []
+        indicator_selected_name = str(indicator_selected[0])
+        for feature in self.admin_layer.getFeatures():
+            index = self.admin_layer.fields().indexFromName(indicator_selected_name)
+            value = float(feature[index]) if feature[index] else 0.0
+            values.append(value)
+
+        return values
+
+    def calculate_attributes_and_composite_index(self, feature, stats):
+        attributes = feature.attributes()
+        composite_index_value = 0.0
+        for indicator_selected in self.selected_indicators:
+            indicator_selected_name = str(indicator_selected[0])
+            index = self.admin_layer.fields().indexFromName(indicator_selected_name)
+            value = float(feature[index]) if feature[index] else 0.0
+
+            zscore = (value - stats[indicator_selected_name].average()) / stats[indicator_selected_name].standard_deviation()
+            attributes.append(float(zscore))
+
+            composite_index_value += self.calculate_composite_index_value(indicator_selected, zscore)
+
+        attributes.append(float(composite_index_value))
+        return attributes, composite_index_value
+
+    def calculate_composite_index_value(self, indicator_selected, zscore):
+        return -zscore if indicator_selected[1] == '+' else zscore
+
+    def create_new_feature(self, feature, attributes):
+        new_feature = QgsFeature()
+        new_geom = QgsGeometry(feature.geometry())
+        new_feature.setAttributes(attributes)
+        new_feature.setGeometry(new_geom)
+
+        return new_feature
+
+    def add_output_layer_to_project(self):
+        self.output_layer = QgsVectorLayer(
+            self.output_file_path,
+            self.name_field,
+            'ogr')
+        QgsProject.instance().addMapLayer(self.output_layer)
 
     def draw_plot(self, data):
         """Function to draw the plot and display it in the canvas.
@@ -334,15 +333,11 @@ class CommonCompositeIndexDialog(QDialog):
 class CompositeIndexDialog(CommonCompositeIndexDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
-        CommonCompositeIndexDialog.__init__(self, parent)
-        # noinspection PyArgumentList
+        super().__init__(parent)
         FORM_CLASS.setupUi(self, self)
-
-        self.use_area = False
-        self.use_point_layer = False
 
         self.setup_ui()
 
     def run_stats(self):
         """Main function which do the process."""
-        CommonCompositeIndexDialog.run_stats(self)
+        super().run_stats()
