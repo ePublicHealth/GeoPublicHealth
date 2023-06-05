@@ -86,16 +86,26 @@ class CommonAutocorrelationDialog(QDialog):
     signalStatus = pyqtSignal(int, str, name='signalStatus')
 
     def __init__(self, parent=None):
-        """Constructor.
-
-        Base class for Incidence and Density dialogs.
-
-        use_area : If you use the area of the polygon or the population field.
-        use_point_layer : If you a point a layer, or a field in the polygon
-         layer.
         """
+        Constructor for base class of Incidence and Density dialogs.
+
+        Parameters:
+        - parent: Parent widget for the dialog.
+
+        Attributes:
+        - parent: Parent widget for the dialog.
+        - name_field: Name field of the layer.
+        - admin_layer: Administrative layer.
+        - figure: The figure object for the dialog.
+        - canvas: The canvas object for the dialog.
+        - toolbar: The toolbar object for the dialog.
+        - output_file_path: The output file path for the dialog.
+        - output_layer: The output layer for the dialog.
+        - use_area: Boolean for whether to use the area of the polygon or the population field.
+        - use_point_layer: Boolean for whether to use a point layer or a field in the polygon layer.
+        """
+        super().__init__(parent)
         self.parent = parent
-        QDialog.__init__(self, parent)
         self.name_field = None
         self.admin_layer = None
         self.figure = None
@@ -103,9 +113,8 @@ class CommonAutocorrelationDialog(QDialog):
         self.toolbar = None
         self.output_file_path = None
         self.output_layer = None
-
-        # Settings
         self.use_area = None
+
 
     def setup_ui(self):
         # Connect slot.
@@ -224,13 +233,8 @@ class CommonAutocorrelationDialog(QDialog):
                 w=Rook.from_shapefile(self.admin_layer.source())
 
 
-            #Pysal 2.0
-            #https://stackoverflow.com/questions/59455383/pysal-does-not-have-attribute-open
-            import geopandas
-
-            f = geopandas.read_file(self.admin_layer.source().replace('.shp','.dbf'))
-
-            y=f[str(field)]
+            f = libpysal.io.open(self.admin_layer.source().replace('.shp','.dbf'))
+            y = np.array(f.by_col[str(field)])
             lm = Moran_Local(y, w, transformation = "r", permutations = 999)
 
             sig_q = lm.q * (lm.p_sim <= 0.05) # could make significance level an option
