@@ -62,10 +62,11 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
 
         self.addParameter(QgsProcessingParameterNumber(
             self.RADIUS_FIELD,
-            'Radius (maps unit)',
-            0,
-            999999999,
-            500.00))
+            tr('Radius (map units)'),  # This should be the description
+            QgsProcessingParameterNumber.Double,  # Add the parameter type (Double or Integer)
+            defaultValue=500.00,
+            minValue=0,
+            maxValue=999999999))
 
         self.addParameter(QgsProcessingParameterVectorLayer(
             self.ENVELOPE_LAYER,
