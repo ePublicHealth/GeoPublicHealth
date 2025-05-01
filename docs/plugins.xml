@@ -6,9 +6,9 @@
                 <![CDATA[GeoPublicHealth offers a simplified interface for users in public health and epidemiology]]>
             </description>
             <about></about>
-            <version>0.101</version>
+            <version>0.2</version>
             <qgis_minimum_version>3.12.0</qgis_minimum_version>
-            <qgis_maximum_version>3.32.0</qgis_maximum_version>
+            <qgis_maximum_version>3.42.10</qgis_maximum_version>
             <homepage>
                 <![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]>
             </homepage>
@@ -20,13 +20,13 @@
                 <![CDATA[Manuel Vidaurre, Javier Cervantes, Pai (Supharerk Thawillarp), Etienne Trimaille, Dr Carlos Castillo-Salgado]]>
             </author_name>
             <download_url>
-                https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.30.zip
+                https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.42.zip
             </download_url>
             <uploaded_by>
                 <![CDATA[mvidaurre]]>
             </uploaded_by>
             <create_date>2016-04-24T15:31:19.824333</create_date>
-            <update_date>2023-06-04T23:31:a9.974521</update_date>
+            <update_date>2025-05-01T12:31:a9.974521</update_date>
             <experimental>True</experimental>
             <deprecated>False</deprecated>
             <tracker>
