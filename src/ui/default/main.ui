@@ -127,38 +127,38 @@ QTreeWidget::item:!has-children
      </item>
     </layout>
    </item>
-   <item>
-    <widget class="QWebView" name="help">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>200</width>
-       <height>0</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-  </layout>
+<item>
+ <widget class="QWebEngineView" name="help">
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>0</height>
+   </size>
+  </property>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QgsMessageBar</class>
-   <extends>QWidget</extends>
-   <header>qgis/gui.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections/>
+</item>
+</layout>
+</widget>
+<customwidgets>
+ <customwidget>
+  <class>QWebEngineView</class>
+  <extends>QWidget</extends>
+  <header>QtWebEngineWidgets/QWebEngineView</header>
+  <container>1</container>
+ </customwidget>
+ <customwidget>
+  <class>QgsMessageBar</class>
+  <extends>QWidget</extends>
+  <header>qgis/gui.h</header>
+  <container>1</container>
+ </customwidget>
+</customwidgets>
+<resources/>
+<connections/>
 </ui>
