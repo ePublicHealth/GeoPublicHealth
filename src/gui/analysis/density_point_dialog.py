@@ -32,14 +32,7 @@ class DensityPointDialog(IncidenceDensityDialog, FORM_CLASS):
     def __init__(self, parent=None):
         """Constructor."""
         IncidenceDensityDialog.__init__(self, parent)
-        # noinspection PyArgumentList
-        FORM_CLASS.setupUi(self, self)
-
         self.use_area = True
         self.use_point_layer = True
-
+        FORM_CLASS.setupUi(self, self)
         self.setup_ui()
-
-    def run_stats(self):
-        """Main function which do the process."""
-        IncidenceDensityDialog.run_stats(self)

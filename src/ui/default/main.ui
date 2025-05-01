@@ -14,7 +14,16 @@
    <string notr="true">GeoPublicHealth</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_2">
-   <property name="margin">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
     <number>0</number>
    </property>
    <item>
@@ -29,36 +38,36 @@
        </property>
        <property name="styleSheet">
         <string notr="true">QTreeWidget{
-	background-color: rgb(69, 69, 69);
-	outline: 0;
-}
-QTreeWidget::item {
-	color: white;
-	padding: 3px;
-}
-QTreeWidget::item::selected {
-	color: black;
-	background-color: rgb(10, 10, 10);
-    padding-right: 0px;
-}
-
-QTreeView::branch { 
-	border-image: url(none.png);
-}
-
-QTreeView::branch:has-children{
-        background-color: rgb(50, 50, 50);
-}
-
-QTreeWidget::item:has-children
-{
-        background-color: rgb(50, 50, 50);
-}
-
-QTreeWidget::item:!has-children
-{
         background-color: rgb(69, 69, 69);
-}</string>
+        outline: 0;
+        }
+        QTreeWidget::item {
+                color: white;
+                padding: 3px;
+        }
+        QTreeWidget::item::selected {
+                color: black;
+                background-color: rgb(10, 10, 10);
+        padding-right: 0px;
+        }
+
+        QTreeView::branch {
+                border-image: url(none.png);
+        }
+
+        QTreeView::branch:has-children{
+                background-color: rgb(50, 50, 50);
+        }
+
+        QTreeWidget::item:has-children
+        {
+                background-color: rgb(50, 50, 50);
+        }
+
+        QTreeWidget::item:!has-children
+        {
+                background-color: rgb(69, 69, 69);
+        }</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -127,38 +136,37 @@ QTreeWidget::item:!has-children
      </item>
     </layout>
    </item>
-<item>
- <widget class="QWebEngineView" name="help">
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>200</width>
-    <height>0</height>
-   </size>
-  </property>
+   <item>
+    <widget class="QTextBrowser" name="help">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Expanding"> <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
+    </widget>
+    </item>
+  </layout>
  </widget>
-</item>
-</layout>
-</widget>
-<customwidgets>
- <customwidget>
-  <class>QWebEngineView</class>
-  <extends>QWidget</extends>
-  <header>QtWebEngineWidgets/QWebEngineView</header>
-  <container>1</container>
- </customwidget>
- <customwidget>
-  <class>QgsMessageBar</class>
-  <extends>QWidget</extends>
-  <header>qgis/gui.h</header>
-  <container>1</container>
- </customwidget>
-</customwidgets>
-<resources/>
-<connections/>
+ <customwidgets>
+  <customwidget>
+   <class>QgsMessageBar</class>
+   <extends>QWidget</extends>
+   <header>qgis/gui.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
 </ui>
