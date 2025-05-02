@@ -21,7 +21,7 @@
  * *
  ***************************************************************************/
 """
-
+import traceback
 # Plugin Imports
 from GeoPublicHealth.src.gui.analysis.parent_incidence_density_dialog import (
     IncidenceDensityDialog)
