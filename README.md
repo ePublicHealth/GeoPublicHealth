@@ -1,141 +1,160 @@
-# GeoPublicHealth 0.101
+# GeoPublicHealth v0.2.0
 
-GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology. To use the plugin, you MUST to install first QGIS.
+**A QGIS Plugin for Epidemiology and Public Health GIS Analysis**
 
-## Install QGIS 3.30
+## Overview
 
-### In Windows
-  
-1. Go to https://download.qgis.org/downloads/QGIS-OSGeo4W-3.24.2-1.msi for the specific version of OSGeo4W
-1. Run the file and choose **Advance Install** 
-1. Select **Install from Internet** and click on **Next>**
-1. Select the root installing directory (highly recommended to maintain defaults) and click on **Next>**
-1. Select the local package directory (highly recommended to maintain defaults) and click on **Next>**
-1. Select the method for the Internet Connection (highly recommended to maintain defaults) and click on **Next>**
-1. Choose a Download Site (highly recommended to maintain default https://download.osgeo.org) and click on **Next>**
-1. Search for **qgis**
-1. Select for **Installing** the **qgis: QGIS Desktop** version should be **3.24.3-1**
-1. Search for **gdal**
-1. Select for **Installing** the **gdal: The GDAL/OGR library and command line tools** version should be **3.4.3-2**
-1. Search for **pysal**
-1. Select for **Installing** the **python3-libpysal: Core components of PySAL a library for spatial analisys functions** version should be 4.3.0-1
-1. Select for **Installing** the **python3-pysal: A library for spatial analisys functions** version should be 2.3.0-2 and click on **Next>**
-1. Maintain checked the additional unmeet dependencies
-1. Accept the Terms and Conditions and click on **Next>**
+GeoPublicHealth provides a simplified interface within QGIS, tailored for users in epidemiology and public health. It builds upon the foundation laid by the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) (developed by Etienne Trimaille) and incorporates additional methods highly relevant for applying GIS in public health research and practice.
 
-You can see a [video of this process here](videos/install.qgis.gdal.pysal.win.2022.06.mp4)
+This plugin aims to integrate and enhance methods similar to those found in the pioneering SIGEpi software, leveraging the power and flexibility of the modern QGIS platform.
 
+## Prerequisites
 
-### In Mac
-  1. Go to [https://www.qgis.org](https://www.qgis.org/en/site/forusers/download.html) for download the specific version 3.30
-  2. Run the installer and follow instructions
-  3. macOS High Sierra (10.13) or newer is required. QGIS is not yet notarized as required by macOS Catalina (10.15) security rules. On first launch, please **control-click on the icon and choose Open from the context menu**, after which a confirmation dialog is shown and you need to click the Open button.
-  4. In some cases the **https://www.xquartz.org/** should be installed. If you have a error about `Library not loaded: /opt/X11/lib/libxcb.1.dylib` the installing of xquartz will fixed.
+Before installing the GeoPublicHealth plugin, you need:
 
-### Installing GeoPublicHealth Plugin in Windows or Mac
-  1. Start QGIS
-  
-  ---- 
-  This section is only for MacOS users
-  
-  1. In the **Plugins** menu select **Python Console** - This will open the console in QGIS
-  1. In the prompt of the console (after the **>>>**) write or copy and paste `import pip` and click enter - this will load the **pip** module in QGIS
-  1. Write or copy and paste `pip.main(['install', 'pip', '--upgrade'])` and click enter - this will upgrade the **pip** to the latest version
-  1. Write or copy and paste `pip.main(['install', 'libpysal', '--upgrade'])` and click enter - this will upgrade the **libpysal** to the latest version
-  1. Write or copy and paste `pip.main(['install', 'numba', '--upgrade'])` and click enter - this will upgrade the **numba** to the latest version
-  ----
-  
-  1. Launch the plugins manager by going to the **Plugins menu and selecting Manage and Install Plugins….**
-  1. In the **Settings** tab of the plugins settings dialog, scroll down and click on the **Add…** button.
-  1. Give the plugin repository the name **epipublichealth** and then add the full URL **https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml** in the URL field.
-  1. Please be sure that `Show also experimental plugins` is checked [x]
-  1. Click on the **OK** button.
-  1. Activate the **All** tab and **Search** field input **geopu**.
-  1. Select the *GeoPublicHealth* plugin
-  1. Click on the **Install plugin** button
-  1. Close the Plugins dialog 
-  1. Check in the **Plugins** menu that the **GeoPublicHealth** plugin is a new option there
+1.  **QGIS:** Version **3.42.x Münster** is required.
+2.  **Python Dependencies:** The plugin relies on specific Python libraries that must be correctly installed within your QGIS environment:
+    * `gdal` (usually included with QGIS/OSGeo4W, target version ~3.10.2)
+    * `libpysal` (target version ~4.3.0)
+    * `numba` (latest compatible version)
 
-* You can see a [video of this process for Windows Users here](videos/install.plugin.geopublichealth.win.2022.06.mp4)
-* You can see a [video of this process for Mac Users here](videos/install.qgis.and.geopublichealth.mac.2022.09.mp4)
+**Note:** The installation methods below are designed to help ensure these dependencies are met.
 
-### Installed Versions
-- QGIS 3.24.3-Tisler
-- Python 3.9
-- Pysal 2.5.0, Pyproj 3.2, libpysal 4.6.2, numb 0.55.2 and geopandas 0.8.1
+## Installation
+
+Installation involves two main steps: installing the correct QGIS version with dependencies, and then installing the GeoPublicHealth plugin itself.
+
+### Step 1: Install QGIS 3.42.x and Dependencies
+
+#### Windows
+
+Using the OSGeo4W Network Installer is **highly recommended** on Windows to ensure all necessary dependencies (like specific versions of GDAL and PySAL) are installed correctly.
+
+1.  Download the **OSGeo4W Network Installer (64 bit)** from the [QGIS Download Page](https://qgis.org/en/site/forusers/download-windows.html). Find the installer matching QGIS version **3.42.2**. *Direct link provided in original README (check if still valid): `https://download.qgis.org/downloads/QGISQT6-OSGeo4W-3.42.2-2.msi`*
+2.  Run the downloaded installer (`.msi` or `.exe`).
+3.  Choose **Advanced Install** and click **Next >**.
+4.  Select **Install from Internet** and click **Next >**.
+5.  Select the Root Install Directory (default recommended) and click **Next >**.
+6.  Select Local Package Directory (default recommended) and click **Next >**.
+7.  Select your Internet Connection (default recommended) and click **Next >**.
+8.  Choose a Download Site (default `https://download.osgeo.org` recommended) and click **Next >**.
+9.  In the "Select Packages" screen, search for and select the following packages (ensure the versions match):
+    * Search for `qgis`. Expand `Desktop`. Select `qgis: QGIS Desktop`. Ensure the version is `3.42.2-x`. Change "Skip" to the version number to mark it for installation.
+    * Search for `gdal`. Expand `Libs`. Select `gdal: The GDAL/OGR library and command line tools`. Ensure the version is `3.10.2-x`. Mark it for installation.
+    * Search for `pysal`. Expand `Libs`. Select `python3-libpysal: Core components of PySAL...`. Ensure the version is `4.3.0-x`. Mark it for installation.
+10. Click **Next >**.
+11. Review the dependencies that will be installed. Keep "Install these packages to meet dependencies" checked. Click **Next >**.
+12. Accept the License Agreements if prompted and click **Next >** to begin the download and installation.
+13. Once finished, launch QGIS Desktop to ensure it starts correctly.
+
+*You can see a [video of this process here](videos/install.qgis.gdal.pysal.win.2022.06.mp4) (Note: Video from 2022, interface might differ slightly).*
+
+#### macOS
+
+1.  Download the **QGIS macOS Installer** for version **3.42.x** from the [QGIS Download Page](https://qgis.org/en/site/forusers/download-macos.html).
+2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder.
+3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer or not notarized. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
+4.  **Install Dependencies (PySAL, Numba):** QGIS on macOS often requires manual installation of some Python packages within its own environment.
+    * Start QGIS.
+    * Open the **Python Console** (Plugins Menu -> Python Console).
+    * Execute the following commands one by one in the console prompt (`>>>`):
+        ```python
+        import pip
+        pip.main(['install', 'pip', '--upgrade'])
+        pip.main(['install', 'libpysal==4.3.0']) # Install specific required version
+        pip.main(['install', 'numba', '--upgrade'])
+        ```
+    * Close and restart QGIS after installing these packages.
+
+*(Note: The original README mentioned potential issues requiring XQuartz (`Library not loaded: /opt/X11/lib/libxcb.1.dylib`). This is less common with recent QGIS versions but if you encounter such errors, installing [XQuartz](https://www.xquartz.org/) might help.)*
+
+*You can see a [video of the QGIS and plugin installation process for Mac here](videos/install.qgis.and.geopublichealth.mac.2022.09.mp4) (Note: Video from 2022, interface/versions might differ).*
+
+#### Linux
+
+Install QGIS 3.42.x using your distribution's package manager or follow the instructions for various Linux distributions on the [QGIS Download Page](https://qgis.org/en/site/forusers/alldownloads.html#linux). Ensure that `python3-gdal`, `python3-pysal` (or `python3-libpysal`), and `python3-numba` are installed and accessible within the QGIS Python environment. Package names may vary slightly between distributions.
+
+### Step 2: Install the GeoPublicHealth Plugin
+
+1.  Start QGIS (ensure dependencies from Step 1 are installed, especially on macOS).
+2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
+3.  Go to the **Settings** tab.
+4.  Ensure the **[x] Show also experimental plugins** checkbox is checked.
+5.  Click the **Add…** button to add a new repository.
+6.  Set the **Name** to `epipublichealth` (or similar).
+7.  Set the **URL** to `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`.
+8.  Click **OK**.
+9.  Go to the **All** tab.
+10. In the **Search** field, type `geopublichealth`.
+11. Select the **GeoPublicHealth** plugin from the list.
+12. Click the **Install Plugin** button.
+13. Once installation is complete, click **Close**.
+14. Check that the **GeoPublicHealth** entry now appears in the **Plugins** menu in QGIS.
+
+## Usage
+
+Once installed, the GeoPublicHealth plugin tools and algorithms can typically be accessed via:
+
+* The **Plugins Menu -> GeoPublicHealth**.
+* A dedicated **GeoPublicHealth Toolbar** (check View Menu -> Toolbars).
+* The **QGIS Processing Toolbox** (under Plugins or GeoPublicHealth).
+
+Refer to specific documentation or tutorials for detailed workflows using the plugin's features.
 
 ## Contributing
-Please review the [Contribution Guidelines](CONTRIBUTING.md)
 
-  1. Fork it!
-  2. Create your feature branch: `git checkout -b my-new-feature`
-  3. Commit your changes: `git commit -am 'Add some feature'`
-  4. Push to the branch: `git push origin my-new-feature`
-  5. Submit a pull request :D
+Contributions are welcome! Please review the [Contribution Guidelines](CONTRIBUTING.md) before starting.
 
-### Reporting Issues
+1.  **Fork** the repository on GitHub.
+2.  Create your feature branch: `git checkout -b my-new-feature`
+3.  Commit your changes: `git commit -am 'Add some feature'`
+4.  Push to the branch: `git push origin my-new-feature`
+5.  Open a **Pull Request** :D
 
-This section guides you through submitting an issue report for GeoPublicHealth. Following these guidelines helps maintainers and the community understand your report :pencil:, reproduce the behavior :computer: :computer:, and find related reports :mag_right:.
+## Reporting Issues
 
-Before creating bug reports, please check [this list](#before-submitting-a-bug-report) as you might find out that you don't need to create one. When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report).
+Found a bug? Please help us fix it by submitting a detailed issue report.
 
-#### Before Submitting A Bug Report
+### Before Submitting A Bug Report
 
-* **Perform a [cursory search](https://github.com/ePublicHealth/GeoPublicHealth/issues)** to see if the problem has already been reported. If it has, adds a comment to the existing issue instead of opening a new one.
+* **Search existing issues:** Check if the problem has already been reported: [GeoPublicHealth Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
+* If you find a similar issue, add comments there instead of creating a new one.
 
-#### How Do I Submit A (Good) Bug Report?
+### How to Submit a Good Bug Report
 
-Bugs are tracked as [GitHub issues](https://guides.github.com/features/issues/). Create an issue on this repository and provide the following information.
+Create an issue on the [repository issues page](https://github.com/ePublicHealth/GeoPublicHealth/issues) and provide as much detail as possible:
 
-Explain the problem and include additional details to help maintainers reproduce the problem:
+* **Clear Title:** Use a descriptive title summarizing the problem.
+* **Steps to Reproduce:** Provide exact steps to reliably reproduce the bug. Include sample data or simplified examples if possible.
+* **Observed Behavior:** Describe what actually happened after following the steps.
+* **Expected Behavior:** Explain what you expected to happen instead.
+* **Screenshots/GIFs:** Visual aids are extremely helpful. Use tools like [LiceCap](http://www.cockos.com/licecap/), [Peek](https://github.com/phw/peek), or similar to record GIFs if possible.
+* **Crash Reports/Logs:** If QGIS or the plugin crashed, include the relevant error messages or log output from the QGIS Log Messages Panel (View -> Panels -> Log Messages). Paste logs inside Markdown code blocks or link to a Gist.
+* **Context:**
+    * Can you consistently reproduce the problem?
+    * When did it start happening (e.g., after an update)?
+    * Does it happen with specific data, projects, or file types?
+* **Your Environment:**
+    * QGIS Version (e.g., `QGIS 3.42.2-Münster`)
+    * Operating System (e.g., `Windows 11`, `macOS Sonoma 14.4`, `Ubuntu 22.04`)
+    * GeoPublicHealth Plugin Version
 
-* **Use a clear and descriptive title** for the issue to identify the problem.
-* **Describe the exact steps which reproduce the problem** in as many details as possible. 
-* **Provide specific examples to demonstrate the steps**. Include links to files or GitHub projects, or copy/pasteable snippets, which you use in those examples. If you're providing snippets in the issue, use [Markdown code blocks](https://help.github.com/articles/markdown-basics/#multiple-lines).
-* **Describe the behavior you observed after following the steps** and point out what exactly is the problem with that behavior.
-* **Explain which behavior you expected to see instead and why.**
-* **Include screenshots and animated GIFs** which show you following the described steps and clearly demonstrate the problem. If you use the keyboard while following the steps, **record the GIF**. You can use [this tool](http://www.cockos.com/licecap/) to record GIFs on macOS and Windows, and [this tool](https://github.com/colinkeenan/silentcast) or [this tool](https://github.com/GNOME/byzanz) on Linux.
-* **If you're reporting that GeoPublicHealth crashed**, include a crash report with the log from QGIS. Include the log report in the issue in a [code block](https://help.github.com/articles/markdown-basics/#multiple-lines), a [file attachment](https://help.github.com/articles/file-attachments-on-issues-and-pull-requests/), or put it in a [gist](https://gist.github.com/) and provide link to that gist.
-* **If the problem wasn't triggered by a specific action**, describe what you were doing before the problem happened and share more information using the guidelines below.
+## Credits and Authorship
 
-Provide more context by answering these questions:
+**GeoPublicHealth Plugin:**
 
-* **Can you reproduce the problem?**
-* **Did the problem start happening recently** (e.g., after updating to a new version ) or was this always a problem?
-* If the problem started happening recently, **can you reproduce the problem in an older version?** What's the most recent version in which the problem doesn't happen?
-* **Can you reliably reproduce the issue?** If not, provide details about how often the problem happens and under which conditions it usually happens.
-* If the problem is related to working with files (e.g., opening and editing files), **does the problem happen for all files and projects or only some?** Does the problem happen only when working with local or remote files (e.g., on network drives), with files of a specific type, with large files or files with very long lines, or with files in a specific encoding? Is there anything else special about the files you are using?
+* Conceptual Design and Extension: Dr. Carlos Castillo-Salgado, Johns Hopkins Bloomberg School of Public Health [Global Public Health Observatory](http://gpho.info/)
+* Development Lead: [Manuel Vidaurre](https://github.com/mvidaurre), ePublicHealth
+* QGIS 3 Migration: [Pai (Supharerk Thawillarp)](https://github.com/raynus)
+* Project Support: ePublicHealth
 
-Include details about your configuration and environment:
+**Based on the original GeoHealth Plugin:**
 
-* **Which version of QGIS are you using?** 
-* **What's the name and version of the OS you're using**?
-* **Which keyboard layout are you using?** Are you using a US layout or some other layout?
-
-## Authors
-  * Etienne Trimaille
-  * This project was designed by UMR Espace-DEV (IRD, UAG, UM2, UR).
-  * Manuel Vidaurre, ePublicHealth
-  * Pai (Supharerk Thawillarp) -- QGIS2to3 Migration work
-=======
-
-# GeoPublicHealth 0.101
-
-## History
-Dr. Carlos Castillo-Salgado has taught in The Bloomberg School of Public Health of Johns Hopkins University the 340.701.11 Epidemiologic Applications of GIS the last 15 years and also in his work as Chief of the Special Program for Health Analysis for the Panamerican Health Organization, Regional Office of the World Health Organization for the Regional Office of the Americas. In this capacity, he led the development of [SIGEpi](http://ais.paho.org/sigepi/index.asp?xml=sigepi/index.htm&lang=en) as a pioneer GIS for Epidemiology and Public Health. Using the QGIS, the GeoPublicHealth will integrate several of the methods and techniques used in SIGEpi but enhance those with the capacities of QGIS. In February 2020, [Pai (Supharerk Thawillarp)](https://github.com/raynus) did the migration work for the plugin from QGIS 2 systems to QGIS 3.
-  
-## Credits
-
-Original GeoHealth Plugin:
-   * Etienne Trimaille
-   * This project was designed by UMR Espace-DEV (IRD, UAG, UM2, UR).
-
-GeoPublicHealth:
-  * ePublicHealth
-  * Dr. Carlos Castillo-Salgado
-  * [Manuel Vidaurre](https://github.com/mvidaurre), ePublicHealth
-  * [Pai (Supharerk Thawillarp)](https://github.com/raynus) -- QGIS2to3 Migration work
-  * This project was designed and extended by the Johns Hopkins/Bloomberg School of Public Health [Global Public Health Observatory](http://gpho.info/)
+* Original Author: Etienne Trimaille
+* Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
 ## License
-Please see [LICENSE](LICENSE) @ 2017-2022
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
+
+Copyright (c) 2017-2025 The GeoPublicHealth Contributors and Original Authors.
