@@ -1,7 +1,7 @@
 # GeoPublicHealth
 
 [![Version](https://img.shields.io/badge/version-0.2.1-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.1)
-[![QGIS](https://img.shields.io/badge/QGIS-3.42.x-green.svg)](https://qgis.org)
+[![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
 
@@ -17,10 +17,13 @@ This plugin aims to integrate and enhance methods similar to those found in the 
 
 Before installing the GeoPublicHealth plugin, you need:
 
-1.  **QGIS:** Version **3.42.x Münster** is required.
+1.  **QGIS:** Version **3.42.x or newer** is required. Tested with:
+    * QGIS 3.44.6 'Solothurn' (Latest Release)
+    * QGIS 3.40.14 'Bratislava' (Long Term Release)
+    * QGIS 3.42.x 'Münster' (minimum version)
 2.  **Python Dependencies:** The plugin relies on specific Python libraries that must be correctly installed within your QGIS environment:
-    * `gdal` (usually included with QGIS/OSGeo4W, target version ~3.10.2)
-    * `libpysal` (target version ~4.3.0)
+    * `gdal` (usually included with QGIS/OSGeo4W, version ~3.10.2 or newer)
+    * `libpysal` (version ~4.3.0)
     * `numba` (latest compatible version)
 
 **Note:** The installation methods below are designed to help ensure these dependencies are met.
@@ -37,55 +40,76 @@ Download the latest version from [GitHub Releases](https://github.com/ePublicHea
 
 Installation involves two main steps: installing the correct QGIS version with dependencies, and then installing the GeoPublicHealth plugin itself.
 
-### Step 1: Install QGIS 3.42.x and Dependencies
+### Step 1: Install QGIS and Dependencies
 
 #### Windows
 
 Using the OSGeo4W Network Installer is **highly recommended** on Windows to ensure all necessary dependencies (like specific versions of GDAL and PySAL) are installed correctly.
 
-1.  Download the **OSGeo4W Network Installer (64 bit)** from the [QGIS Download Page](https://qgis.org/en/site/forusers/download-windows.html). Find the installer matching QGIS version **3.42.2**. *Direct link provided in original README (check if still valid): `https://download.qgis.org/downloads/QGISQT6-OSGeo4W-3.42.2-2.msi`*
-2.  Run the downloaded installer (`.msi` or `.exe`).
-3.  Choose **Advanced Install** and click **Next >**.
-4.  Select **Install from Internet** and click **Next >**.
-5.  Select the Root Install Directory (default recommended) and click **Next >**.
-6.  Select Local Package Directory (default recommended) and click **Next >**.
-7.  Select your Internet Connection (default recommended) and click **Next >**.
-8.  Choose a Download Site (default `https://download.osgeo.org` recommended) and click **Next >**.
-9.  In the "Select Packages" screen, search for and select the following packages (ensure the versions match):
-    * Search for `qgis`. Expand `Desktop`. Select `qgis: QGIS Desktop`. Ensure the version is `3.42.2-x`. Change "Skip" to the version number to mark it for installation.
-    * Search for `gdal`. Expand `Libs`. Select `gdal: The GDAL/OGR library and command line tools`. Ensure the version is `3.10.2-x`. Mark it for installation.
-    * Search for `pysal`. Expand `Libs`. Select `python3-libpysal: Core components of PySAL...`. Ensure the version is `4.3.0-x`. Mark it for installation.
-10. Click **Next >**.
-11. Review the dependencies that will be installed. Keep "Install these packages to meet dependencies" checked. Click **Next >**.
-12. Accept the License Agreements if prompted and click **Next >** to begin the download and installation.
-13. Once finished, launch QGIS Desktop to ensure it starts correctly.
+##### Option A: OSGeo4W Network Installer (Recommended)
 
-*You can see a [video of this process here](videos/install.qgis.gdal.pysal.win.2022.06.mp4) (Note: Video from 2022, interface might differ slightly).*
+1.  Download the **[OSGeo4W Network Installer](https://download.osgeo.org/osgeo4w/v2/osgeo4w-setup.exe)** from the [QGIS Download Page](https://qgis.org/download/)
+2.  Run the downloaded `osgeo4w-setup.exe`
+3.  Choose **Advanced Install** and click **Next >**
+4.  Select **Install from Internet** and click **Next >**
+5.  Select the Root Install Directory (default recommended) and click **Next >**
+6.  Select Local Package Directory (default recommended) and click **Next >**
+7.  Select your Internet Connection (default recommended) and click **Next >**
+8.  Choose a Download Site (default `https://download.osgeo.org` recommended) and click **Next >**
+9.  In the "Select Packages" screen, search for and select the following packages:
+    * Search for `qgis`. Expand `Desktop`. Select `qgis: QGIS Desktop` (latest version or LTR). Change "Skip" to the version number to mark it for installation.
+    * Search for `gdal`. Expand `Libs`. Select `gdal: The GDAL/OGR library and command line tools`. Mark it for installation.
+    * Search for `pysal`. Expand `Libs`. Select `python3-libpysal: Core components of PySAL...` (version 4.3.0 or newer). Mark it for installation.
+10. Click **Next >**
+11. Review the dependencies that will be installed. Keep "Install these packages to meet dependencies" checked. Click **Next >**
+12. Accept the License Agreements if prompted and click **Next >** to begin the download and installation
+13. Once finished, launch QGIS Desktop to ensure it starts correctly
+
+##### Option B: Standalone Installers
+
+For offline installation or sharing on USB/network:
+
+- **Latest Release (3.44):** [Download QGIS 3.44.6](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.44.6-1.msi)
+- **Long Term Release (3.40 LTR):** [Download QGIS 3.40.14](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.40.14-1.msi)
+
+After installation, install Python dependencies via Python Console (see macOS instructions below).
+
+*You can see a [video of the OSGeo4W process here](videos/install.qgis.gdal.pysal.win.2022.06.mp4) (Note: Video from 2022, interface might differ slightly).*
 
 #### macOS
 
-1.  Download the **QGIS macOS Installer** for version **3.42.x** from the [QGIS Download Page](https://qgis.org/en/site/forusers/download-macos.html).
-2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder.
-3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer or not notarized. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies (PySAL, Numba):** QGIS on macOS often requires manual installation of some Python packages within its own environment.
-    * Start QGIS.
-    * Open the **Python Console** (Plugins Menu -> Python Console).
+1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
+2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
+3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
+4.  **Install Dependencies (PySAL, Numba):** QGIS on macOS requires manual installation of Python packages within its own environment.
+    * Start QGIS
+    * Open the **Python Console** (Plugins Menu -> Python Console)
     * Execute the following commands one by one in the console prompt (`>>>`):
         ```python
         import pip
         pip.main(['install', 'pip', '--upgrade'])
-        pip.main(['install', 'libpysal==4.3.0']) # Install specific required version
+        pip.main(['install', 'libpysal==4.3.0'])  # Install specific required version
         pip.main(['install', 'numba', '--upgrade'])
         ```
-    * Close and restart QGIS after installing these packages.
+    * Close and restart QGIS after installing these packages
 
-*(Note: The original README mentioned potential issues requiring XQuartz (`Library not loaded: /opt/X11/lib/libxcb.1.dylib`). This is less common with recent QGIS versions but if you encounter such errors, installing [XQuartz](https://www.xquartz.org/) might help.)*
+**Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
+
+*(Tip: If you encounter library loading errors, installing [XQuartz](https://www.xquartz.org/) may help, though this is less common with recent QGIS versions.)*
 
 *You can see a [video of the QGIS and plugin installation process for Mac here](videos/install.qgis.and.geopublichealth.mac.2022.09.mp4) (Note: Video from 2022, interface/versions might differ).*
 
 #### Linux
 
-Install QGIS 3.42.x using your distribution's package manager or follow the instructions for various Linux distributions on the [QGIS Download Page](https://qgis.org/en/site/forusers/alldownloads.html#linux). Ensure that `python3-gdal`, `python3-pysal` (or `python3-libpysal`), and `python3-numba` are installed and accessible within the QGIS Python environment. Package names may vary slightly between distributions.
+Install QGIS using your distribution's package manager or follow the instructions for various Linux distributions on the [QGIS Download Page](https://qgis.org/download/). 
+
+Common distributions:
+- **Debian/Ubuntu**: [Installation Instructions](https://qgis.org/resources/installation-guide/#debian--ubuntu)
+- **Fedora**: [Installation Instructions](https://qgis.org/resources/installation-guide/#fedora)
+- **Arch Linux**: [Installation Instructions](https://qgis.org/resources/installation-guide/#arch-linux)
+- **Flatpak** (universal): [Installation Instructions](https://qgis.org/resources/installation-guide/#flatpak)
+
+Ensure that `python3-gdal`, `python3-pysal` (or `python3-libpysal`), and `python3-numba` are installed and accessible within the QGIS Python environment. Package names may vary slightly between distributions.
 
 ### Step 2: Install the GeoPublicHealth Plugin
 
