@@ -18,9 +18,9 @@ This plugin aims to integrate and enhance methods similar to those found in the 
 Before installing the GeoPublicHealth plugin, you need:
 
 1.  **QGIS:** Version **3.42.x or newer** is required. Tested with:
-    * QGIS 3.44.6 'Solothurn' (Latest Release)
-    * QGIS 3.40.14 'Bratislava' (Long Term Release)
-    * QGIS 3.42.x 'Münster' (minimum version)
+    * [QGIS 3.44.6 'Solothurn'](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.44.6-1.msi) (Latest Release) - [macOS](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)
+    * [QGIS 3.40.14 'Bratislava'](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.40.14-1.msi) (Long Term Release) - Windows only
+    * QGIS 3.42.x 'Münster' (minimum supported version)
 2.  **Python Dependencies:** The plugin relies on specific Python libraries that must be correctly installed within your QGIS environment:
     * `gdal` (usually included with QGIS/OSGeo4W, version ~3.10.2 or newer)
     * `libpysal` (version ~4.3.0)
@@ -39,6 +39,18 @@ Download the latest version from [GitHub Releases](https://github.com/ePublicHea
 ## Installation
 
 Installation involves two main steps: installing the correct QGIS version with dependencies, and then installing the GeoPublicHealth plugin itself.
+
+### QGIS Download Links by Version
+
+Choose the QGIS version that best fits your needs:
+
+| Version | Release Type | Windows | macOS | Linux |
+|---------|--------------|---------|-------|-------|
+| **3.44.6 'Solothurn'** | Latest Release (Recommended) | [Download](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.44.6-1.msi) | [Download](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg) | [See distro links](#linux) |
+| **3.40.14 'Bratislava'** | Long Term Release (LTR) | [Download](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.40.14-1.msi) | Not Available* | [See distro links](#linux) |
+| **OSGeo4W Installer** | Network Installer (All versions) | [Download](https://download.osgeo.org/osgeo4w/v2/osgeo4w-setup.exe) | - | - |
+
+\* *macOS users should use QGIS 3.44, which is stable and recommended for macOS.*
 
 ### Step 1: Install QGIS and Dependencies
 
