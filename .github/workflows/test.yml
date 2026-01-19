@@ -1,0 +1,47 @@
+name: Test Plugin
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pep8 pycodestyle
+        
+    - name: Run PEP8 checks
+      run: |
+        # Run PEP8 with the same config as Makefile
+        pep8 --version
+        pep8 --repeat --ignore=E203,E121,E122,E123,E124,E125,E126,E127,E128,E402 \
+          --exclude=resources_rc.py,geopublichealth/ui/ . || true
+        
+    - name: Check Python syntax
+      run: |
+        # Compile all Python files to check for syntax errors
+        python -m py_compile $(find . -name "*.py" -not -path "./.git/*" -not -path "./build/*")
+        
+    - name: List Python files
+      run: |
+        echo "Python files in the project:"
+        find . -name "*.py" -not -path "./.git/*" | head -20

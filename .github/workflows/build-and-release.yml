@@ -1,0 +1,132 @@
+name: Build and Release Plugin
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v0.2.1
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build:
+    name: Build Plugin Package
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set version from tag
+      id: version
+      run: |
+        if [ "${{ github.ref_type }}" = "tag" ]; then
+          VERSION=${GITHUB_REF#refs/tags/v}
+        else
+          VERSION=$(grep "^version=" metadata.txt | cut -d'=' -f2 | tr -d ' ' | sed 's/version //')
+        fi
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+        
+    - name: Build plugin package
+      run: |
+        # Create build directory
+        mkdir -p build/GeoPublicHealth
+        
+        # Copy plugin files (exclude development files)
+        rsync -av \
+          --exclude='.git' \
+          --exclude='__pycache__' \
+          --exclude='*.pyc' \
+          --exclude='.DS_Store' \
+          --exclude='installation' \
+          --exclude='.tx' \
+          --exclude='.github' \
+          --exclude='.travis.yml' \
+          --exclude='Makefile' \
+          --exclude='test_suite.py' \
+          --exclude='CONTRIBUTING.md' \
+          --exclude='videos' \
+          --exclude='docs' \
+          --exclude='scripts' \
+          --exclude='sample_data' \
+          --exclude='AGENTS.md' \
+          --exclude='*.log' \
+          --exclude='.vscode' \
+          --exclude='.ruff_cache' \
+          --exclude='.gitignore' \
+          --exclude='build' \
+          ./ build/GeoPublicHealth/
+        
+        # Create zip file
+        cd build
+        zip -r geopublichealth${{ steps.version.outputs.VERSION }}.zip GeoPublicHealth -x "*.pyc" "*__pycache__*" "*.DS_Store"
+        cd ..
+        
+        # Move to root for artifact upload
+        mv build/geopublichealth${{ steps.version.outputs.VERSION }}.zip ./
+        
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: plugin-package
+        path: geopublichealth*.zip
+        retention-days: 30
+        
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: plugin-package
+        
+    - name: Extract changelog for this version
+      id: changelog
+      run: |
+        VERSION="${{ needs.build.outputs.version }}"
+        # Extract changelog entry for this version from metadata.txt
+        CHANGELOG=$(awk "/^changelog=/,/^[a-z]/" metadata.txt | grep "^    $VERSION" | head -1 || echo "Bug fixes and improvements")
+        echo "CHANGELOG=$CHANGELOG" >> $GITHUB_OUTPUT
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: "GeoPublicHealth v${{ needs.build.outputs.version }}"
+        body: |
+          ## GeoPublicHealth v${{ needs.build.outputs.version }}
+          
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ### Installation
+          
+          1. Download the `geopublichealth*.zip` file below
+          2. In QGIS, go to **Plugins → Manage and Install Plugins**
+          3. Click **Install from ZIP** and select the downloaded file
+          
+          Or use the plugin repository:
+          - Repository URL: `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`
+          
+          ### Requirements
+          - QGIS 3.42.x Münster
+          - Python dependencies: `libpysal 4.3.0`, `gdal ~3.10.2`, `numba`
+          
+          ---
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ needs.build.outputs.version }}...HEAD
+        files: |
+          geopublichealth*.zip
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
