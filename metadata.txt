@@ -7,7 +7,7 @@ author=Manuel Vidaurre, Pai (Supharerk Thawillarp)
 qgisMinimumVersion=3.0
 description=GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the GeoHealth Plugin developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology.
 about=Dr. Carlos Castillo-Salgado has taught in The Bloomberg School of Public Health of Johns Hopkins University the 340.701.11 Epidemiologic Applications of GIS the last 15 years and also in his work as Chief of the Special Program for Health Analysis for the Panamerican Health Organization, Regional Office of the World Health Organization for the Regional Office of the Americas. In this capacity, he led the development of SIGEpi as a pioneer GIS for Epidemiology and Public Health. Using the QGIS, the GeoPublicHealth will integrate several of the methods and techniques used in SIGEpi but enhance those with the capacities of QGIS. In February 2020, Pai (Supharerk Thawillarp) did the migration work for the plugin from QGIS 2 systems to QGIS 3.
-version=version 0.2
+version=version 0.2.1
 tracker=https://github.com/ePublicHealth/GeoPublicHealth/issues
 repository=https://github.com/ePublicHealth/GeoPublicHealth
 ; end of mandatory metadata
@@ -15,7 +15,9 @@ repository=https://github.com/ePublicHealth/GeoPublicHealth
 ; start of optional metadata
 category=Vector
 changelog=The changelog lists the plugin versions
-    and their changes as in the example below:
+    and their changes:
+    0.2.1 - Bug fix: Fixed f-string syntax error in autocorrelation dialog that prevented plugin loading on macOS
+    0.2.0 - QGIS 3.42 support and autocorrelation improvements
     1.0 - First stable release
     0.9 - All features implemented
     0.8 - First testing release
