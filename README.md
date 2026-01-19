@@ -1,4 +1,9 @@
-# GeoPublicHealth v0.2.0
+# GeoPublicHealth
+
+[![Version](https://img.shields.io/badge/version-0.2.1-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.1)
+[![QGIS](https://img.shields.io/badge/QGIS-3.42.x-green.svg)](https://qgis.org)
+[![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
+[![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
 
 **A QGIS Plugin for Epidemiology and Public Health GIS Analysis**
 
@@ -19,6 +24,14 @@ Before installing the GeoPublicHealth plugin, you need:
     * `numba` (latest compatible version)
 
 **Note:** The installation methods below are designed to help ensure these dependencies are met.
+
+## Quick Start
+
+### Latest Release
+
+Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
+
+**Latest Version:** [v0.2.1](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.1) - Bug fix release for macOS compatibility
 
 ## Installation
 
@@ -76,6 +89,10 @@ Install QGIS 3.42.x using your distribution's package manager or follow the inst
 
 ### Step 2: Install the GeoPublicHealth Plugin
 
+You have three options to install the plugin:
+
+#### Option A: From QGIS Plugin Repository (Recommended)
+
 1.  Start QGIS (ensure dependencies from Step 1 are installed, especially on macOS).
 2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
 3.  Go to the **Settings** tab.
@@ -91,6 +108,26 @@ Install QGIS 3.42.x using your distribution's package manager or follow the inst
 13. Once installation is complete, click **Close**.
 14. Check that the **GeoPublicHealth** entry now appears in the **Plugins** menu in QGIS.
 
+#### Option B: Install from ZIP (Direct Download)
+
+1.  Download the latest release from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest)
+2.  In QGIS, go to **Plugins → Manage and Install Plugins...**
+3.  Click on **Install from ZIP**
+4.  Select the downloaded `geopublichealth*.zip` file
+5.  Click **Install Plugin**
+
+#### Option C: Install from GitHub (Development Version)
+
+For the latest development version:
+
+```bash
+cd ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
+# Or on Windows: %APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\
+git clone https://github.com/ePublicHealth/GeoPublicHealth.git
+```
+
+Then restart QGIS and enable the plugin in the Plugin Manager.
+
 ## Usage
 
 Once installed, the GeoPublicHealth plugin tools and algorithms can typically be accessed via:
@@ -101,15 +138,46 @@ Once installed, the GeoPublicHealth plugin tools and algorithms can typically be
 
 Refer to specific documentation or tutorials for detailed workflows using the plugin's features.
 
+## Development
+
+### For Developers
+
+See [AGENTS.md](AGENTS.md) for development guidelines and coding standards.
+
+See [RELEASE.md](RELEASE.md) for information on the release process.
+
+### Running Tests
+
+```bash
+# Run all tests
+python test_suite.py
+
+# Run a single test
+python -m unittest src.test.test_pep8.TestPep8.test_pep8
+
+# Run PEP8 style check
+make pep8
+```
+
+### Building the Plugin
+
+The plugin is automatically built and released using GitHub Actions. To manually build:
+
+```bash
+# See RELEASE.md for detailed build instructions
+```
+
 ## Contributing
 
 Contributions are welcome! Please review the [Contribution Guidelines](CONTRIBUTING.md) before starting.
 
 1.  **Fork** the repository on GitHub.
 2.  Create your feature branch: `git checkout -b my-new-feature`
-3.  Commit your changes: `git commit -am 'Add some feature'`
-4.  Push to the branch: `git push origin my-new-feature`
-5.  Open a **Pull Request** :D
+3.  Make your changes following the [code style guidelines](AGENTS.md)
+4.  Run tests: `python test_suite.py` and `make pep8`
+5.  Commit your changes: `git commit -am 'Add some feature'`
+6.  Push to the branch: `git push origin my-new-feature`
+7.  Open a **Pull Request**
 
 ## Reporting Issues
 
@@ -153,8 +221,35 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 * Original Author: Etienne Trimaille
 * Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
+## Changelog
+
+### v0.2.1 (2026-01-19)
+- **Bug Fix**: Fixed f-string syntax error in autocorrelation dialog that prevented plugin loading on macOS
+- Added AGENTS.md for AI coding agent guidance
+- Added RELEASE.md for release process documentation
+- Set up GitHub Actions for automated testing and releases
+- Fixed indentation errors in test files
+
+### v0.2.0 (2025-05-01)
+- QGIS 3.42 support and autocorrelation improvements
+- Updated dependencies and compatibility
+
+See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) for complete version history.
+
+## Documentation
+
+- [AGENTS.md](AGENTS.md) - Development guide for AI coding agents
+- [RELEASE.md](RELEASE.md) - Release process and versioning
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
+- **Discussions**: Use GitHub Issues for questions and discussions
+- **Email**: manuel.vidaurre@gmail.com
+
 ## License
 
 This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
 
-Copyright (c) 2017-2025 The GeoPublicHealth Contributors and Original Authors.
+Copyright (c) 2017-2026 The GeoPublicHealth Contributors and Original Authors.
