@@ -426,24 +426,8 @@ class CommonAutocorrelationDialog(QDialog):
             if hasattr(self, "cbx_contiguity"):
                 contiguity_index = self.cbx_contiguity.currentIndex()
 
-            # Get the layer source and handle GeoPackage layers
             source = self.admin_layer.source()
-
-            # For GeoPackage layers, geopandas needs special handling
-            if "|layername=" in source:
-                # Split the path and layer name
-                parts = source.split("|layername=")
-                gpkg_path = parts[0]
-                layer_name = parts[1] if len(parts) > 1 else None
-
-                # Read specific layer from GeoPackage
-                if layer_name:
-                    gdf = gpd.read_file(gpkg_path, layer=layer_name)
-                else:
-                    gdf = gpd.read_file(gpkg_path)
-            else:
-                # Read regular shapefile or other formats
-                gdf = gpd.read_file(source)
+            gdf = self._read_geopandas_layer(source)
 
             # Create weights matrix
             if contiguity_index == 0:  # queen
@@ -462,6 +446,34 @@ class CommonAutocorrelationDialog(QDialog):
                 Qgis.Warning,
             )
             return self.get_weights_legacy()
+
+    def _read_geopandas_layer(self, source):
+        """Read a layer with GeoPandas, with fallback engine support."""
+        if "|layername=" in source:
+            parts = source.split("|layername=")
+            layer_path = parts[0]
+            layer_name = parts[1] if len(parts) > 1 else None
+        else:
+            layer_path = source
+            layer_name = None
+
+        read_kwargs = {}
+        if layer_name:
+            read_kwargs["layer"] = layer_name
+
+        try:
+            return gpd.read_file(layer_path, **read_kwargs)
+        except Exception as exc:
+            if "expected bytes, str found" not in str(exc):
+                raise
+
+            QgsMessageLog.logMessage(
+                "GeoPandas read_file failed with pyogrio; retrying with Fiona.",
+                "GeoPublicHealth",
+                Qgis.Warning,
+            )
+
+            return gpd.read_file(layer_path, engine="fiona", **read_kwargs)
 
     def get_weights_legacy(self):
         """
@@ -513,24 +525,8 @@ class CommonAutocorrelationDialog(QDialog):
             numpy.ndarray: Array of indicator values
         """
         try:
-            # Get the layer source and handle GeoPackage layers
             source = self.admin_layer.source()
-
-            # For GeoPackage layers, geopandas needs special handling
-            if "|layername=" in source:
-                # Split the path and layer name
-                parts = source.split("|layername=")
-                gpkg_path = parts[0]
-                layer_name = parts[1] if len(parts) > 1 else None
-
-                # Read specific layer from GeoPackage
-                if layer_name:
-                    gdf = gpd.read_file(gpkg_path, layer=layer_name)
-                else:
-                    gdf = gpd.read_file(gpkg_path)
-            else:
-                # Read regular shapefile or other formats
-                gdf = gpd.read_file(source)
+            gdf = self._read_geopandas_layer(source)
 
             # Get values of the specified field
             if field in gdf.columns:
