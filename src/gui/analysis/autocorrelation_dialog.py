@@ -128,6 +128,8 @@ try:
     )
     from esda.getisord import G_Local
     from esda.geary_local import Geary_Local
+    from esda.join_counts import Join_Counts
+    from esda.join_counts_local import Join_Counts_Local
 
     # Check if geopandas is available for modern approach
     try:
@@ -167,6 +169,8 @@ STAT_MORAN_RATE = "moran_rate"
 STAT_MORAN_GLOBAL = "moran_global"
 STAT_MORAN_BV_GLOBAL = "moran_bv_global"
 STAT_MORAN_BV_LOCAL = "moran_bv_local"
+STAT_JOIN_COUNTS_GLOBAL = "join_counts_global"
+STAT_JOIN_COUNTS_LOCAL = "join_counts_local"
 
 
 class CommonAutocorrelationDialog(QDialog):
@@ -475,6 +479,19 @@ class CommonAutocorrelationDialog(QDialog):
                 moran_bv_local = self.calculate_moran_bv_local(y, y_secondary, w)
                 sig_q = moran_bv_local.q * (moran_bv_local.p_sim <= 0.05)
                 self.create_output_features(file_writer, moran_bv_local, sig_q)
+            elif self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+                y_binary = self.binarize_values(y)
+                jc = self.calculate_join_counts_global(y_binary, w)
+                QgsMessageLog.logMessage(
+                    f"Join Counts BB: {jc.bb:.4f}, p={jc.p_sim_bb:.4f}",
+                    "GeoPublicHealth",
+                    Qgis.Info,
+                )
+                self.create_output_features(file_writer, jc)
+            elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+                y_binary = self.binarize_values(y)
+                jc_local = self.calculate_join_counts_local(y_binary, w)
+                self.create_output_features(file_writer, jc_local)
             del file_writer
 
             # Create output layer and add symbology
@@ -539,6 +556,10 @@ class CommonAutocorrelationDialog(QDialog):
                 return STAT_G_LOCAL
             if "rate" in stat_text:
                 return STAT_MORAN_RATE
+            if "join" in stat_text and "global" in stat_text:
+                return STAT_JOIN_COUNTS_GLOBAL
+            if "join" in stat_text and "local" in stat_text:
+                return STAT_JOIN_COUNTS_LOCAL
             if "bivariate" in stat_text and "global" in stat_text:
                 return STAT_MORAN_BV_GLOBAL
             if "bivariate" in stat_text and "local" in stat_text:
@@ -562,6 +583,10 @@ class CommonAutocorrelationDialog(QDialog):
             return ["MBV_I", "MBV_Z", "MBV_P"]
         if self.statistic_type == STAT_MORAN_BV_LOCAL:
             return ["MBV_P", "MBV_Z", "MBV_Q", "MBV_I", "MBV_C"]
+        if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+            return ["JC_BB", "JC_WW", "JC_BW", "JC_PBB", "JC_PBW"]
+        if self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+            return ["LJC", "LJC_P", "LJC_S"]
         return ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]
 
     def get_output_layer_prefix(self):
@@ -579,6 +604,10 @@ class CommonAutocorrelationDialog(QDialog):
             return "MBV"
         if self.statistic_type == STAT_MORAN_BV_LOCAL:
             return "MBVL"
+        if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+            return "JC"
+        if self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+            return "LJC"
         return "LISA"
 
     def get_output_layer_title(self, field):
@@ -596,12 +625,17 @@ class CommonAutocorrelationDialog(QDialog):
             return f"Moran BV Global - {field}"
         if self.statistic_type == STAT_MORAN_BV_LOCAL:
             return f"Moran BV Local - {field}"
+        if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+            return f"Join Counts Global - {field}"
+        if self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+            return f"Join Counts Local - {field}"
         return f"LISA Moran's I - {field}"
 
     def update_statistic_controls(self):
         stat_type = self.get_statistic_type()
         is_rate = stat_type == STAT_MORAN_RATE
         is_bivariate = stat_type in (STAT_MORAN_BV_GLOBAL, STAT_MORAN_BV_LOCAL)
+        is_join = stat_type in (STAT_JOIN_COUNTS_GLOBAL, STAT_JOIN_COUNTS_LOCAL)
 
         if hasattr(self, "cbx_population_field"):
             self.cbx_population_field.setEnabled(is_rate)
@@ -619,6 +653,11 @@ class CommonAutocorrelationDialog(QDialog):
                 hint = tr("(Global)")
             self.label_statistic_hint.setText(hint)
 
+        if hasattr(self, "sbx_binary_threshold"):
+            self.sbx_binary_threshold.setEnabled(is_join)
+        if hasattr(self, "label_binary_threshold"):
+            self.label_binary_threshold.setEnabled(is_join)
+
     def update_help_text(self):
         stat_type = self.get_statistic_type()
         help_map = {
@@ -629,6 +668,8 @@ class CommonAutocorrelationDialog(QDialog):
             STAT_MORAN_GLOBAL: "moran_global",
             STAT_MORAN_BV_GLOBAL: "moran_bv_global",
             STAT_MORAN_BV_LOCAL: "moran_bv_local",
+            STAT_JOIN_COUNTS_GLOBAL: "join_counts_global",
+            STAT_JOIN_COUNTS_LOCAL: "join_counts_local",
         }
         help_key = help_map.get(stat_type, "moran")
         if hasattr(self, "label_stat_help"):
@@ -640,11 +681,20 @@ class CommonAutocorrelationDialog(QDialog):
                 "moran_global": tr("Moran (Global): overall autocorrelation."),
                 "moran_bv_global": tr("Moran BV (Global): two-field association."),
                 "moran_bv_local": tr("Moran BV (Local): co-location clusters."),
+                "join_counts_global": tr("Join Counts: global binary clustering."),
+                "join_counts_local": tr("Join Counts (Local): binary clusters."),
             }
             self.label_stat_help.setText(short_help.get(help_key, ""))
 
         help_html = help_autocorrelation(help_key)
         self.signalHelpChanged.emit(help_html)
+
+    def binarize_values(self, values):
+        if not hasattr(self, "sbx_binary_threshold"):
+            return (values > 0).astype(int)
+
+        threshold = self.sbx_binary_threshold.value()
+        return (values >= threshold).astype(int)
 
     @staticmethod
     def _hotspot_class(z_value, p_value):
@@ -695,6 +745,16 @@ class CommonAutocorrelationDialog(QDialog):
             fields.append(QgsField("MBV_Q", 2, "Integer", 1, 0))
             fields.append(QgsField("MBV_I", 6, "Real", 10, 6))
             fields.append(QgsField("MBV_C", 2, "Integer", 1, 0))
+        elif self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+            fields.append(QgsField("JC_BB", 6, "Real", 10, 6))
+            fields.append(QgsField("JC_WW", 6, "Real", 10, 6))
+            fields.append(QgsField("JC_BW", 6, "Real", 10, 6))
+            fields.append(QgsField("JC_PBB", 6, "Real", 10, 6))
+            fields.append(QgsField("JC_PBW", 6, "Real", 10, 6))
+        elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+            fields.append(QgsField("LJC", 6, "Real", 10, 6))
+            fields.append(QgsField("LJC_P", 6, "Real", 10, 6))
+            fields.append(QgsField("LJC_S", 2, "Integer", 1, 0))
 
     def prepare_file_writer(self, fields, crs_admin_layer):
         """Prepare the output file writer."""
@@ -1037,6 +1097,27 @@ class CommonAutocorrelationDialog(QDialog):
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
             raise
 
+    def calculate_join_counts_global(self, y, w):
+        try:
+            return Join_Counts(y, w, permutations=999)
+        except Exception as e:
+            error_msg = tr("Error calculating Join Counts:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def calculate_join_counts_local(self, y, w):
+        try:
+            return Join_Counts_Local(
+                connectivity=w,
+                permutations=999,
+                n_jobs=1,
+                keep_simulations=False,
+            ).fit(y)
+        except Exception as e:
+            error_msg = tr("Error calculating Local Join Counts:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
     def calculate_geary_local(self, y, w):
         try:
             return Geary_Local(
@@ -1123,6 +1204,16 @@ class CommonAutocorrelationDialog(QDialog):
                     attributes.append(int(stats.q[i]))
                     attributes.append(float(stats.Is[i]))
                     attributes.append(int(sig_q[i]))
+                elif self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+                    attributes.append(float(stats.bb))
+                    attributes.append(float(stats.ww))
+                    attributes.append(float(stats.bw))
+                    attributes.append(float(stats.p_sim_bb))
+                    attributes.append(float(stats.p_sim_bw))
+                elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+                    attributes.append(float(stats.LJC[i]))
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(int(stats.p_sim[i] <= 0.05))
 
                 new_feature = QgsFeature()
                 new_geom = QgsGeometry(feature.geometry())
@@ -1180,6 +1271,10 @@ class CommonAutocorrelationDialog(QDialog):
                 self.output_layer.triggerRepaint()
                 return
 
+            if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
+                self.output_layer.triggerRepaint()
+                return
+
             if self.statistic_type == STAT_GEARY:
                 categories = []
                 for value, (color, label) in {
@@ -1207,6 +1302,21 @@ class CommonAutocorrelationDialog(QDialog):
                     categories.append(QgsRendererCategory(value, sym, label))
 
                 renderer = QgsCategorizedSymbolRenderer("G_HOT", categories)
+                self.output_layer.setRenderer(renderer)
+                self.output_layer.triggerRepaint()
+                return
+
+            if self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
+                categories = []
+                for value, (color, label) in {
+                    1: ("#b92815", tr("Significant")),
+                    0: ("#c0c0c0", tr("Not significant")),
+                }.items():
+                    sym = QgsSymbol.defaultSymbol(self.output_layer.geometryType())
+                    sym.setColor(QColor(color))
+                    categories.append(QgsRendererCategory(value, sym, label))
+
+                renderer = QgsCategorizedSymbolRenderer("LJC_S", categories)
                 self.output_layer.setRenderer(renderer)
                 self.output_layer.triggerRepaint()
                 return

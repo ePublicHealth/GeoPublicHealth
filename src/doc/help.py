@@ -412,6 +412,40 @@ def help_autocorrelation(statistic=None):
             tr("MBV_C = significance level"),
         ]
         more = [tr("Local bivariate Moran highlights co-location patterns.")]
+    elif stat == "join_counts_global":
+        intro = tr("Join Counts (Global)")
+        inputs = [
+            tr("Polygon layer : administrative boundary with a binary field"),
+            tr("Field: binary indicator (0/1 or thresholded)"),
+            tr("Binary threshold: values >= threshold are treated as 1"),
+            tr("Contiguity: Rook or Queen weights"),
+            tr("Output: shapefile or GeoPackage for results"),
+        ]
+        outputs = [
+            tr("New polygon layer with:"),
+            tr("JC_BB = black-black joins"),
+            tr("JC_WW = white-white joins"),
+            tr("JC_BW = black-white joins"),
+            tr("JC_PBB = p-value for BB joins"),
+            tr("JC_PBW = p-value for BW joins"),
+        ]
+        more = [tr("Join counts summarize clustering of a binary outcome.")]
+    elif stat == "join_counts_local":
+        intro = tr("Join Counts (Local)")
+        inputs = [
+            tr("Polygon layer : administrative boundary with a binary field"),
+            tr("Field: binary indicator (0/1 or thresholded)"),
+            tr("Binary threshold: values >= threshold are treated as 1"),
+            tr("Contiguity: Rook or Queen weights"),
+            tr("Output: shapefile or GeoPackage for results"),
+        ]
+        outputs = [
+            tr("New polygon layer with:"),
+            tr("LJC = local join count"),
+            tr("LJC_P = pseudo p-values"),
+            tr("LJC_S = significance flag"),
+        ]
+        more = [tr("Local join counts highlight binary clustering hotspots.")]
     else:
         intro = tr("Local Moran / LISA")
         inputs = [

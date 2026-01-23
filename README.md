@@ -1,6 +1,6 @@
 # GeoPublicHealth
 
-[![Version](https://img.shields.io/badge/version-0.2.18-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.18)
+[![Version](https://img.shields.io/badge/version-0.2.19-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.19)
 [![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
@@ -14,7 +14,7 @@ GeoPublicHealth provides a simplified interface within QGIS, tailored for users 
 This plugin aims to integrate and enhance methods similar to those found in the pioneering SIGEpi software, leveraging the power and flexibility of the modern QGIS platform.
 
 Key analysis tools include:
-- Spatial autocorrelation: Moran (local/global), Moran rate, bivariate Moran, Local Geary, Getis-Ord G
+- Spatial autocorrelation: Moran (local/global), Moran rate, bivariate Moran, Join Counts, Local Geary, Getis-Ord G
 - Incidence and density mapping workflows
 - Composite index building and data blurring utilities
 
@@ -40,7 +40,7 @@ Before installing the GeoPublicHealth plugin, you need:
 
 Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
 
-**Latest Version:** v0.2.18 (2026-01-23) - Moran global and bivariate
+**Latest Version:** v0.2.19 (2026-01-23) - Join counts statistics
 
 ## Installation
 
