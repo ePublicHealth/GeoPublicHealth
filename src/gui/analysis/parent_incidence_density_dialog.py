@@ -26,6 +26,7 @@
 import traceback
 import tempfile
 import os
+import sys
 from typing import Dict, List, Optional, Union, Any
 
 # Third-Party Imports
@@ -803,13 +804,34 @@ class IncidenceDensityDialog(QDialog):
             return
 
         last_dir = QSettings().value("GeoPublicHealth/lastDir", os.path.expanduser("~"))
+        options = QFileDialog.Options()
+        if sys.platform == "darwin":
+            options |= QFileDialog.DontUseNativeDialog
 
-        output_file, selected_filter = QFileDialog.getSaveFileName(
-            self,
-            tr("Save Output Layer"),
-            last_dir,
-            tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
-        )
+        try:
+            output_file, selected_filter = QFileDialog.getSaveFileName(
+                self,
+                tr("Save Output Layer"),
+                last_dir,
+                tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
+                options=options,
+            )
+        except Exception as exc:
+            QgsMessageLog.logMessage(
+                f"Output file dialog failed: {exc}",
+                "GeoPublicHealth",
+                Qgis.Critical,
+            )
+            QgsMessageLog.logMessage(
+                traceback.format_exc(),
+                "GeoPublicHealth",
+                Qgis.Critical,
+            )
+            display_message_bar(
+                tr("Failed to open output file dialog."),
+                level=Qgis.Critical,
+            )
+            return
 
         if output_file:
             is_shp = "(*.shp)" in selected_filter
