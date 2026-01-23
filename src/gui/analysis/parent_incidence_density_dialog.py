@@ -100,6 +100,7 @@ from geopublichealth.src.core.exceptions import (
     GeoPublicHealthException,
     NoLayerProvidedException,
     DifferentCrsException,
+    CreatingShapeFileException,
     FieldExistingException,
     FieldException,
     NotANumberException,
