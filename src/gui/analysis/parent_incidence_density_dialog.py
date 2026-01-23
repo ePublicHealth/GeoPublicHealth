@@ -26,6 +26,7 @@
 import traceback
 import tempfile
 import os
+import sys
 from typing import Dict, List, Optional, Union, Any
 
 # Third-Party Imports
@@ -44,6 +45,7 @@ from qgis.PyQt.QtWidgets import (
     QTableWidgetItem,
     QApplication,
     QFileDialog,
+    QInputDialog,
     QMessageBox,
     QVBoxLayout,
     QCheckBox,
@@ -83,7 +85,6 @@ from qgis.core import (
 
 # QGIS GUI Imports
 from qgis.gui import (
-    QgsFileDialog,
     QgsFieldComboBox,
     QgsMapLayerComboBox,
     QgsColorButton,
@@ -805,12 +806,23 @@ class IncidenceDensityDialog(QDialog):
 
         last_dir = QSettings().value("GeoPublicHealth/lastDir", os.path.expanduser("~"))
         try:
-            output_file, selected_filter = QgsFileDialog.getSaveFileName(
-                self,
-                tr("Save Output Layer"),
-                last_dir,
-                tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
-            )
+            if sys.platform == "darwin":
+                output_file, ok = QInputDialog.getText(
+                    self,
+                    tr("Save Output Layer"),
+                    tr("Output file path (.gpkg or .shp):"),
+                    text=last_dir,
+                )
+                if not ok:
+                    return
+                selected_filter = ""
+            else:
+                output_file, selected_filter = QFileDialog.getSaveFileName(
+                    self,
+                    tr("Save Output Layer"),
+                    last_dir,
+                    tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
+                )
         except Exception as exc:
             QgsMessageLog.logMessage(
                 f"Output file dialog failed: {exc}",
@@ -829,8 +841,12 @@ class IncidenceDensityDialog(QDialog):
             return
 
         if output_file:
-            is_shp = "(*.shp)" in selected_filter
-            is_gpkg = "(*.gpkg)" in selected_filter
+            is_shp = "(*.shp)" in selected_filter or output_file.lower().endswith(
+                ".shp"
+            )
+            is_gpkg = "(*.gpkg)" in selected_filter or output_file.lower().endswith(
+                ".gpkg"
+            )
             base, ext = os.path.splitext(output_file)
 
             # Apply correct extension based on filter
