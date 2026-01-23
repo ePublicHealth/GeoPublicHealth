@@ -67,6 +67,30 @@ After installation, check that the plugin loaded successfully:
 3. **GeoPublicHealth** should be listed without any error icons
 4. You should see the **GeoPublicHealth** menu in the QGIS menu bar
 
+## Optional: Install matplotlib for Plotting Features
+
+matplotlib is optional but enables graphing and plotting features. To install it:
+
+### Using QGIS Python Console (Easiest Method)
+
+1. Open QGIS
+2. Go to **Plugins** → **Python Console**
+3. Paste this code and press Enter:
+   ```python
+   import subprocess, sys
+   subprocess.run([sys.executable, "-m", "pip", "install", "--user", "matplotlib"])
+   ```
+4. Restart QGIS
+
+### Alternative: Run the Installation Script
+
+1. Download `install_matplotlib_in_qgis.py` from the repository
+2. Open QGIS
+3. Go to **Plugins** → **Python Console**
+4. Click **Show Editor** button (folder icon)
+5. Open the script file
+6. Click **Run Script** (play button)
+
 ## Still Having Issues?
 
 If you're still experiencing problems:
@@ -76,6 +100,14 @@ If you're still experiencing problems:
    ls -la ~/Library/Application\ Support/QGIS/QGIS3/profiles/default/python/plugins/geopublichealth/
    ```
 3. Make sure the `__init__.py` file contains: `from geopublichealth.src.plugin import GeoPublicHealthPlugin`
+4. Check if matplotlib is missing by running in the Python Console:
+   ```python
+   try:
+       import matplotlib
+       print(f"matplotlib {matplotlib.__version__} is installed")
+   except ImportError:
+       print("matplotlib is not installed (optional for plotting)")
+   ```
 
 ## For Developers
 
