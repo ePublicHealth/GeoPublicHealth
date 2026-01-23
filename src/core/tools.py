@@ -212,7 +212,8 @@ def get_open_file_path(parent, title, directory, file_filter, prompt=None):
 def _normalize_path(path):
     if not path:
         return path
-    return os.path.normpath(os.path.expanduser(path))
+    cleaned = path.strip().strip('"').strip("'")
+    return os.path.normpath(os.path.expanduser(cleaned))
 
 
 def _validate_output_path(output_file):
@@ -224,7 +225,10 @@ def _validate_output_path(output_file):
         return True
 
     if not os.path.isdir(directory):
-        display_message_bar(tr("Output directory does not exist."), level=Qgis.Critical)
+        display_message_bar(
+            tr("Output directory does not exist:") + f" {directory}",
+            level=Qgis.Critical,
+        )
         return False
 
     return True

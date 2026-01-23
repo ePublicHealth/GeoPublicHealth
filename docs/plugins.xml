@@ -1,9 +1,9 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <plugins>
-    <pyqgis_plugin name="GeoPublicHealth" version="0.2.12">
+    <pyqgis_plugin name="GeoPublicHealth" version="0.2.13">
         <description><![CDATA[Comprehensive QGIS plugin for epidemiology and public health spatial analysis, disease mapping, and statistical tools]]></description>
         <about><![CDATA[GeoPublicHealth is a specialized QGIS plugin for epidemiologists and public health professionals. Features include spatial autocorrelation (Moran's I, LISA), disease incidence and density mapping, data blurring for privacy, composite index creation, and statistical analysis. Built upon GeoHealth Plugin by Etienne Trimaille, integrating methods from SIGEpi developed by Dr. Carlos Castillo-Salgado (Johns Hopkins Bloomberg School of Public Health, PAHO/WHO). Compatible with QGIS 3.42+. Full GeoPackage and Shapefile support. Optional matplotlib for visualization. Actively maintained with comprehensive documentation.]]></about>
-        <version>0.2.12</version>
+        <version>0.2.13</version>
         <qgis_minimum_version>3.0</qgis_minimum_version>
         <qgis_maximum_version>3.99</qgis_maximum_version>
         <homepage><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]></homepage>
@@ -13,7 +13,7 @@
         <download_url><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth.zip]]></download_url>
         <uploaded_by><![CDATA[mvidaurre]]></uploaded_by>
         <create_date>2016-04-24T15:31:19.824333</create_date>
-        <update_date>2026-01-23T01:55:00.000000</update_date>
+        <update_date>2026-01-23T02:05:00.000000</update_date>
         <experimental>True</experimental>
         <deprecated>False</deprecated>
         <tracker><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/issues]]></tracker>
