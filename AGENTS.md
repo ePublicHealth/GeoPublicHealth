@@ -272,6 +272,7 @@ except ImportError:
 5. **PEP8 Compliance**: Code must pass `make pep8` with the project's ignore rules
 6. **Localization**: All user-facing strings must be translatable (wrapped in `tr()`)
 7. **Qt Compatibility**: Use PyQt5 (or PyQt6 if migrating, but currently PyQt5)
+8. **macOS dialogs**: File dialogs fall back to manual path prompts for stability
 
 ## Contributing Workflow
 
