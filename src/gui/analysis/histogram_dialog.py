@@ -20,24 +20,26 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from __future__ import print_function
 
 from builtins import str
 from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox
 from qgis.PyQt.QtCore import QSize, pyqtSignal
-from matplotlib.backends.backend_qt5agg import \
-    FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
 
+from geopublichealth.src.core.optional_deps import (
+    MATPLOTLIB_AVAILABLE,
+    Figure,
+    FigureCanvas,
+)
 from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
 from geopublichealth.src.utilities.resources import get_ui_class
 
-FORM_CLASS = get_ui_class('analysis', 'histogram.ui')
+FORM_CLASS = get_ui_class("analysis", "histogram.ui")
 
 
 class HistogramDialog(QDialog, FORM_CLASS):
-
-    signalAskCloseWindow = pyqtSignal(int, name='signalAskCloseWindow')
+    signalAskCloseWindow = pyqtSignal(int, name="signalAskCloseWindow")
 
     def __init__(self, parent=None):
         """Constructor."""
@@ -45,21 +47,26 @@ class HistogramDialog(QDialog, FORM_CLASS):
         self.setupUi(self)
 
         # Connect slot.
-        self.button_box.button(QDialogButtonBox.Ok).clicked.connect(
-            self.draw_plot)
+        self.button_box.button(QDialogButtonBox.Ok).clicked.connect(self.draw_plot)
+        self.button_box.button(QDialogButtonBox.Cancel).clicked.connect(self.hide)
         self.button_box.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.hide)
-        self.button_box.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
+            self.signalAskCloseWindow.emit
+        )
 
         # Setup the graph.
-        self.figure = Figure()
-        self.ax = self.figure.add_subplot(1, 1, 1)
-        self.canvas = FigureCanvas(self.figure)
-        self.canvas.setMinimumSize(QSize(300, 0))
-        self.toolbar = CustomNavigationToolbar(self.canvas, self)
-        self.layout_plot.addWidget(self.toolbar)
-        self.layout_plot.addWidget(self.canvas)
+        if MATPLOTLIB_AVAILABLE:
+            self.figure = Figure()
+            self.ax = self.figure.add_subplot(1, 1, 1)
+            self.canvas = FigureCanvas(self.figure)
+            self.canvas.setMinimumSize(QSize(300, 0))
+            self.toolbar = CustomNavigationToolbar(self.canvas, self)
+            self.layout_plot.addWidget(self.toolbar)
+            self.layout_plot.addWidget(self.canvas)
+        else:
+            self.figure = None
+            self.ax = None
+            self.canvas = None
+            self.toolbar = None
 
     def draw_plot(self):
         """Function to draw the plot and display it in the canvas."""
@@ -70,16 +77,14 @@ class HistogramDialog(QDialog, FORM_CLASS):
 
         for ran in render.ranges():
             # fix_print_with_import
-            print("%f - %f: %s %s" % (
-                ran.lowerValue(),
-                ran.upperValue(),
-                ran.label(),
-                str(ran.symbol())
-            ))
+            print(
+                "%f - %f: %s %s"
+                % (ran.lowerValue(), ran.upperValue(), ran.label(), str(ran.symbol()))
+            )
 
         bar_list = self.ax.bar([1, 2, 3, 4], [1, 2, 3, 4])
-        bar_list[0].set_color('r')
-        bar_list[1].set_color('g')
-        bar_list[2].set_color('b')
+        bar_list[0].set_color("r")
+        bar_list[1].set_color("g")
+        bar_list[2].set_color("b")
 
         self.canvas.draw()

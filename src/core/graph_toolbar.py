@@ -20,10 +20,25 @@
  *                                                                         *
  ***************************************************************************/
 """
-from matplotlib.backends.backend_qt5agg import \
-    NavigationToolbar2QT as NavigationToolbar
+
+from geopublichealth.src.core.optional_deps import (
+    MATPLOTLIB_AVAILABLE,
+    NavigationToolbar,
+)
 
 
-class CustomNavigationToolbar(NavigationToolbar):
-    toolitems = [t for t in NavigationToolbar.toolitems if
-                 t[0] in ('Home', 'Back', 'Next', 'Pan', 'Zoom', 'Save')]
+class CustomNavigationToolbar(NavigationToolbar if MATPLOTLIB_AVAILABLE else object):
+    """Custom navigation toolbar for matplotlib plots."""
+
+    def __init__(self, *args, **kwargs):
+        if not MATPLOTLIB_AVAILABLE:
+            super().__init__()
+            return
+        super().__init__(*args, **kwargs)
+
+    if MATPLOTLIB_AVAILABLE and NavigationToolbar is not None:
+        toolitems = [
+            t
+            for t in NavigationToolbar.toolitems
+            if t[0] in ("Home", "Back", "Next", "Pan", "Zoom", "Save")
+        ]
