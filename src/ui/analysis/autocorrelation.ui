@@ -122,6 +122,23 @@
        </item>
       </widget>
      </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_stat_help_title">
+       <property name="text">
+        <string>Help</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="label_stat_help">
+       <property name="text">
+        <string>Moran (LISA): clusters. Local Geary: local dissimilarity. Getis-Ord G: hot/cold spots. Moran Rate: use case/population.</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
      <item row="12" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
