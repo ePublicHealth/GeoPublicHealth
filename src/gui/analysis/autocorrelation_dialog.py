@@ -556,9 +556,30 @@ class CommonAutocorrelationDialog(QDialog):
             layer_crs = self.admin_layer.crs()
             if layer_crs and layer_crs.isValid():
                 crs_value = layer_crs.authid() or layer_crs.toWkt()
-                gdf.set_crs(crs_value, inplace=True)
+                self._set_geopandas_crs(gdf, crs_value)
 
         return gdf
+
+    def _set_geopandas_crs(self, gdf, crs_value):
+        if not crs_value:
+            return
+
+        try:
+            gdf.set_crs(crs_value, inplace=True)
+            return
+        except TypeError:
+            if isinstance(crs_value, str):
+                try:
+                    gdf.set_crs(crs_value.encode("utf-8"), inplace=True)
+                    return
+                except Exception:
+                    pass
+
+        QgsMessageLog.logMessage(
+            "Unable to set CRS for GeoPandas data.",
+            "GeoPublicHealth",
+            Qgis.Warning,
+        )
 
     def _read_fiona_without_geometry(self, layer_path, layer_name):
         try:
@@ -582,8 +603,12 @@ class CommonAutocorrelationDialog(QDialog):
         gdf = gpd.GeoDataFrame(pd.DataFrame(rows), geometry=geometries)
         gdf = self._ensure_geopandas_geometry(gdf)
 
-        if gdf.crs is None and crs_value:
-            gdf.set_crs(crs_value, inplace=True)
+        if gdf.crs is None:
+            layer_crs = self.admin_layer.crs()
+            if layer_crs and layer_crs.isValid():
+                crs_value = layer_crs.authid() or layer_crs.toWkt()
+
+            self._set_geopandas_crs(gdf, crs_value)
 
         return gdf
 
