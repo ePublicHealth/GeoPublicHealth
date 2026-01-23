@@ -1,6 +1,6 @@
 # GeoPublicHealth
 
-[![Version](https://img.shields.io/badge/version-0.2.21-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.21)
+[![Version](https://img.shields.io/badge/version-0.2.22-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.22)
 [![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
@@ -40,7 +40,7 @@ Before installing the GeoPublicHealth plugin, you need:
 
 Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
 
-**Latest Version:** v0.2.21 (2026-01-23) - Global stat symbology
+**Latest Version:** v0.2.22 (2026-01-23) - Autocorrelation UI improvements
 
 ## Installation
 

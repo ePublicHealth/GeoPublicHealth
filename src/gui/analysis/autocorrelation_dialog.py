@@ -309,6 +309,40 @@ class CommonAutocorrelationDialog(QDialog):
 
             self.update_statistic_controls()
             self.update_help_text()
+            self.set_summary_text(tr("Summary will appear after running."))
+
+            if hasattr(self, "cbx_aggregation_layer"):
+                self.cbx_aggregation_layer.setToolTip(
+                    tr("Polygon layer with the indicator field.")
+                )
+            if hasattr(self, "cbx_indicator_field"):
+                self.cbx_indicator_field.setToolTip(
+                    tr("Primary numeric field used in the statistic.")
+                )
+            if hasattr(self, "cbx_population_field"):
+                self.cbx_population_field.setToolTip(
+                    tr("Population field used for Moran Rate.")
+                )
+            if hasattr(self, "cbx_secondary_field"):
+                self.cbx_secondary_field.setToolTip(
+                    tr("Secondary field used for bivariate statistics.")
+                )
+            if hasattr(self, "cbx_statistic"):
+                self.cbx_statistic.setToolTip(
+                    tr("Select the autocorrelation statistic to run.")
+                )
+            if hasattr(self, "cbx_contiguity"):
+                self.cbx_contiguity.setToolTip(
+                    tr("Define spatial neighbors: Queen or Rook.")
+                )
+            if hasattr(self, "sbx_binary_threshold"):
+                self.sbx_binary_threshold.setToolTip(
+                    tr("Threshold for binarizing values for Join Counts.")
+                )
+            if hasattr(self, "cbx_binary_auto"):
+                self.cbx_binary_auto.setToolTip(
+                    tr("Auto-detect 0/1 binary fields for Join Counts.")
+                )
 
         except Exception as e:
             display_message_bar(
@@ -371,6 +405,7 @@ class CommonAutocorrelationDialog(QDialog):
         try:
             # Prepare UI for processing
             self.prepare_run()
+            self.set_summary_text(tr("Running analysis..."))
 
             # Get input parameters
             self.admin_layer = self.cbx_aggregation_layer.currentLayer()
@@ -435,12 +470,15 @@ class CommonAutocorrelationDialog(QDialog):
                 lm = self.calculate_moran_local(y, w)
                 sig_q = lm.q * (lm.p_sim <= 0.05)
                 self.create_output_features(file_writer, lm, sig_q)
+                self.set_summary_text(tr("Local statistic; see output layer fields."))
             elif self.statistic_type == STAT_GEARY:
                 geary = self.calculate_geary_local(y, w)
                 self.create_output_features(file_writer, geary)
+                self.set_summary_text(tr("Local statistic; see output layer fields."))
             elif self.statistic_type == STAT_G_LOCAL:
                 g_local = self.calculate_g_local(y, w)
                 self.create_output_features(file_writer, g_local)
+                self.set_summary_text(tr("Local statistic; see output layer fields."))
             elif self.statistic_type == STAT_MORAN_RATE:
                 if GEOPANDAS_AVAILABLE:
                     population = self.get_indicator_values_modern(population_field)
@@ -454,6 +492,12 @@ class CommonAutocorrelationDialog(QDialog):
                 )
                 sig_q = rate_local.q * (rate_local.p_sim <= 0.05)
                 self.create_output_features(file_writer, rate_local, sig_q)
+                self.set_summary_text(
+                    tr("Moran Rate (Global)")
+                    + f"\nI={rate_global.I:.4f}"
+                    + f"\nZ={rate_global.z_sim:.4f}"
+                    + f"\nP={rate_global.p_sim:.4f}"
+                )
             elif self.statistic_type == STAT_MORAN_GLOBAL:
                 moran_global = self.calculate_moran_global(y, w)
                 QgsMessageLog.logMessage(
@@ -462,6 +506,12 @@ class CommonAutocorrelationDialog(QDialog):
                     Qgis.Info,
                 )
                 self.create_output_features(file_writer, moran_global)
+                self.set_summary_text(
+                    tr("Moran (Global)")
+                    + f"\nI={moran_global.I:.4f}"
+                    + f"\nZ={moran_global.z_sim:.4f}"
+                    + f"\nP={moran_global.p_sim:.4f}"
+                )
             elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
                 if GEOPANDAS_AVAILABLE:
                     y_secondary = self.get_indicator_values_modern(secondary_field)
@@ -474,6 +524,12 @@ class CommonAutocorrelationDialog(QDialog):
                     Qgis.Info,
                 )
                 self.create_output_features(file_writer, moran_bv)
+                self.set_summary_text(
+                    tr("Moran BV (Global)")
+                    + f"\nI={moran_bv.I:.4f}"
+                    + f"\nZ={moran_bv.z_sim:.4f}"
+                    + f"\nP={moran_bv.p_sim:.4f}"
+                )
             elif self.statistic_type == STAT_MORAN_BV_LOCAL:
                 if GEOPANDAS_AVAILABLE:
                     y_secondary = self.get_indicator_values_modern(secondary_field)
@@ -482,6 +538,7 @@ class CommonAutocorrelationDialog(QDialog):
                 moran_bv_local = self.calculate_moran_bv_local(y, y_secondary, w)
                 sig_q = moran_bv_local.q * (moran_bv_local.p_sim <= 0.05)
                 self.create_output_features(file_writer, moran_bv_local, sig_q)
+                self.set_summary_text(tr("Local statistic; see output layer fields."))
             elif self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
                 y_binary = self.binarize_values(y)
                 jc = self.calculate_join_counts_global(y_binary, w)
@@ -491,10 +548,17 @@ class CommonAutocorrelationDialog(QDialog):
                     Qgis.Info,
                 )
                 self.create_output_features(file_writer, jc)
+                self.set_summary_text(
+                    tr("Join Counts (Global)")
+                    + f"\nBB={jc.bb:.4f} (p={jc.p_sim_bb:.4f})"
+                    + f"\nWW={jc.ww:.4f}"
+                    + f"\nBW={jc.bw:.4f} (p={jc.p_sim_bw:.4f})"
+                )
             elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
                 y_binary = self.binarize_values(y)
                 jc_local = self.calculate_join_counts_local(y_binary, w)
                 self.create_output_features(file_writer, jc_local)
+                self.set_summary_text(tr("Local statistic; see output layer fields."))
             del file_writer
 
             # Create output layer and add symbology
@@ -587,7 +651,7 @@ class CommonAutocorrelationDialog(QDialog):
         if self.statistic_type == STAT_MORAN_BV_LOCAL:
             return ["MBV_P", "MBV_Z", "MBV_Q", "MBV_I", "MBV_C"]
         if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
-            return ["JC_BB", "JC_WW", "JC_BW", "JC_PBB", "JC_PBW"]
+            return ["JC_BB", "JC_WW", "JC_BW", "JC_PBB", "JC_PBW", "JC_S"]
         if self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
             return ["LJC", "LJC_P", "LJC_S"]
         return ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]
@@ -698,6 +762,10 @@ class CommonAutocorrelationDialog(QDialog):
 
         help_html = help_autocorrelation(help_key)
         self.signalHelpChanged.emit(help_html)
+
+    def set_summary_text(self, text):
+        if hasattr(self, "te_summary"):
+            self.te_summary.setPlainText(text)
 
     def binarize_values(self, values):
         auto_binary = False

@@ -228,7 +228,7 @@
        </property>
       </widget>
      </item>
-     <item row="12" column="1">
+     <item row="11" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
         <widget class="QLineEdit" name="le_output_filepath">
@@ -246,14 +246,14 @@
        </item>
       </layout>
      </item>
-     <item row="8" column="0">
+     <item row="10" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Contiguity</string>
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="10" column="1">
       <widget class="QComboBox" name="cbx_contiguity">
        <property name="enabled">
         <bool>true</bool>
@@ -282,7 +282,7 @@
        </item>
       </widget>
      </item>
-     <item row="12" column="0">
+     <item row="11" column="0">
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>Output</string>
@@ -290,6 +290,28 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="group_summary">
+     <property name="title">
+      <string>Summary</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_summary">
+      <item>
+       <widget class="QTextEdit" name="te_summary">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="minimumHeight">
+         <number>70</number>
+        </property>
+        <property name="placeholderText">
+         <string>Summary will appear after running.</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="button_box_ok">
