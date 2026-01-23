@@ -364,6 +364,28 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 
 ## Changelog
 
+### v0.2.22 (2026-01-23)
+- Autocorrelation UI summary panel and updated layout
+- Tooltips for statistic, fields, and join counts inputs
+
+### v0.2.21 (2026-01-23)
+- Added significance flags and symbology for global stats
+
+### v0.2.20 (2026-01-23)
+- Join counts auto-detect for binary fields
+
+### v0.2.19 (2026-01-23)
+- Join counts global/local statistics with thresholding
+
+### v0.2.18 (2026-01-23)
+- Moran global and bivariate statistics
+- Dynamic help panel updates based on statistic
+
+### v0.2.17–0.2.3 (2026-01-22 to 2026-01-23)
+- GeoPackage autocorrelation fixes and CRS handling
+- macOS file dialog fallbacks and output path validation
+- Output geometry recovery and exception handling fixes
+
 ### v0.2.2 (2026-01-22)
 - **Critical Bug Fixes**:
   - Fixed spatial autocorrelation for GeoPackage layers
