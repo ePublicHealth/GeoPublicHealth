@@ -861,7 +861,12 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_geary_local(self, y, w):
         try:
-            return Geary_Local(connectivity=w, permutations=999).fit(y)
+            return Geary_Local(
+                connectivity=w,
+                permutations=999,
+                n_jobs=1,
+                keep_simulations=False,
+            ).fit(y)
         except Exception as e:
             error_msg = tr("Error calculating Local Geary:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -869,7 +874,14 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_g_local(self, y, w):
         try:
-            return G_Local(y, w, transform="R", permutations=999)
+            return G_Local(
+                y,
+                w,
+                transform="R",
+                permutations=999,
+                n_jobs=1,
+                keep_simulations=False,
+            )
         except Exception as e:
             error_msg = tr("Error calculating Getis-Ord G:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
