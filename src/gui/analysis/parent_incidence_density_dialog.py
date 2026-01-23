@@ -570,12 +570,15 @@ class IncidenceDensityDialog(QDialog):
         if hasattr(self, "cbx_aggregation_layer") and self.cbx_aggregation_layer:
             self.cbx_aggregation_layer.setFilters(QgsMapLayerProxyModel.PolygonLayer)
         else:
-            QMessageBox.critical(
-                self,
-                tr("UI Setup Error"),
-                tr("Aggregation layer combobox ('cbx_aggregation_layer') not found."),
+            # Log warning but don't block - some dialog variants may not have this element
+            QgsMessageLog.logMessage(
+                tr(
+                    "Aggregation layer combobox ('cbx_aggregation_layer') not found in UI. This is expected for some dialog variants."
+                ),
+                "GeoPublicHealth",
+                Qgis.Warning,
             )
-            return
+            # Don't return - continue with initialization
 
         # --- Conditional UI Setup ---
         self._setup_conditional_ui()
