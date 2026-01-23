@@ -67,6 +67,46 @@ After installation, check that the plugin loaded successfully:
 3. **GeoPublicHealth** should be listed without any error icons
 4. You should see the **GeoPublicHealth** menu in the QGIS menu bar
 
+## Install Required Dependencies
+
+After reinstalling the plugin, you'll need to install the required Python dependencies.
+
+### Installing libpysal and esda (Required)
+
+These are **required** for spatial autocorrelation and analysis features.
+
+**Using QGIS Python Console:**
+
+1. Open QGIS
+2. Go to **Plugins** → **Python Console**
+3. Run these commands **one at a time** (press Enter after each line):
+   ```python
+   import pip
+   ```
+   ```python
+   pip.main(['install', 'numpy'])
+   ```
+   ```python
+   pip.main(['install', 'scipy'])
+   ```
+   ```python
+   pip.main(['install', 'pandas'])
+   ```
+   ```python
+   pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+   ```
+   ```python
+   pip.main(['install', 'numba'])
+   ```
+4. Restart QGIS
+5. Verify installation:
+   ```python
+   import libpysal, esda
+   print(f"libpysal {libpysal.__version__}, esda {esda.__version__} installed!")
+   ```
+
+**Important:** Do NOT paste multiple lines at once. Run each command separately.
+
 ## Optional: Install matplotlib for Plotting Features
 
 matplotlib is optional but enables graphing and plotting features. To install it:
@@ -75,12 +115,21 @@ matplotlib is optional but enables graphing and plotting features. To install it
 
 1. Open QGIS
 2. Go to **Plugins** → **Python Console**
-3. Paste this code and press Enter:
+3. Run these commands **one at a time** (press Enter after each line):
    ```python
-   import subprocess, sys
-   subprocess.run([sys.executable, "-m", "pip", "install", "--user", "matplotlib"])
+   import pip
+   ```
+   ```python
+   pip.main(['install', 'matplotlib'])
    ```
 4. Restart QGIS
+5. Verify installation:
+   ```python
+   import matplotlib
+   print(f"matplotlib {matplotlib.__version__} installed!")
+   ```
+
+**Important:** Do NOT paste multiple lines at once. Run each command separately or you'll get a `SyntaxError`.
 
 ### Alternative: Run the Installation Script
 
