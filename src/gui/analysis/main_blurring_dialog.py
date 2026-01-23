@@ -24,7 +24,7 @@
 from qgis.PyQt.QtWidgets import QDialog
 from qgis.PyQt.QtCore import pyqtSignal
 
-from GeoPublicHealth.src.ui.main_blurring import Ui_Form
+from geopublichealth.src.ui.main_blurring import Ui_Form
 
 
 class MainBlurringDialog(QDialog, Ui_Form):

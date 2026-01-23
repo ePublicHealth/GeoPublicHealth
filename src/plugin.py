@@ -29,9 +29,9 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 #from processing.core.Processing import Processing
 
-from GeoPublicHealth.src.gui.main_window import MainDialog
-from GeoPublicHealth.src.processing_geopublichealth.provider import Provider
-from GeoPublicHealth.src.utilities.resources import resource
+from geopublichealth.src.gui.main_window import MainDialog
+from geopublichealth.src.processing_geopublichealth.provider import Provider
+from geopublichealth.src.utilities.resources import resource
 
 
 class GeoPublicHealthPlugin(object):

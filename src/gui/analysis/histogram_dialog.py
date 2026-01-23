@@ -29,8 +29,8 @@ from matplotlib.backends.backend_qt5agg import \
     FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
+from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('analysis', 'histogram.ui')
 

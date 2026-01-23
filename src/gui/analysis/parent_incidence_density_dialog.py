@@ -61,16 +61,16 @@ from qgis.gui import (
 from qgis.utils import iface
 
 # Plugin-Specific Imports
-from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
-from GeoPublicHealth.src.core.tools import display_message_bar, tr
-from GeoPublicHealth.src.core.exceptions import \
+from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
+from geopublichealth.src.core.tools import display_message_bar, tr
+from geopublichealth.src.core.exceptions import \
     GeoPublicHealthException,\
     NoLayerProvidedException,\
     DifferentCrsException,\
     FieldExistingException,\
     FieldException,\
     NotANumberException
-from GeoPublicHealth.src.core.stats import Stats
+from geopublichealth.src.core.stats import Stats
 
 
 # --------------------------------------------------------------------------

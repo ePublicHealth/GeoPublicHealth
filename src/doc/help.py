@@ -24,7 +24,7 @@
 
 
 from os.path import dirname, abspath, join
-from GeoPublicHealth.src.core.tools import tr
+from geopublichealth.src.core.tools import tr
 
 
 PATH = dirname(abspath(__file__))

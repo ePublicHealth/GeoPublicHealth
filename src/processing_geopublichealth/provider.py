@@ -25,9 +25,9 @@ from qgis.PyQt.QtGui import QIcon
 #from qgis.core import QgsProcessingProvider
 from qgis.core import QgsProcessingProvider
 
-from GeoPublicHealth.src.processing_geopublichealth.blurring import (
+from geopublichealth.src.processing_geopublichealth.blurring import (
     BlurringGeoAlgorithm)
-from GeoPublicHealth.src.utilities.resources import resource
+from geopublichealth.src.utilities.resources import resource
 
 class Provider(QgsProcessingProvider):
 #class Provider(QgsProcessingProvider):

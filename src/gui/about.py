@@ -23,7 +23,7 @@
 
 from qgis.PyQt.QtWidgets import QWidget
 from qgis.PyQt.QtGui import QPixmap
-from GeoPublicHealth.src.utilities.resources import get_ui_class, resource
+from geopublichealth.src.utilities.resources import get_ui_class, resource
 
 FORM_CLASS = get_ui_class('default', 'about.ui')
 

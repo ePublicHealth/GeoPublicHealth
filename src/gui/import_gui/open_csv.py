@@ -27,7 +27,7 @@ from qgis.core import QgsProviderRegistry
 from qgis.utils import iface
 from qgis.gui import QgisInterface,QgsGui
 
-from GeoPublicHealth.src.core.tools import tr
+from geopublichealth.src.core.tools import tr
 
 
 class OpenCsv(QWidget):

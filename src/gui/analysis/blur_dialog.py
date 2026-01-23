@@ -47,12 +47,12 @@ from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QFileDialog, QApplica
 from qgis.PyQt.QtCore import pyqtSignal, QSettings, QVariant, Qt # <-- Added Qt import
 
 # Plugin Imports
-from GeoPublicHealth.src.core.blurring.layer_index import LayerIndex
-from GeoPublicHealth.src.core.blurring.blur import Blur
-from GeoPublicHealth.src.core.tools import (
+from geopublichealth.src.core.blurring.layer_index import LayerIndex
+from geopublichealth.src.core.blurring.blur import Blur
+from geopublichealth.src.core.tools import (
     get_last_input_path, set_last_input_path, tr, display_message_bar
 )
-from GeoPublicHealth.src.core.exceptions import (
+from geopublichealth.src.core.exceptions import (
     GeoPublicHealthException,
     NoLayerProvidedException,
     NoFileNoDisplayException,
@@ -60,7 +60,7 @@ from GeoPublicHealth.src.core.exceptions import (
     CreatingShapeFileException,
     PointOutsideEnvelopeException # Added for specific exception handling
 )
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.utilities.resources import get_ui_class
 
 # Load the UI class from the .ui file
 FORM_CLASS = get_ui_class('analysis', 'blur.ui')

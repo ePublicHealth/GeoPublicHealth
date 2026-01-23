@@ -4,7 +4,7 @@
 
 from qgis.core import QgsCoordinateTransform, QgsFeature
 
-from GeoPublicHealth.src.core.tools import create_memory_layer
+from geopublichealth.src.core.tools import create_memory_layer
 
 
 def reproject(layer, output_crs):

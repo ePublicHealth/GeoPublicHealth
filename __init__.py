@@ -20,7 +20,7 @@
  ***************************************************************************/
 """
 
-from GeoPublicHealth.src.plugin import GeoPublicHealthPlugin
+from geopublichealth.src.plugin import GeoPublicHealthPlugin
 
 
 def classFactory(iface):

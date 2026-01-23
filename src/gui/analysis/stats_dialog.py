@@ -32,13 +32,13 @@ from matplotlib.backends.backend_qt5agg import \
 from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QApplication, QTableWidgetItem, QFileDialog
 from qgis.PyQt.QtCore import pyqtSignal, QSize
 
-from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
-from GeoPublicHealth.src.core.stats import Stats
-from GeoPublicHealth.src.core.tools import \
+from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
+from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.core.tools import \
     tr, display_message_bar, get_last_input_path, set_last_input_path
-from GeoPublicHealth.src.core.exceptions import \
+from geopublichealth.src.core.exceptions import \
     GeoPublicHealthException, NoLayerProvidedException, DifferentCrsException
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('analysis', 'stats.ui')
 

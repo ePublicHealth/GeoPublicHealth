@@ -45,10 +45,10 @@ from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant, QCoreApplication
 
 # Plugin specific imports
-from GeoPublicHealth.src.core.blurring.blur import Blur
-from GeoPublicHealth.src.core.blurring.layer_index import LayerIndex
-from GeoPublicHealth.src.utilities.resources import resource
-from GeoPublicHealth.src.core.exceptions import GeoPublicHealthException
+from geopublichealth.src.core.blurring.blur import Blur
+from geopublichealth.src.core.blurring.layer_index import LayerIndex
+from geopublichealth.src.utilities.resources import resource
+from geopublichealth.src.core.exceptions import GeoPublicHealthException
 
 class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
     """

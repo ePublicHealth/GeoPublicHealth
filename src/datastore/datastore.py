@@ -3,7 +3,7 @@
 from builtins import object
 from abc import ABCMeta, abstractmethod
 from qgis.core import QgsRasterLayer, QgsVectorLayer, Qgis
-from GeoPublicHealth.src.core.tools import tr
+from geopublichealth.src.core.tools import tr
 from future.utils import with_metaclass
 
 

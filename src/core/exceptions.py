@@ -26,7 +26,7 @@ from qgis.core import QgsProcessingException,Qgis
 #from processing.core.GeoAlgorithmExecutionException import \
     #GeoAlgorithmExecutionException
 
-from GeoPublicHealth.src.core.tools import tr
+from geopublichealth.src.core.tools import tr
 
 # QApplication.translate doesn't work in constructor's parameters.
 

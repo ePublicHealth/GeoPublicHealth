@@ -88,16 +88,16 @@ except ImportError:
     PYSAL_AVAILABLE = False
     GEOPANDAS_AVAILABLE = False
 
-from GeoPublicHealth.src.core.graph_toolbar import CustomNavigationToolbar
-from GeoPublicHealth.src.core.tools import display_message_bar, tr
-from GeoPublicHealth.src.core.exceptions import (
+from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
+from geopublichealth.src.core.tools import display_message_bar, tr
+from geopublichealth.src.core.exceptions import (
     GeoPublicHealthException,
     NoLayerProvidedException,
     FieldExistingException,
     NotANumberException,
 )
-from GeoPublicHealth.src.core.stats import Stats
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class("analysis", "autocorrelation.ui")
 

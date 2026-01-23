@@ -25,8 +25,8 @@ from qgis.core import QgsProject, QgsRasterLayer, QgsProviderRegistry
 
 from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QFileDialog
 
-from GeoPublicHealth.src.core.tools import tr
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.core.tools import tr
+from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('import_ui', 'open_raster.ui')
 

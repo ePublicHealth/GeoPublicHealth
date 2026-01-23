@@ -23,9 +23,9 @@
 """
 import traceback
 # Plugin Imports
-from GeoPublicHealth.src.gui.analysis.parent_incidence_density_dialog import (
+from geopublichealth.src.gui.analysis.parent_incidence_density_dialog import (
     IncidenceDensityDialog)
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.utilities.resources import get_ui_class
 
 # Load UI from .ui file
 FORM_CLASS = get_ui_class('analysis', 'incidence.ui')

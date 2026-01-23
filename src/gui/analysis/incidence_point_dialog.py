@@ -21,9 +21,9 @@
  ***************************************************************************/
 """
 
-from GeoPublicHealth.src.gui.analysis.parent_incidence_density_dialog import \
+from geopublichealth.src.gui.analysis.parent_incidence_density_dialog import \
     IncidenceDensityDialog
-from GeoPublicHealth.src.utilities.resources import get_ui_class
+from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class('analysis', 'incidence_with_point.ui')
 
