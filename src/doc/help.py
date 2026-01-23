@@ -374,6 +374,7 @@ def help_autocorrelation(statistic=None):
             tr("MORAN_I = global Moran's I"),
             tr("MORAN_Z = standardized z-score"),
             tr("MORAN_P = pseudo p-values"),
+            tr("MORAN_S = significance flag"),
         ]
         more = [tr("Global Moran's I summarizes overall spatial autocorrelation.")]
     elif stat == "moran_bv_global":
@@ -390,6 +391,7 @@ def help_autocorrelation(statistic=None):
             tr("MBV_I = global bivariate Moran's I"),
             tr("MBV_Z = standardized z-score"),
             tr("MBV_P = pseudo p-values"),
+            tr("MBV_S = significance flag"),
         ]
         more = [
             tr("Bivariate Moran's I measures spatial association between two fields.")
@@ -428,6 +430,7 @@ def help_autocorrelation(statistic=None):
             tr("JC_BW = black-white joins"),
             tr("JC_PBB = p-value for BB joins"),
             tr("JC_PBW = p-value for BW joins"),
+            tr("JC_S = significance flag"),
         ]
         more = [tr("Join counts summarize clustering of a binary outcome.")]
     elif stat == "join_counts_local":

@@ -581,9 +581,9 @@ class CommonAutocorrelationDialog(QDialog):
         if self.statistic_type == STAT_G_LOCAL:
             return ["G_LOC", "G_Z", "G_P", "G_HOT"]
         if self.statistic_type == STAT_MORAN_GLOBAL:
-            return ["MORAN_I", "MORAN_Z", "MORAN_P"]
+            return ["MORAN_I", "MORAN_Z", "MORAN_P", "MORAN_S"]
         if self.statistic_type == STAT_MORAN_BV_GLOBAL:
-            return ["MBV_I", "MBV_Z", "MBV_P"]
+            return ["MBV_I", "MBV_Z", "MBV_P", "MBV_S"]
         if self.statistic_type == STAT_MORAN_BV_LOCAL:
             return ["MBV_P", "MBV_Z", "MBV_Q", "MBV_I", "MBV_C"]
         if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
@@ -762,10 +762,12 @@ class CommonAutocorrelationDialog(QDialog):
             fields.append(QgsField("MORAN_I", 6, "Real", 10, 6))
             fields.append(QgsField("MORAN_Z", 6, "Real", 10, 6))
             fields.append(QgsField("MORAN_P", 6, "Real", 10, 6))
+            fields.append(QgsField("MORAN_S", 2, "Integer", 1, 0))
         elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
             fields.append(QgsField("MBV_I", 6, "Real", 10, 6))
             fields.append(QgsField("MBV_Z", 6, "Real", 10, 6))
             fields.append(QgsField("MBV_P", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_S", 2, "Integer", 1, 0))
         elif self.statistic_type == STAT_MORAN_BV_LOCAL:
             fields.append(QgsField("MBV_P", 6, "Real", 10, 6))
             fields.append(QgsField("MBV_Z", 6, "Real", 10, 6))
@@ -778,6 +780,7 @@ class CommonAutocorrelationDialog(QDialog):
             fields.append(QgsField("JC_BW", 6, "Real", 10, 6))
             fields.append(QgsField("JC_PBB", 6, "Real", 10, 6))
             fields.append(QgsField("JC_PBW", 6, "Real", 10, 6))
+            fields.append(QgsField("JC_S", 2, "Integer", 1, 0))
         elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
             fields.append(QgsField("LJC", 6, "Real", 10, 6))
             fields.append(QgsField("LJC_P", 6, "Real", 10, 6))
@@ -1221,10 +1224,12 @@ class CommonAutocorrelationDialog(QDialog):
                     attributes.append(float(stats.I))
                     attributes.append(float(stats.z_sim))
                     attributes.append(float(stats.p_sim))
+                    attributes.append(int(stats.p_sim <= 0.05))
                 elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
                     attributes.append(float(stats.I))
                     attributes.append(float(stats.z_sim))
                     attributes.append(float(stats.p_sim))
+                    attributes.append(int(stats.p_sim <= 0.05))
                 elif self.statistic_type == STAT_MORAN_BV_LOCAL:
                     attributes.append(float(stats.p_sim[i]))
                     attributes.append(float(stats.z_sim[i]))
@@ -1237,6 +1242,7 @@ class CommonAutocorrelationDialog(QDialog):
                     attributes.append(float(stats.bw))
                     attributes.append(float(stats.p_sim_bb))
                     attributes.append(float(stats.p_sim_bw))
+                    attributes.append(int(stats.p_sim_bb <= 0.05))
                 elif self.statistic_type == STAT_JOIN_COUNTS_LOCAL:
                     attributes.append(float(stats.LJC[i]))
                     attributes.append(float(stats.p_sim[i]))
@@ -1295,11 +1301,34 @@ class CommonAutocorrelationDialog(QDialog):
         """Add symbology to the output layer."""
         try:
             if self.statistic_type in (STAT_MORAN_GLOBAL, STAT_MORAN_BV_GLOBAL):
-                self.output_layer.triggerRepaint()
+                categories = []
+                for value, (color, label) in {
+                    1: ("#b92815", tr("Significant")),
+                    0: ("#c0c0c0", tr("Not significant")),
+                }.items():
+                    sym = QgsSymbol.defaultSymbol(self.output_layer.geometryType())
+                    sym.setColor(QColor(color))
+                    categories.append(QgsRendererCategory(value, sym, label))
+
+                field_name = "MORAN_S"
+                if self.statistic_type == STAT_MORAN_BV_GLOBAL:
+                    field_name = "MBV_S"
+                renderer = QgsCategorizedSymbolRenderer(field_name, categories)
+                self.output_layer.setRenderer(renderer)
                 return
 
             if self.statistic_type == STAT_JOIN_COUNTS_GLOBAL:
-                self.output_layer.triggerRepaint()
+                categories = []
+                for value, (color, label) in {
+                    1: ("#b92815", tr("Significant")),
+                    0: ("#c0c0c0", tr("Not significant")),
+                }.items():
+                    sym = QgsSymbol.defaultSymbol(self.output_layer.geometryType())
+                    sym.setColor(QColor(color))
+                    categories.append(QgsRendererCategory(value, sym, label))
+
+                renderer = QgsCategorizedSymbolRenderer("JC_S", categories)
+                self.output_layer.setRenderer(renderer)
                 return
 
             if self.statistic_type == STAT_GEARY:
