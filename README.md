@@ -17,6 +17,7 @@ Key analysis tools include:
 - Spatial autocorrelation: Moran (local/global), Moran rate, bivariate Moran, Join Counts, Local Geary, Getis-Ord G
 - Incidence and density mapping workflows
 - Composite index building and data blurring utilities
+- Autocorrelation UI with dynamic help text and summary output panel
 
 ## Prerequisites
 

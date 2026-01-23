@@ -17,6 +17,9 @@ GeoPublicHealth is a QGIS 3.x plugin for epidemiology and public health GIS anal
 **Autocorrelation Coverage:**
 - Moran (local/global), Moran Rate, bivariate Moran (global/local), Join Counts (global/local), Local Geary, Getis-Ord G
 
+**Autocorrelation UI Notes:**
+- Statistic selector drives contextual help content and summary output panel
+
 ## Build, Lint, and Test Commands
 
 ### Running Tests
