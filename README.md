@@ -22,11 +22,12 @@ Before installing the GeoPublicHealth plugin, you need:
     * [QGIS 3.40.14 'Bratislava'](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.40.14-1.msi) (Long Term Release) - Windows only
     * QGIS 3.42.x 'Münster' (minimum supported version)
 2.  **Python Dependencies:** The plugin relies on specific Python libraries that must be correctly installed within your QGIS environment:
-    * `gdal` (usually included with QGIS/OSGeo4W, version ~3.10.2 or newer)
-    * `libpysal` (version ~4.3.0)
-    * `numba` (latest compatible version)
+    * `gdal` (usually included with QGIS/OSGeo4W, version ~3.10.2 or newer) - **Required**
+    * `libpysal` (version ~4.3.0) - **Required**
+    * `numba` (latest compatible version) - **Required**
+    * `matplotlib` (latest compatible version) - **Optional** (enables graphing/plotting features)
 
-**Note:** The installation methods below are designed to help ensure these dependencies are met.
+**Note:** The installation methods below are designed to help ensure these dependencies are met. See [DEPENDENCIES.md](DEPENDENCIES.md) for detailed dependency information.
 
 ## Quick Start
 
@@ -164,6 +165,66 @@ git clone https://github.com/ePublicHealth/GeoPublicHealth.git
 
 Then restart QGIS and enable the plugin in the Plugin Manager.
 
+### Optional: Install matplotlib for Plotting Features
+
+matplotlib is optional but enables graphing and plotting features in analysis dialogs. To install:
+
+**Using QGIS Python Console (Easiest):**
+
+1. Open QGIS
+2. Go to **Plugins** → **Python Console**
+3. Paste this code and press Enter:
+   ```python
+   import subprocess, sys
+   subprocess.run([sys.executable, "-m", "pip", "install", "--user", "matplotlib"])
+   ```
+4. Restart QGIS
+
+**Alternative:** Use the provided installation script `install_matplotlib_in_qgis.py` from the repository.
+
+See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for more installation options.
+
+## Troubleshooting
+
+### Plugin Not Appearing After Installation
+
+If the plugin doesn't appear after installation:
+
+1. **Check experimental plugins are enabled:**
+   - Go to **Plugins** → **Manage and Install Plugins** → **Settings**
+   - Ensure **[x] Show also experimental plugins** is checked
+
+2. **Clear cache and reinstall:**
+   ```bash
+   # macOS
+   rm -rf ~/Library/Application\ Support/QGIS/QGIS3/profiles/default/python/plugins/geopublichealth
+   rm -rf ~/Library/Application\ Support/QGIS/QGIS3/profiles/default/cache
+   
+   # Linux
+   rm -rf ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/geopublichealth
+   rm -rf ~/.local/share/QGIS/QGIS3/profiles/default/cache
+   
+   # Windows
+   rmdir /s /q "%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\geopublichealth"
+   rmdir /s /q "%APPDATA%\QGIS\QGIS3\profiles\default\cache"
+   ```
+
+3. **Restart QGIS** and reinstall the plugin
+
+### ModuleNotFoundError
+
+If you see errors about missing modules:
+
+- **matplotlib**: Optional - see [installation instructions above](#optional-install-matplotlib-for-plotting-features)
+- **libpysal, numba**: Required - see [Step 1: Install QGIS and Dependencies](#step-1-install-qgis-and-dependencies)
+
+### Other Issues
+
+- Check the [QGIS Python Console](https://docs.qgis.org/latest/en/docs/user_manual/plugins/python_console.html) for detailed error messages
+- See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for complete reinstallation guide
+- See [DEPENDENCIES.md](DEPENDENCIES.md) for dependency troubleshooting
+- Report issues on [GitHub Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
+
 ## Usage
 
 Once installed, the GeoPublicHealth plugin tools and algorithms can typically be accessed via:
@@ -259,12 +320,30 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 
 ## Changelog
 
-### v0.2.1 (2026-01-19)
-- **Bug Fix**: Fixed f-string syntax error in autocorrelation dialog that prevented plugin loading on macOS
-- Added AGENTS.md for AI coding agent guidance
-- Added RELEASE.md for release process documentation
-- Set up GitHub Actions for automated testing and releases
-- Fixed indentation errors in test files
+### v0.2.1 (2026-01-22)
+- **Critical Fixes**: 
+  - Fixed plugins.xml configuration for proper QGIS plugin repository integration
+  - Fixed module import paths (GeoPublicHealth → geopublichealth) throughout codebase
+  - Fixed plugin directory name mismatch issue
+  - Fixed display_message_bar API compatibility with QGIS 3.x
+  - Made matplotlib dependency optional - plugin now loads without it
+- **Improvements**:
+  - Added optional_deps.py module for graceful handling of optional dependencies
+  - Graphing features now disable gracefully when matplotlib unavailable
+  - Updated all 89 import statements for correct module paths
+- **Documentation**:
+  - Added DEPENDENCIES.md with complete dependency information
+  - Added UNINSTALL_INSTRUCTIONS.md for troubleshooting installation issues
+  - Added install_matplotlib_in_qgis.py script for easy matplotlib installation
+  - Updated README with troubleshooting section
+- **Bug Fixes**: 
+  - Fixed f-string syntax error in autocorrelation dialog that prevented plugin loading on macOS
+  - Fixed TypeError when displaying message bar warnings
+- **Development**:
+  - Added AGENTS.md for AI coding agent guidance
+  - Added RELEASE.md for release process documentation
+  - Set up GitHub Actions for automated testing and releases
+  - Fixed indentation errors in test files
 
 ### v0.2.0 (2025-05-01)
 - QGIS 3.42 support and autocorrelation improvements
@@ -277,6 +356,9 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 - [AGENTS.md](AGENTS.md) - Development guide for AI coding agents
 - [RELEASE.md](RELEASE.md) - Release process and versioning
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
+- [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) - Complete plugin reinstallation guide
+- [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Script to install matplotlib in QGIS
 
 ## Support
 
