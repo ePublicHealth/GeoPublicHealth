@@ -7,10 +7,10 @@
         <qgis_minimum_version>3.0</qgis_minimum_version>
         <qgis_maximum_version>3.99</qgis_maximum_version>
         <homepage><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]></homepage>
-        <file_name>geopublichealth3.42.1.zip</file_name>
+        <file_name>geopublichealth.zip</file_name>
         <icon><![CDATA[https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/src/resources/icon-32.png]]></icon>
         <author_name><![CDATA[Manuel Vidaurre, Pai (Supharerk Thawillarp)]]></author_name>
-        <download_url><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.42.1.zip]]></download_url>
+        <download_url><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth.zip]]></download_url>
         <uploaded_by><![CDATA[mvidaurre]]></uploaded_by>
         <create_date>2016-04-24T15:31:19.824333</create_date>
         <update_date>2026-01-19T12:00:00.000000</update_date>
