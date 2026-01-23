@@ -13,6 +13,11 @@ GeoPublicHealth provides a simplified interface within QGIS, tailored for users 
 
 This plugin aims to integrate and enhance methods similar to those found in the pioneering SIGEpi software, leveraging the power and flexibility of the modern QGIS platform.
 
+Key analysis tools include:
+- Spatial autocorrelation: Moran (local/global), Moran rate, bivariate Moran, Local Geary, Getis-Ord G
+- Incidence and density mapping workflows
+- Composite index building and data blurring utilities
+
 ## Prerequisites
 
 Before installing the GeoPublicHealth plugin, you need:

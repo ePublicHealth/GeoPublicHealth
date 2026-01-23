@@ -14,6 +14,9 @@ GeoPublicHealth is a QGIS 3.x plugin for epidemiology and public health GIS anal
 - GDAL ~3.10.2 for geospatial operations
 - NumPy, Numba for numerical operations
 
+**Autocorrelation Coverage:**
+- Moran (local/global), Moran Rate, bivariate Moran (global/local), Local Geary, Getis-Ord G
+
 ## Build, Lint, and Test Commands
 
 ### Running Tests
