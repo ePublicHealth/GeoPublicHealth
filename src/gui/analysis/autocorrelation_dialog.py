@@ -118,7 +118,9 @@ try:
 
     import libpysal
     from libpysal.weights import Queen, Rook
-    from esda.moran import Moran_Local
+    from esda.moran import Moran_Local, Moran_Rate, Moran_Local_Rate
+    from esda.getisord import G_Local
+    from esda.geary_local import Geary_Local
 
     # Check if geopandas is available for modern approach
     try:
@@ -149,6 +151,11 @@ from geopublichealth.src.core.stats import Stats
 from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class("analysis", "autocorrelation.ui")
+
+STAT_MORAN = "moran"
+STAT_GEARY = "geary"
+STAT_G_LOCAL = "g_local"
+STAT_MORAN_RATE = "moran_rate"
 
 
 class CommonAutocorrelationDialog(QDialog):
@@ -230,6 +237,17 @@ class CommonAutocorrelationDialog(QDialog):
                 )
                 self.cbx_aggregation_layer.layerChanged.connect(
                     self.cbx_indicator_field.setLayer
+                )
+
+            if hasattr(self, "cbx_population_field") and hasattr(
+                self, "cbx_aggregation_layer"
+            ):
+                self.cbx_population_field.setFilters(QgsFieldProxyModel.Numeric)
+                self.cbx_population_field.setLayer(
+                    self.cbx_aggregation_layer.currentLayer()
+                )
+                self.cbx_aggregation_layer.layerChanged.connect(
+                    self.cbx_population_field.setLayer
                 )
 
             # LISA categories with colors and labels
@@ -319,6 +337,15 @@ class CommonAutocorrelationDialog(QDialog):
             self.admin_layer = self.cbx_aggregation_layer.currentLayer()
             input_name = self.admin_layer.name()
             field = self.cbx_indicator_field.currentField()
+            self.statistic_type = self.get_statistic_type()
+            population_field = None
+            if self.statistic_type == STAT_MORAN_RATE:
+                if hasattr(self, "cbx_population_field"):
+                    population_field = self.cbx_population_field.currentField()
+                if not population_field:
+                    raise GeoPublicHealthException(
+                        msg=tr("Population field is required for Moran Rate.")
+                    )
 
             # Get the layer from the project
             self.layer = QgsProject.instance().mapLayersByName(input_name)[0]
@@ -356,14 +383,30 @@ class CommonAutocorrelationDialog(QDialog):
                 w = self.get_weights_legacy()
                 y = self.get_indicator_values_legacy(field)
 
-            # Calculate Local Moran's I
-            lm = self.calculate_moran_local(y, w)
-
-            # Get significant clusters (p <= 0.05)
-            sig_q = lm.q * (lm.p_sim <= 0.05)
-
-            # Create output features
-            self.create_output_features(file_writer, lm, sig_q)
+            # Calculate statistics based on selection
+            if self.statistic_type == STAT_MORAN:
+                lm = self.calculate_moran_local(y, w)
+                sig_q = lm.q * (lm.p_sim <= 0.05)
+                self.create_output_features(file_writer, lm, sig_q)
+            elif self.statistic_type == STAT_GEARY:
+                geary = self.calculate_geary_local(y, w)
+                self.create_output_features(file_writer, geary)
+            elif self.statistic_type == STAT_G_LOCAL:
+                g_local = self.calculate_g_local(y, w)
+                self.create_output_features(file_writer, g_local)
+            elif self.statistic_type == STAT_MORAN_RATE:
+                if GEOPANDAS_AVAILABLE:
+                    population = self.get_indicator_values_modern(population_field)
+                else:
+                    population = self.get_indicator_values_legacy(population_field)
+                rate_global, rate_local = self.calculate_moran_rate(y, population, w)
+                QgsMessageLog.logMessage(
+                    f"Moran Rate I: {rate_global.I:.4f}, p={rate_global.p_sim:.4f}",
+                    "GeoPublicHealth",
+                    Qgis.Info,
+                )
+                sig_q = rate_local.q * (rate_local.p_sim <= 0.05)
+                self.create_output_features(file_writer, rate_local, sig_q)
             del file_writer
 
             # Create output layer and add symbology
@@ -419,20 +462,85 @@ class CommonAutocorrelationDialog(QDialog):
                     self.output_file_path = f"{base}_{counter}{extension}"
                     counter += 1
 
+    def get_statistic_type(self):
+        if hasattr(self, "cbx_statistic"):
+            stat_text = self.cbx_statistic.currentText().strip().lower()
+            if "geary" in stat_text:
+                return STAT_GEARY
+            if "getis" in stat_text or "g (local)" in stat_text:
+                return STAT_G_LOCAL
+            if "rate" in stat_text:
+                return STAT_MORAN_RATE
+        return STAT_MORAN
+
+    def get_output_field_names(self):
+        if self.statistic_type == STAT_MORAN:
+            return ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]
+        if self.statistic_type == STAT_MORAN_RATE:
+            return ["RATE_P", "RATE_Z", "RATE_Q", "RATE_I", "RATE_C"]
+        if self.statistic_type == STAT_GEARY:
+            return ["GEARY_G", "GEARY_P", "GEARY_S"]
+        if self.statistic_type == STAT_G_LOCAL:
+            return ["G_LOC", "G_Z", "G_P", "G_HOT"]
+        return ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]
+
+    def get_output_layer_prefix(self):
+        if self.statistic_type == STAT_MORAN:
+            return "LISA"
+        if self.statistic_type == STAT_MORAN_RATE:
+            return "RATE"
+        if self.statistic_type == STAT_GEARY:
+            return "GEARY"
+        if self.statistic_type == STAT_G_LOCAL:
+            return "GLOCAL"
+        return "LISA"
+
+    def get_output_layer_title(self, field):
+        if self.statistic_type == STAT_MORAN:
+            return f"LISA Moran's I - {field}"
+        if self.statistic_type == STAT_MORAN_RATE:
+            return f"Moran Rate - {field}"
+        if self.statistic_type == STAT_GEARY:
+            return f"Local Geary - {field}"
+        if self.statistic_type == STAT_G_LOCAL:
+            return f"Getis-Ord G - {field}"
+        return f"LISA Moran's I - {field}"
+
+    @staticmethod
+    def _hotspot_class(z_value, p_value):
+        if p_value > 0.05:
+            return 0
+        return 1 if z_value > 0 else -1
+
     def check_existing_field(self, fields):
         """Check if output fields already exist in the layer."""
-        for field_name in ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]:
+        for field_name in self.get_output_field_names():
             if fields.indexOf(field_name) != -1:
                 raise FieldExistingException(field=field_name)
 
     def append_new_fields(self, fields):
         """Add new fields for LISA results."""
-        # Add the LISA result fields
-        fields.append(QgsField("LISA_P", 6, "Real", 10, 6))  # P-value
-        fields.append(QgsField("LISA_Z", 6, "Real", 10, 6))  # Z-score
-        fields.append(QgsField("LISA_Q", 2, "Integer", 1, 0))  # Quadrant
-        fields.append(QgsField("LISA_I", 6, "Real", 10, 6))  # Local Moran's I
-        fields.append(QgsField("LISA_C", 2, "Integer", 1, 0))  # Cluster (sig. quadrant)
+        if self.statistic_type == STAT_MORAN:
+            fields.append(QgsField("LISA_P", 6, "Real", 10, 6))
+            fields.append(QgsField("LISA_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("LISA_Q", 2, "Integer", 1, 0))
+            fields.append(QgsField("LISA_I", 6, "Real", 10, 6))
+            fields.append(QgsField("LISA_C", 2, "Integer", 1, 0))
+        elif self.statistic_type == STAT_MORAN_RATE:
+            fields.append(QgsField("RATE_P", 6, "Real", 10, 6))
+            fields.append(QgsField("RATE_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("RATE_Q", 2, "Integer", 1, 0))
+            fields.append(QgsField("RATE_I", 6, "Real", 10, 6))
+            fields.append(QgsField("RATE_C", 2, "Integer", 1, 0))
+        elif self.statistic_type == STAT_GEARY:
+            fields.append(QgsField("GEARY_G", 6, "Real", 10, 6))
+            fields.append(QgsField("GEARY_P", 6, "Real", 10, 6))
+            fields.append(QgsField("GEARY_S", 2, "Integer", 1, 0))
+        elif self.statistic_type == STAT_G_LOCAL:
+            fields.append(QgsField("G_LOC", 6, "Real", 10, 6))
+            fields.append(QgsField("G_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("G_P", 6, "Real", 10, 6))
+            fields.append(QgsField("G_HOT", 2, "Integer", 1, 0))
 
     def prepare_file_writer(self, fields, crs_admin_layer):
         """Prepare the output file writer."""
@@ -448,7 +556,8 @@ class CommonAutocorrelationDialog(QDialog):
         # If it's a GPKG, set the layer name
         if driver_name == "GPKG":
             field_name = self.cbx_indicator_field.currentField()
-            save_options.layerName = f"LISA_{field_name}".replace(" ", "_")
+            layer_prefix = self.get_output_layer_prefix()
+            save_options.layerName = f"{layer_prefix}_{field_name}".replace(" ", "_")
 
         # Create the vector file writer
         file_writer = QgsVectorFileWriter.create(
@@ -750,7 +859,33 @@ class CommonAutocorrelationDialog(QDialog):
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
             raise
 
-    def create_output_features(self, file_writer, lm, sig_q):
+    def calculate_geary_local(self, y, w):
+        try:
+            return Geary_Local(connectivity=w, permutations=999).fit(y)
+        except Exception as e:
+            error_msg = tr("Error calculating Local Geary:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def calculate_g_local(self, y, w):
+        try:
+            return G_Local(y, w, transform="R", permutations=999)
+        except Exception as e:
+            error_msg = tr("Error calculating Getis-Ord G:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def calculate_moran_rate(self, events, population, w):
+        try:
+            global_rate = Moran_Rate(events, population, w, permutations=999)
+            local_rate = Moran_Local_Rate(events, population, w, permutations=999)
+            return global_rate, local_rate
+        except Exception as e:
+            error_msg = tr("Error calculating Moran Rate:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def create_output_features(self, file_writer, stats, sig_q=None):
         """
         Create output features with LISA statistics.
 
@@ -763,20 +898,33 @@ class CommonAutocorrelationDialog(QDialog):
             for i, feature in enumerate(self.admin_layer.getFeatures()):
                 attributes = feature.attributes()
 
-                # Add LISA statistics as attributes
-                attributes.append(float(lm.p_sim[i]))  # P-value
-                attributes.append(float(lm.z_sim[i]))  # Z-score
-                attributes.append(int(lm.q[i]))  # Quadrant
-                attributes.append(float(lm.Is[i]))  # Local Moran's I
-                attributes.append(int(sig_q[i]))  # Significant quadrant
+                if self.statistic_type == STAT_MORAN:
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(float(stats.z_sim[i]))
+                    attributes.append(int(stats.q[i]))
+                    attributes.append(float(stats.Is[i]))
+                    attributes.append(int(sig_q[i]))
+                elif self.statistic_type == STAT_MORAN_RATE:
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(float(stats.z_sim[i]))
+                    attributes.append(int(stats.q[i]))
+                    attributes.append(float(stats.Is[i]))
+                    attributes.append(int(sig_q[i]))
+                elif self.statistic_type == STAT_GEARY:
+                    attributes.append(float(stats.localG[i]))
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(int(stats.p_sim[i] <= 0.05))
+                elif self.statistic_type == STAT_G_LOCAL:
+                    attributes.append(float(stats.Gs[i]))
+                    attributes.append(float(stats.Zs[i]))
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(self._hotspot_class(stats.Zs[i], stats.p_sim[i]))
 
-                # Create new feature with same geometry
                 new_feature = QgsFeature()
                 new_geom = QgsGeometry(feature.geometry())
                 new_feature.setAttributes(attributes)
                 new_feature.setGeometry(new_geom)
 
-                # Add to output file
                 file_writer.addFeature(new_feature)
         except Exception as e:
             display_message_bar(
@@ -802,13 +950,16 @@ class CommonAutocorrelationDialog(QDialog):
 
         # Construct layer URI
         if is_gpkg:
-            layer_name = f"LISA_{field}".replace(" ", "_")
+            layer_prefix = self.get_output_layer_prefix()
+            layer_name = f"{layer_prefix}_{field}".replace(" ", "_")
             layer_uri = f"{self.output_file_path}|layername={layer_name}"
         else:
             layer_uri = self.output_file_path
 
         # Create vector layer
-        output_layer = QgsVectorLayer(layer_uri, "LISA Moran's I - " + field, "ogr")
+        output_layer = QgsVectorLayer(
+            layer_uri, self.get_output_layer_title(field), "ogr"
+        )
 
         if not output_layer.isValid():
             display_message_bar(tr("Output layer invalid"), level=Qgis.Critical)
@@ -821,6 +972,37 @@ class CommonAutocorrelationDialog(QDialog):
     def add_symbology(self):
         """Add symbology to the output layer."""
         try:
+            if self.statistic_type == STAT_GEARY:
+                categories = []
+                for value, (color, label) in {
+                    1: ("#b92815", tr("Significant")),
+                    0: ("#c0c0c0", tr("Not significant")),
+                }.items():
+                    sym = QgsSymbol.defaultSymbol(self.output_layer.geometryType())
+                    sym.setColor(QColor(color))
+                    categories.append(QgsRendererCategory(value, sym, label))
+
+                renderer = QgsCategorizedSymbolRenderer("GEARY_S", categories)
+                self.output_layer.setRenderer(renderer)
+                self.output_layer.triggerRepaint()
+                return
+
+            if self.statistic_type == STAT_G_LOCAL:
+                categories = []
+                for value, (color, label) in {
+                    1: ("#b92815", tr("Hotspot")),
+                    -1: ("#3f70df", tr("Coldspot")),
+                    0: ("#c0c0c0", tr("Not significant")),
+                }.items():
+                    sym = QgsSymbol.defaultSymbol(self.output_layer.geometryType())
+                    sym.setColor(QColor(color))
+                    categories.append(QgsRendererCategory(value, sym, label))
+
+                renderer = QgsCategorizedSymbolRenderer("G_HOT", categories)
+                self.output_layer.setRenderer(renderer)
+                self.output_layer.triggerRepaint()
+                return
+
             # Create categories for LISA quadrants
             categories = []
             for lisaCategory, (color, label) in self.lisa.items():
@@ -837,7 +1019,8 @@ class CommonAutocorrelationDialog(QDialog):
             if is_gpkg:
                 # For GeoPackage, clone the original layer
                 field_name = self.cbx_indicator_field.currentField()
-                new_layer_name = f"LISA_{field_name}_sig".replace(" ", "_")
+                layer_prefix = self.get_output_layer_prefix()
+                new_layer_name = f"{layer_prefix}_{field_name}_sig".replace(" ", "_")
 
                 # Need to create a new copy in the GeoPackage
                 options = QgsVectorFileWriter.SaveVectorOptions()
@@ -876,7 +1059,13 @@ class CommonAutocorrelationDialog(QDialog):
             QgsProject.instance().addMapLayer(new_layer)
 
             # Set categorized renderer for LISA quadrants
-            renderer = QgsCategorizedSymbolRenderer("LISA_Q", categories)
+            quadrant_field = "LISA_Q"
+            sig_field = "LISA_C"
+            if self.statistic_type == STAT_MORAN_RATE:
+                quadrant_field = "RATE_Q"
+                sig_field = "RATE_C"
+
+            renderer = QgsCategorizedSymbolRenderer(quadrant_field, categories)
             self.output_layer.setRenderer(renderer)
 
             # Set graduated renderer for significance
@@ -890,7 +1079,7 @@ class CommonAutocorrelationDialog(QDialog):
 
             if classification_method:
                 # Set method and create renderer
-                renderer = QgsGraduatedSymbolRenderer("LISA_C")
+                renderer = QgsGraduatedSymbolRenderer(sig_field)
                 renderer.setSourceSymbol(symbol.clone())
                 renderer.setSourceColorRamp(color_ramp.clone())
                 renderer.setClassificationMethod(classification_method.clone())
@@ -911,7 +1100,7 @@ class CommonAutocorrelationDialog(QDialog):
                 # Fallback to older method if classification method not available
                 renderer = QgsGraduatedSymbolRenderer.createRenderer(
                     new_layer,
-                    "LISA_C",
+                    sig_field,
                     4,
                     QgsGraduatedSymbolRenderer.Jenks,
                     symbol,
