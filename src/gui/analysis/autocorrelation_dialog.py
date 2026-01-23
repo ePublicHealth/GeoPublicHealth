@@ -61,6 +61,50 @@ from qgis.gui import QgsFieldComboBox, QgsMapLayerComboBox
 
 import numpy as np
 
+
+def _ensure_proj_data_dir():
+    prefix_path = QgsApplication.prefixPath()
+    candidate_paths = [
+        os.path.join(prefix_path, "Resources", "proj"),
+        os.path.join(os.path.dirname(prefix_path), "Resources", "proj"),
+        os.path.join(prefix_path, "share", "proj"),
+        os.path.join(os.path.dirname(prefix_path), "share", "proj"),
+    ]
+
+    if not (os.environ.get("PROJ_DATA") or os.environ.get("PROJ_LIB")):
+        for candidate in candidate_paths:
+            if os.path.exists(candidate):
+                os.environ["PROJ_DATA"] = candidate
+                os.environ["PROJ_LIB"] = candidate
+                break
+
+    try:
+        from pyproj import datadir
+    except ImportError:
+        return
+
+    try:
+        current_dir = datadir.get_data_dir()
+    except Exception:
+        current_dir = None
+
+    if current_dir and os.path.exists(current_dir):
+        return
+
+    for candidate in candidate_paths:
+        if os.path.exists(candidate):
+            datadir.set_data_dir(candidate)
+            QgsMessageLog.logMessage(
+                f"Set PROJ data directory to {candidate}",
+                "GeoPublicHealth",
+                Qgis.Info,
+            )
+            return
+
+
+# Ensure PROJ data is available before importing GeoPandas/libpysal
+_ensure_proj_data_dir()
+
 # Import PySAL libraries with fallbacks
 try:
     # Filter out specific PySAL deprecation warnings
@@ -462,7 +506,7 @@ class CommonAutocorrelationDialog(QDialog):
             read_kwargs["layer"] = layer_name
 
         try:
-            return gpd.read_file(layer_path, **read_kwargs)
+            gdf = gpd.read_file(layer_path, **read_kwargs)
         except Exception as exc:
             if "expected bytes, str found" not in str(exc):
                 raise
@@ -473,7 +517,41 @@ class CommonAutocorrelationDialog(QDialog):
                 Qgis.Warning,
             )
 
-            return gpd.read_file(layer_path, engine="fiona", **read_kwargs)
+            gdf = gpd.read_file(layer_path, engine="fiona", **read_kwargs)
+
+        return self._ensure_geopandas_geometry(gdf)
+
+    def _ensure_geopandas_geometry(self, gdf):
+        if getattr(gdf, "geometry", None) is not None and not gdf.geometry.isna().all():
+            return gdf
+
+        geometry_column = None
+        for candidate in (
+            "geometry",
+            "geom",
+            "wkt_geom",
+            "wkt",
+            "geom_wkt",
+            "geometry_wkt",
+        ):
+            if candidate in gdf.columns:
+                geometry_column = candidate
+                break
+
+        if geometry_column:
+            gdf = gdf.copy()
+            gdf.set_geometry(
+                gpd.GeoSeries.from_wkt(gdf[geometry_column]),
+                inplace=True,
+            )
+
+        if gdf.crs is None:
+            layer_crs = self.admin_layer.crs()
+            if layer_crs and layer_crs.isValid():
+                crs_value = layer_crs.authid() or layer_crs.toWkt()
+                gdf.set_crs(crs_value, inplace=True)
+
+        return gdf
 
     def get_weights_legacy(self):
         """

@@ -284,6 +284,13 @@ except ImportError:
 7. Push to branch: `git push origin my-new-feature`
 8. Open a Pull Request
 
+## Release Packaging Notes
+
+- The plugin zip must contain a top-level folder named `geopublichealth` to match the plugin id.
+- Keep the published filename as `geopublichealth.zip` (no version suffix) because QGIS infers the folder name from the zip.
+- When building manually, sync files into `build/geopublichealth/`, zip from `build/`, then copy the zip to `installation/geopublichealth.zip`.
+- Update `docs/plugins.xml` to point at `installation/geopublichealth.zip` and refresh the `<update_date>`.
+
 ## References
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Full contribution guidelines
