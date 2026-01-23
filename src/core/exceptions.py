@@ -22,9 +22,9 @@
 """
 
 from qgis.gui import QgsMessageBar
-from qgis.core import QgsProcessingException,Qgis
-#from processing.core.GeoAlgorithmExecutionException import \
-    #GeoAlgorithmExecutionException
+from qgis.core import QgsProcessingException, Qgis
+# from processing.core.GeoAlgorithmExecutionException import \
+# GeoAlgorithmExecutionException
 
 from geopublichealth.src.core.tools import tr
 
@@ -34,6 +34,7 @@ from geopublichealth.src.core.tools import tr
 class GeoPublicHealthException(QgsProcessingException):
     def __init__(self, msg=None):
         QgsProcessingException.__init__(self, msg)
+        self.msg = msg or ""
         self.level = Qgis.Critical
         self.duration = 7
 
@@ -41,21 +42,21 @@ class GeoPublicHealthException(QgsProcessingException):
 class NoLayerProvidedException(GeoPublicHealthException):
     def __init__(self, msg=None):
         if not msg:
-            msg = tr(u'No layer was provided.')
+            msg = tr("No layer was provided.")
         GeoPublicHealthException.__init__(self, msg)
 
 
 class NoFileNoDisplayException(GeoPublicHealthException):
     def __init__(self, msg=None):
         if not msg:
-            msg = tr(u'No file provided, "add result to canvas" required')
+            msg = tr('No file provided, "add result to canvas" required')
         GeoPublicHealthException.__init__(self, msg)
 
 
 class CreatingShapeFileException(GeoPublicHealthException):
     def __init__(self, msg=None, suffix=None):
         if not msg:
-            msg = tr(u'Error while creating the shapefile')
+            msg = tr("Error while creating the shapefile")
         if suffix:
             msg += suffix
         GeoPublicHealthException.__init__(self, msg)
@@ -64,29 +65,28 @@ class CreatingShapeFileException(GeoPublicHealthException):
 class PointOutsideEnvelopeException(GeoPublicHealthException):
     def __init__(self, msg=None, number=None):
         if not msg:
-            msg = tr(u'Point number %d is outside the envelope.' % number)
+            msg = tr("Point number %d is outside the envelope." % number)
         GeoPublicHealthException.__init__(self, msg)
 
 
 class DifferentCrsException(GeoPublicHealthException):
     def __init__(self, msg=None, epsg1=None, epsg2=None):
         if not msg:
-            msg = tr(u'It\'s not the same projection system : %s != %s' %
-                     (epsg1, epsg2))
+            msg = tr("It's not the same projection system : %s != %s" % (epsg1, epsg2))
         GeoPublicHealthException.__init__(self, msg)
 
 
 class FieldExistingException(GeoPublicHealthException):
     def __init__(self, msg=None, field=None):
         if not msg:
-            msg = tr(u'The field %s already exists in the layer.' % field)
+            msg = tr("The field %s already exists in the layer." % field)
         GeoPublicHealthException.__init__(self, msg)
 
 
 class NotANumberException(GeoPublicHealthException):
     def __init__(self, msg=None, suffix=None):
         if not msg:
-            msg = tr(u'It\'s not a number')
+            msg = tr("It's not a number")
         if suffix:
             msg += " : %s" % suffix
         GeoPublicHealthException.__init__(self, msg)
@@ -95,7 +95,7 @@ class NotANumberException(GeoPublicHealthException):
 class FieldException(GeoPublicHealthException):
     def __init__(self, msg=None, field_1=None, field_2=None):
         if not msg:
-            msg = tr(u'Fields are not different')
+            msg = tr("Fields are not different")
         if field_1 and field_2:
             msg += " : %s and %s " % (field_1, field_2)
         GeoPublicHealthException.__init__(self, msg)
