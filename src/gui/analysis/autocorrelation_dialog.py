@@ -426,8 +426,24 @@ class CommonAutocorrelationDialog(QDialog):
             if hasattr(self, "cbx_contiguity"):
                 contiguity_index = self.cbx_contiguity.currentIndex()
 
-            # Read the shapefile using geopandas
-            gdf = gpd.read_file(self.admin_layer.source())
+            # Get the layer source and handle GeoPackage layers
+            source = self.admin_layer.source()
+
+            # For GeoPackage layers, geopandas needs special handling
+            if "|layername=" in source:
+                # Split the path and layer name
+                parts = source.split("|layername=")
+                gpkg_path = parts[0]
+                layer_name = parts[1] if len(parts) > 1 else None
+
+                # Read specific layer from GeoPackage
+                if layer_name:
+                    gdf = gpd.read_file(gpkg_path, layer=layer_name)
+                else:
+                    gdf = gpd.read_file(gpkg_path)
+            else:
+                # Read regular shapefile or other formats
+                gdf = gpd.read_file(source)
 
             # Create weights matrix
             if contiguity_index == 0:  # queen
@@ -451,6 +467,8 @@ class CommonAutocorrelationDialog(QDialog):
         """
         Get spatial weights matrix using legacy PySAL approach.
 
+        Note: This only works with shapefiles, not GeoPackage layers.
+
         Returns:
             libpysal.weights: Spatial weights matrix
         """
@@ -459,12 +477,20 @@ class CommonAutocorrelationDialog(QDialog):
             if hasattr(self, "cbx_contiguity"):
                 contiguity_index = self.cbx_contiguity.currentIndex()
 
-            # Use context manager to ensure proper file closing
-            with libpysal.io.open(self.admin_layer.source()) as shp_file:
-                if contiguity_index == 0:  # queen
-                    w = Queen.from_shapefile(self.admin_layer.source())
-                else:  # rook
-                    w = Rook.from_shapefile(self.admin_layer.source())
+            source = self.admin_layer.source()
+
+            # Legacy approach only works with shapefiles
+            if not source.lower().endswith(".shp"):
+                raise ValueError(
+                    "Legacy PySAL approach requires shapefile format. "
+                    "Please ensure GeoPandas is installed for GeoPackage support."
+                )
+
+            # Create weights from shapefile (no context manager - not supported)
+            if contiguity_index == 0:  # queen
+                w = Queen.from_shapefile(source)
+            else:  # rook
+                w = Rook.from_shapefile(source)
 
             return w
 
@@ -487,8 +513,24 @@ class CommonAutocorrelationDialog(QDialog):
             numpy.ndarray: Array of indicator values
         """
         try:
-            # Read the shapefile using geopandas
-            gdf = gpd.read_file(self.admin_layer.source())
+            # Get the layer source and handle GeoPackage layers
+            source = self.admin_layer.source()
+
+            # For GeoPackage layers, geopandas needs special handling
+            if "|layername=" in source:
+                # Split the path and layer name
+                parts = source.split("|layername=")
+                gpkg_path = parts[0]
+                layer_name = parts[1] if len(parts) > 1 else None
+
+                # Read specific layer from GeoPackage
+                if layer_name:
+                    gdf = gpd.read_file(gpkg_path, layer=layer_name)
+                else:
+                    gdf = gpd.read_file(gpkg_path)
+            else:
+                # Read regular shapefile or other formats
+                gdf = gpd.read_file(source)
 
             # Get values of the specified field
             if field in gdf.columns:
@@ -514,6 +556,8 @@ class CommonAutocorrelationDialog(QDialog):
         """
         Get indicator values using legacy PySAL approach.
 
+        Note: This only works with shapefiles, not GeoPackage layers.
+
         Args:
             field: Field name containing indicator values
 
@@ -521,11 +565,21 @@ class CommonAutocorrelationDialog(QDialog):
             numpy.ndarray: Array of indicator values
         """
         try:
-            # Use context manager to ensure proper file closing
-            with libpysal.io.open(
-                self.admin_layer.source().replace(".shp", ".dbf")
-            ) as f:
-                y = np.array(f.by_col[str(field)])
+            source = self.admin_layer.source()
+
+            # Legacy approach only works with shapefiles
+            if not source.lower().endswith(".shp"):
+                raise ValueError(
+                    "Legacy PySAL approach requires shapefile format. "
+                    "Please ensure GeoPandas is installed for GeoPackage support."
+                )
+
+            # Read from DBF file (no context manager - not supported by PurePyShpWrapper)
+            dbf_path = source.replace(".shp", ".dbf")
+            f = libpysal.io.open(dbf_path)
+            y = np.array(f.by_col[str(field)])
+            f.close()
+
             return y
 
         except Exception as e:
