@@ -283,6 +283,9 @@ class CommonAutocorrelationDialog(QDialog):
                 )
                 self.cbx_statistic.currentIndexChanged.connect(self.update_help_text)
 
+            if hasattr(self, "cbx_binary_auto"):
+                self.cbx_binary_auto.toggled.connect(self.update_statistic_controls)
+
             # LISA categories with colors and labels
             self.lisa = {
                 1: ("#b92815", "High - High"),
@@ -636,6 +639,9 @@ class CommonAutocorrelationDialog(QDialog):
         is_rate = stat_type == STAT_MORAN_RATE
         is_bivariate = stat_type in (STAT_MORAN_BV_GLOBAL, STAT_MORAN_BV_LOCAL)
         is_join = stat_type in (STAT_JOIN_COUNTS_GLOBAL, STAT_JOIN_COUNTS_LOCAL)
+        auto_binary = False
+        if hasattr(self, "cbx_binary_auto"):
+            auto_binary = self.cbx_binary_auto.isChecked()
 
         if hasattr(self, "cbx_population_field"):
             self.cbx_population_field.setEnabled(is_rate)
@@ -654,9 +660,13 @@ class CommonAutocorrelationDialog(QDialog):
             self.label_statistic_hint.setText(hint)
 
         if hasattr(self, "sbx_binary_threshold"):
-            self.sbx_binary_threshold.setEnabled(is_join)
+            self.sbx_binary_threshold.setEnabled(is_join and not auto_binary)
         if hasattr(self, "label_binary_threshold"):
-            self.label_binary_threshold.setEnabled(is_join)
+            self.label_binary_threshold.setEnabled(is_join and not auto_binary)
+        if hasattr(self, "cbx_binary_auto"):
+            self.cbx_binary_auto.setEnabled(is_join)
+        if hasattr(self, "label_binary_auto"):
+            self.label_binary_auto.setEnabled(is_join)
 
     def update_help_text(self):
         stat_type = self.get_statistic_type()
@@ -690,6 +700,23 @@ class CommonAutocorrelationDialog(QDialog):
         self.signalHelpChanged.emit(help_html)
 
     def binarize_values(self, values):
+        auto_binary = False
+        if hasattr(self, "cbx_binary_auto"):
+            auto_binary = self.cbx_binary_auto.isChecked()
+
+        if auto_binary:
+            values_array = np.asarray(values)
+            valid = values_array[np.isfinite(values_array)]
+            unique_values = np.unique(valid)
+            if set(unique_values.tolist()).issubset({0, 1}):
+                return (values_array == 1).astype(int)
+
+            QgsMessageLog.logMessage(
+                tr("Binary auto-detect failed; using threshold."),
+                "GeoPublicHealth",
+                Qgis.Warning,
+            )
+
         if not hasattr(self, "sbx_binary_threshold"):
             return (values > 0).astype(int)
 
