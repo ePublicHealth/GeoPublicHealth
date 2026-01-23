@@ -1,45 +1,26 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
-<?xml-stylesheet type="text/xsl" href="" ?>
-    <plugins>
-        <pyqgis_plugin name="GeoPublicHealth" version="0.2.1" plugin_id="1970">
-            <description>
-                <![CDATA[GeoPublicHealth offers a simplified interface for users in public health and epidemiology]]>
-            </description>
-            <about></about>
-            <version>0.2.1</version>
-            <qgis_minimum_version>3.12.0</qgis_minimum_version>
-            <qgis_maximum_version>3.42.10</qgis_maximum_version>
-            <homepage>
-                <![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]>
-            </homepage>
-            <file_name>GeoPublicHealth.zip</file_name>
-            <icon>
-                https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/master/resources/icon-32.png
-            </icon>
-            <author_name>
-                <![CDATA[Manuel Vidaurre, Javier Cervantes, Pai (Supharerk Thawillarp), Etienne Trimaille, Dr Carlos Castillo-Salgado]]>
-            </author_name>
-            <download_url>
-                https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.42.1.zip
-            </download_url>
-            <uploaded_by>
-                <![CDATA[mvidaurre]]>
-            </uploaded_by>
-            <create_date>2016-04-24T15:31:19.824333</create_date>
-            <update_date>2026-01-19T12:00:00.000000</update_date>
-            <experimental>True</experimental>
-            <deprecated>False</deprecated>
-            <tracker>
-                <![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/issues]]>
-            </tracker>
-            <repository>
-                <![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]>
-            </repository>
-            <tags>
-                <![CDATA[development,public health,tools]]>
-            </tags>
-            <downloads>0</downloads>
-            <average_vote>0</average_vote>
-            <rating_votes>0</rating_votes>
-        </pyqgis_plugin>
-    </plugins>
+<plugins>
+    <pyqgis_plugin name="GeoPublicHealth" version="0.2.1">
+        <description><![CDATA[GeoPublicHealth offers a simplified interface for users in public health and epidemiology]]></description>
+        <about><![CDATA[GeoPublicHealth aims to provide a simplified interface for users in epidemiology and public health for QGIS. It is based on the GeoHealth Plugin developed by Etienne Trimaille. GeoPublicHealth includes additional methods that are very relevant for the use of GIS in public health and epidemiology.]]></about>
+        <version>0.2.1</version>
+        <qgis_minimum_version>3.0</qgis_minimum_version>
+        <qgis_maximum_version>3.99</qgis_maximum_version>
+        <homepage><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]></homepage>
+        <file_name>geopublichealth3.42.1.zip</file_name>
+        <icon><![CDATA[https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/src/resources/icon-32.png]]></icon>
+        <author_name><![CDATA[Manuel Vidaurre, Pai (Supharerk Thawillarp)]]></author_name>
+        <download_url><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth3.42.1.zip]]></download_url>
+        <uploaded_by><![CDATA[mvidaurre]]></uploaded_by>
+        <create_date>2016-04-24T15:31:19.824333</create_date>
+        <update_date>2026-01-19T12:00:00.000000</update_date>
+        <experimental>True</experimental>
+        <deprecated>False</deprecated>
+        <tracker><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/issues]]></tracker>
+        <repository><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth]]></repository>
+        <tags><![CDATA[vector,public health,epidemiology,tools]]></tags>
+        <downloads>0</downloads>
+        <average_vote>0</average_vote>
+        <rating_votes>0</rating_votes>
+    </pyqgis_plugin>
+</plugins>
