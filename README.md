@@ -35,7 +35,7 @@ Before installing the GeoPublicHealth plugin, you need:
 
 Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
 
-**Latest Version:** [v0.2.1](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.1) - Bug fix release for macOS compatibility
+**Latest Version:** v0.2.2 (2026-01-22) - GeoPackage support and critical bug fixes
 
 ## Installation
 
@@ -357,6 +357,23 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 * Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
 ## Changelog
+
+### v0.2.2 (2026-01-22)
+- **Critical Bug Fixes**:
+  - Fixed spatial autocorrelation for GeoPackage layers
+  - Fixed GeoPandas layer reading with `|layername=` parameter
+  - Removed unsupported context manager in legacy PySAL code
+  - Fixed "No such file or directory" error when reading GeoPackage
+  - Fixed UI validation warnings when no layers loaded
+- **Installation & Dependencies**:
+  - Updated macOS installation instructions with working commands
+  - Fixed dependency installation with `--no-build-isolation` flag
+  - Added step-by-step libpysal, esda, and matplotlib installation
+  - Documented one-line-at-a-time Python Console requirement
+- **Improvements**:
+  - Full GeoPackage and Shapefile format support
+  - Better error messages for format compatibility
+  - Enhanced documentation with verified installation methods
 
 ### v0.2.1 (2026-01-22)
 - **Critical Fixes**: 
