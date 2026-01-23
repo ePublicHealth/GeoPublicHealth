@@ -26,7 +26,6 @@
 import traceback
 import tempfile
 import os
-import sys
 from typing import Dict, List, Optional, Union, Any
 
 # Third-Party Imports
@@ -84,6 +83,7 @@ from qgis.core import (
 
 # QGIS GUI Imports
 from qgis.gui import (
+    QgsFileDialog,
     QgsFieldComboBox,
     QgsMapLayerComboBox,
     QgsColorButton,
@@ -804,17 +804,12 @@ class IncidenceDensityDialog(QDialog):
             return
 
         last_dir = QSettings().value("GeoPublicHealth/lastDir", os.path.expanduser("~"))
-        options = QFileDialog.Options()
-        if sys.platform == "darwin":
-            options |= QFileDialog.DontUseNativeDialog
-
         try:
-            output_file, selected_filter = QFileDialog.getSaveFileName(
+            output_file, selected_filter = QgsFileDialog.getSaveFileName(
                 self,
                 tr("Save Output Layer"),
                 last_dir,
                 tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
-                options=options,
             )
         except Exception as exc:
             QgsMessageLog.logMessage(
