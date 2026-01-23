@@ -92,8 +92,10 @@ class StatsWidget(QWidget, FORM_CLASS):
             self.toolbar = None
             # Show warning message about missing matplotlib
             display_message_bar(
-                tr("matplotlib is not available. Graphing features will be disabled."),
-                Qgis.Warning,
+                msg=tr(
+                    "matplotlib is not available. Graphing features will be disabled."
+                ),
+                level=Qgis.Warning,
                 duration=5,
             )
 

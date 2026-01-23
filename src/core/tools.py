@@ -28,11 +28,18 @@ from qgis.PyQt.QtWidgets import QApplication
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from qgis.core import (
-    QgsVectorLayer, Qgis, QgsGeometry, QgsFeature, QgsSpatialIndex,QgsWkbTypes)
+    QgsVectorLayer,
+    Qgis,
+    QgsGeometry,
+    QgsFeature,
+    QgsSpatialIndex,
+    QgsWkbTypes,
+)
 
 
 def create_memory_layer(
-        layer_name, geometry, coordinate_reference_system=None, fields=None):
+    layer_name, geometry, coordinate_reference_system=None, fields=None
+):
     """Create a vector memory layer.
 
     :param layer_name: The name of the layer.
@@ -52,25 +59,24 @@ def create_memory_layer(
     """
 
     if geometry == QgsWkbTypes.Point:
-        type_string = 'MultiPoint'
+        type_string = "MultiPoint"
     elif geometry == QgsWkbTypes.Line:
-        type_string = 'MultiLineString'
+        type_string = "MultiLineString"
     elif geometry == QgsWkbTypes.Polygon:
-        type_string = 'MultiPolygon'
+        type_string = "MultiPolygon"
     elif geometry == QgsWkbTypes.NoGeometry:
-        type_string = 'none'
+        type_string = "none"
     else:
         raise Exception(
-            'Layer is whether Point nor Line nor Polygon, I got %s' % geometry)
+            "Layer is whether Point nor Line nor Polygon, I got %s" % geometry
+        )
 
-    uri = '%s?index=yes&uuid=%s' % (type_string, str(uuid4()))
+    uri = "%s?index=yes&uuid=%s" % (type_string, str(uuid4()))
     if coordinate_reference_system:
         crs = coordinate_reference_system.authid().lower()
-        uri += '&crs=%s' % crs
-    memory_layer = QgsVectorLayer(uri, layer_name, 'memory')
-    memory_layer.keywords = {
-        'inasafe_fields': {}
-    }
+        uri += "&crs=%s" % crs
+    memory_layer = QgsVectorLayer(uri, layer_name, "memory")
+    memory_layer.keywords = {"inasafe_fields": {}}
 
     if fields:
         data_provider = memory_layer.dataProvider()
@@ -138,27 +144,52 @@ def create_spatial_index(layer):
 
 def get_last_input_path():
     settings = QSettings()
-    return settings.value('LastInputPath')
+    return settings.value("LastInputPath")
 
 
 def set_last_input_path(directory):
     settings = QSettings()
-    settings.setValue('LastInputPath', str(directory))
+    settings.setValue("LastInputPath", str(directory))
 
 
 def tr(msg):
     # noinspection PyCallByClass,PyArgumentList
-    return QApplication.translate('GeoPublicHealth', msg)
+    return QApplication.translate("GeoPublicHealth", msg)
 
 
-def display_message_bar(
-        title=None, msg=None, level=Qgis.Info, duration=5):
+def display_message_bar(title=None, msg=None, level=Qgis.Info, duration=5):
+    """
+    Display a message in QGIS message bar.
+
+    :param title: Message title (optional, can be None)
+    :param msg: Message text
+    :param level: Message level (Qgis.Info, Qgis.Warning, Qgis.Critical, Qgis.Success)
+    :param duration: Duration in seconds to display message (0 for indefinite)
+    """
+    # Handle the case where only msg is provided (title is used as msg)
+    if msg is None and title is not None:
+        message = title
+        title = ""
+    elif msg is not None and title is not None:
+        message = f"{title}: {msg}"
+    elif msg is not None:
+        message = msg
+    else:
+        message = ""
 
     try:
-        if iface.Blurring_mainWindowDialog.isVisible():
+        # Check if there's a custom message bar (for dialogs)
+        if (
+            hasattr(iface, "Blurring_mainWindowDialog")
+            and iface.Blurring_mainWindowDialog.isVisible()
+        ):
             iface.Blurring_mainWindowDialog.messageBar.pushMessage(
-                title, msg, level, duration)
+                "", message, level, duration
+            )
         else:
-            iface.messageBar().pushMessage(title, msg, level, duration)
-    except AttributeError:
-        iface.messageBar().pushMessage(title, msg, level, duration)
+            # Use the main QGIS message bar
+            # QGIS 3.x API: pushMessage(text, level, duration)
+            iface.messageBar().pushMessage(message, level, duration)
+    except (AttributeError, TypeError):
+        # Fallback to main message bar with just message text
+        iface.messageBar().pushMessage(message, level, duration)
