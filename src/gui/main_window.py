@@ -22,7 +22,6 @@
  ***************************************************************************/
 """
 
-
 from builtins import range
 from qgis.PyQt.QtWidgets import QDialog, QTreeWidgetItem, QTabWidget
 from qgis.PyQt.QtGui import QIcon
@@ -44,34 +43,29 @@ from geopublichealth.src.doc.help import (
     help_attribute_table,
     help_export_kml,
 )
-from geopublichealth.src.gui.import_gui.open_shapefile import (
-    OpenShapefileWidget)
+from geopublichealth.src.gui.import_gui.open_shapefile import OpenShapefileWidget
 from geopublichealth.src.gui.import_gui.open_csv import OpenCsv
 from geopublichealth.src.gui.import_gui.open_raster import OpenRasterWidget
-from geopublichealth.src.gui.import_gui.open_xls_dbf import (
-    OpenXlsDbfFileWidget)
+from geopublichealth.src.gui.import_gui.open_xls_dbf import OpenXlsDbfFileWidget
 from geopublichealth.src.gui.analysis.blur_dialog import BlurWidget
 from geopublichealth.src.gui.analysis.stats_dialog import StatsWidget
-from geopublichealth.src.gui.analysis.composite_index_dialog import (
-    CompositeIndexDialog)
+from geopublichealth.src.gui.analysis.composite_index_dialog import CompositeIndexDialog
 from geopublichealth.src.gui.analysis.incidence_dialog import IncidenceDialog
-from geopublichealth.src.gui.analysis.incidence_point_dialog import (
-    IncidencePointDialog)
+from geopublichealth.src.gui.analysis.incidence_point_dialog import IncidencePointDialog
 from geopublichealth.src.gui.analysis.density_dialog import DensityDialog
-from geopublichealth.src.gui.analysis.density_point_dialog import (
-    DensityPointDialog)
+from geopublichealth.src.gui.analysis.density_point_dialog import DensityPointDialog
 from geopublichealth.src.gui.analysis.autocorrelation_dialog import (
-    AutocorrelationDialog)
+    AutocorrelationDialog,
+)
 from geopublichealth.src.gui.export.csv import CsvExport
 from geopublichealth.src.gui.export.kml import KmlExport
 from geopublichealth.src.gui.about import AboutWidget
 from geopublichealth.src.utilities.resources import get_ui_class, resource
 
-FORM_CLASS = get_ui_class('default', 'main.ui')
+FORM_CLASS = get_ui_class("default", "main.ui")
 
 
 class MainDialog(QDialog, FORM_CLASS):
-
     def __init__(self, parent=None):
         """Constructor."""
         QDialog.__init__(self)
@@ -83,162 +77,164 @@ class MainDialog(QDialog, FORM_CLASS):
 
         self.tree_menu = [
             {
-                'label': 'Import',
-                'icon': resource('import.png'),
-                'content': [
+                "label": "Import",
+                "icon": resource("import.png"),
+                "content": [
                     {
-                        'label': 'Shapefile',
-                        'icon': resource('shp.png'),
-                        'content': {
-                            'widget': OpenShapefileWidget(),
-                            'help': help_open_shapefile()
-                        }
-                    }, {
-                        'label': 'Raster',
-                        'icon': resource('raster.png'),
-                        'content': {
-                            'widget': OpenRasterWidget(),
-                            'help': help_open_raster()
-                        }
-                    }, {
-                        'label': 'Table XLS/DBF',
-                        'icon': resource('xls.png'),
-                        'content': {
-                            'widget': OpenXlsDbfFileWidget(),
-                            'help': help_open_table()
-                        }
-                    }, {
-                        'label': 'Table CSV',
-                        'icon': resource('csv.png'),
-                        'content': {
-                            'widget': OpenCsv(),
-                            'help': help_open_csv()
-                        }
-                    }, {
-                        'label': 'XY to map',
-                        'icon': resource('xy.png'),
-                        'content': {
-                            'widget': OpenCsv(),
-                            'help': help_open_csv()
-                        }
-                    }
-                ]
-            }, {
-                'label': 'Analyze',
-                'icon': resource('gears.png'),
-                'content': [
-                     {
-                        'label': 'Incidence',
-                        'icon': resource('incidence.png'),
-                        'content': [
-                            {
-                                'label': 'Polygon layer only',
-                                'icon': resource('incidence.png'),
-                                'content': {
-                                    'widget': IncidenceDialog(),
-                                    'help': help_incidence()
-                                }
-                            }, {
-                                'label': 'Case and aggregation layers',
-                                'icon': resource('incidence.png'),
-                                'content': {
-                                    'widget': IncidencePointDialog(),
-                                    'help': help_incidence_point()
-                                }
-                            }
-                        ]
-                    }, {
-                        'label': 'Autocorrelation',
-                        'icon':resource('autocorrelation.png'),
-                        'content': [
-                            {
-                                'label': 'Polygon layer only',
-                                'icon': resource('autocorrelation.png'),
-                                'content': {
-                                    'widget': AutocorrelationDialog(),
-                                    'help': help_autocorrelation()
-                                }
-                            }
-                        ]
-                    }, {
-                        'label': 'Composite Index',
-                        'icon': resource('composite_index.png'),
-                        'content': [
-                            {
-                                'label': 'Polygon layer only',
-                                'icon': resource('composite_index.png'),
-                                'content': {
-                                    'widget': CompositeIndexDialog(),
-                                    'help': help_composite_index()
-                                }
-                            }
-                        ]
-                    }, {
-                        'label': 'Blur',
-                        'icon': resource('blur.png'),
-                        'content': [
-                            {
-                                'label': 'Blur',
-                                'icon': resource('blur.png'),
-                                'content': {
-                                    'widget': BlurWidget(),
-                                    'help': help_blur()
-                                }
-                            }, {
-                                'label': 'Stats',
-                                'icon': resource('sigma.png'),
-                                'content': {
-                                    'widget': StatsWidget(),
-                                    'help': help_stats_blurring()
-                                }
-                            }
-                        ]
-                    }, {
-                        'label': 'Density',
-                        'icon': resource('incidence.png'),
-                        'content': [
-                            {
-                                'label': 'Polygon layer only',
-                                'icon': resource('incidence.png'),
-                                'content': {
-                                    'widget': DensityDialog(),
-                                    'help': help_density()
-                                }
-                            }, {
-                                'label': 'Case and aggregation layers',
-                                'icon': resource('incidence.png'),
-                                'content': {
-                                    'widget': DensityPointDialog(),
-                                    'help': help_density_point()
-                                }
-                            }
-                        ]
-                    }
-                ]
+                        "label": "Shapefile",
+                        "icon": resource("shp.png"),
+                        "content": {
+                            "widget": OpenShapefileWidget(),
+                            "help": help_open_shapefile(),
+                        },
+                    },
+                    {
+                        "label": "Raster",
+                        "icon": resource("raster.png"),
+                        "content": {
+                            "widget": OpenRasterWidget(),
+                            "help": help_open_raster(),
+                        },
+                    },
+                    {
+                        "label": "Table XLS/DBF",
+                        "icon": resource("xls.png"),
+                        "content": {
+                            "widget": OpenXlsDbfFileWidget(),
+                            "help": help_open_table(),
+                        },
+                    },
+                    {
+                        "label": "Table CSV",
+                        "icon": resource("csv.png"),
+                        "content": {"widget": OpenCsv(), "help": help_open_csv()},
+                    },
+                    {
+                        "label": "XY to map",
+                        "icon": resource("xy.png"),
+                        "content": {"widget": OpenCsv(), "help": help_open_csv()},
+                    },
+                ],
             },
             {
-                'label': 'Export',
-                'icon': resource('export.png'),
-                'content': [
+                "label": "Analyze",
+                "icon": resource("gears.png"),
+                "content": [
                     {
-                        'label': 'Attribute table',
-                        'icon': resource('csv.png'),
-                        'content': {
-                            'widget': CsvExport(),
-                            'help': help_attribute_table()
-                        }
+                        "label": "Incidence",
+                        "icon": resource("incidence.png"),
+                        "content": [
+                            {
+                                "label": "Polygon layer only",
+                                "icon": resource("incidence.png"),
+                                "content": {
+                                    "widget": IncidenceDialog(),
+                                    "help": help_incidence(),
+                                },
+                            },
+                            {
+                                "label": "Case and aggregation layers",
+                                "icon": resource("incidence.png"),
+                                "content": {
+                                    "widget": IncidencePointDialog(),
+                                    "help": help_incidence_point(),
+                                },
+                            },
+                        ],
                     },
-
+                    {
+                        "label": "Autocorrelation",
+                        "icon": resource("autocorrelation.png"),
+                        "content": [
+                            {
+                                "label": "Polygon layer only",
+                                "icon": resource("autocorrelation.png"),
+                                "content": {
+                                    "widget": AutocorrelationDialog(),
+                                    "help": help_autocorrelation(),
+                                },
+                            }
+                        ],
+                    },
+                    {
+                        "label": "Composite Index",
+                        "icon": resource("composite_index.png"),
+                        "content": [
+                            {
+                                "label": "Polygon layer only",
+                                "icon": resource("composite_index.png"),
+                                "content": {
+                                    "widget": CompositeIndexDialog(),
+                                    "help": help_composite_index(),
+                                },
+                            }
+                        ],
+                    },
+                    {
+                        "label": "Blur",
+                        "icon": resource("blur.png"),
+                        "content": [
+                            {
+                                "label": "Blur",
+                                "icon": resource("blur.png"),
+                                "content": {
+                                    "widget": BlurWidget(),
+                                    "help": help_blur(),
+                                },
+                            },
+                            {
+                                "label": "Stats",
+                                "icon": resource("sigma.png"),
+                                "content": {
+                                    "widget": StatsWidget(),
+                                    "help": help_stats_blurring(),
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        "label": "Density",
+                        "icon": resource("incidence.png"),
+                        "content": [
+                            {
+                                "label": "Polygon layer only",
+                                "icon": resource("incidence.png"),
+                                "content": {
+                                    "widget": DensityDialog(),
+                                    "help": help_density(),
+                                },
+                            },
+                            {
+                                "label": "Case and aggregation layers",
+                                "icon": resource("incidence.png"),
+                                "content": {
+                                    "widget": DensityPointDialog(),
+                                    "help": help_density_point(),
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "label": "Export",
+                "icon": resource("export.png"),
+                "content": [
+                    {
+                        "label": "Attribute table",
+                        "icon": resource("csv.png"),
+                        "content": {
+                            "widget": CsvExport(),
+                            "help": help_attribute_table(),
+                        },
+                    },
                     {  # ajoute par Rachel Goree 30/05/2017
-                        'label': 'KML',
-                        'icon': resource('kml.png'),
-                        'content': {
-                            'widget': KmlExport(),
-                            'help': help_export_kml()
-                        }
-                    }
-                ]
-            }
+                        "label": "KML",
+                        "icon": resource("kml.png"),
+                        "content": {"widget": KmlExport(), "help": help_export_kml()},
+                    },
+                ],
+            },
         ]
 
         self.stack.addWidget(AboutWidget())
@@ -248,32 +244,36 @@ class MainDialog(QDialog, FORM_CLASS):
         # A category is import, process and export.
         for category_def in self.tree_menu:
             category_menu = QTreeWidgetItem(self.menu)
-            category_menu.setIcon(0, QIcon(category_def['icon']))
-            category_menu.setText(0, category_def['label'])
+            category_menu.setIcon(0, QIcon(category_def["icon"]))
+            category_menu.setText(0, category_def["label"])
 
             # Sub item
-            for sub_category_def in category_def['content']:
+            for sub_category_def in category_def["content"]:
                 menu_entry = QTreeWidgetItem(category_menu)
-                menu_entry.setIcon(0, QIcon(sub_category_def['icon']))
-                menu_entry.setText(0, sub_category_def['label'])
+                menu_entry.setIcon(0, QIcon(sub_category_def["icon"]))
+                menu_entry.setText(0, sub_category_def["label"])
 
                 # Add widget or add tab
-                if isinstance(sub_category_def['content'], dict):
-                    widget = sub_category_def['content']['widget']
+                if isinstance(sub_category_def["content"], dict):
+                    widget = sub_category_def["content"]["widget"]
                     self.stack.addWidget(widget)
-                    self.help_list.append(sub_category_def['content']['help'])
+                    if hasattr(widget, "signalHelpChanged"):
+                        widget.signalHelpChanged.connect(self.help.setHtml)
+                    self.help_list.append(sub_category_def["content"]["help"])
                 else:
                     tab = QTabWidget(self.stack)
                     tab.setIconSize(QSize(32, 32))
                     self.stack.addWidget(tab)
 
                     tab_help = []
-                    tab_bar = sub_category_def['content']
+                    tab_bar = sub_category_def["content"]
                     for item in tab_bar:
-                        label = item['label']
-                        icon = QIcon(item['icon'])
-                        widget = item['content']['widget']
-                        help_widget = item['content']['help']
+                        label = item["label"]
+                        icon = QIcon(item["icon"])
+                        widget = item["content"]["widget"]
+                        help_widget = item["content"]["help"]
+                        if hasattr(widget, "signalHelpChanged"):
+                            widget.signalHelpChanged.connect(self.help.setHtml)
                         tab_help.append(help_widget)
                         tab.addTab(widget, icon, label)
                     self.help_list.append(tab_help)
@@ -289,7 +289,7 @@ class MainDialog(QDialog, FORM_CLASS):
         self.help.setHtml(content[tab_index])
 
     def show_status(self, level, message):
-        self.messageBar.pushMessage('', message, level, 5)
+        self.messageBar.pushMessage("", message, level, 5)
 
     def expand(self, i):
         """Auto expand item on single click."""
@@ -328,8 +328,7 @@ class MainDialog(QDialog, FORM_CLASS):
                 current_widget.currentChanged.connect(self.display_help_tab)
             else:
                 try:
-                    current_widget.currentChanged.disconnect(
-                        self.display_help_tab)
+                    current_widget.currentChanged.disconnect(self.display_help_tab)
                 except AttributeError:
                     pass
 

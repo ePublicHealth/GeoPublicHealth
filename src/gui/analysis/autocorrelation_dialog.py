@@ -118,7 +118,14 @@ try:
 
     import libpysal
     from libpysal.weights import Queen, Rook
-    from esda.moran import Moran_Local, Moran_Rate, Moran_Local_Rate
+    from esda.moran import (
+        Moran,
+        Moran_BV,
+        Moran_Local,
+        Moran_Local_BV,
+        Moran_Rate,
+        Moran_Local_Rate,
+    )
     from esda.getisord import G_Local
     from esda.geary_local import Geary_Local
 
@@ -148,6 +155,7 @@ from geopublichealth.src.core.exceptions import (
     NotANumberException,
 )
 from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.doc.help import help_autocorrelation
 from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class("analysis", "autocorrelation.ui")
@@ -156,6 +164,9 @@ STAT_MORAN = "moran"
 STAT_GEARY = "geary"
 STAT_G_LOCAL = "g_local"
 STAT_MORAN_RATE = "moran_rate"
+STAT_MORAN_GLOBAL = "moran_global"
+STAT_MORAN_BV_GLOBAL = "moran_bv_global"
+STAT_MORAN_BV_LOCAL = "moran_bv_local"
 
 
 class CommonAutocorrelationDialog(QDialog):
@@ -165,6 +176,7 @@ class CommonAutocorrelationDialog(QDialog):
 
     signalAskCloseWindow = pyqtSignal(int, name="signalAskCloseWindow")
     signalStatus = pyqtSignal(int, str, name="signalStatus")
+    signalHelpChanged = pyqtSignal(str, name="signalHelpChanged")
 
     def __init__(self, parent=None):
         """
@@ -250,6 +262,23 @@ class CommonAutocorrelationDialog(QDialog):
                     self.cbx_population_field.setLayer
                 )
 
+            if hasattr(self, "cbx_secondary_field") and hasattr(
+                self, "cbx_aggregation_layer"
+            ):
+                self.cbx_secondary_field.setFilters(QgsFieldProxyModel.Numeric)
+                self.cbx_secondary_field.setLayer(
+                    self.cbx_aggregation_layer.currentLayer()
+                )
+                self.cbx_aggregation_layer.layerChanged.connect(
+                    self.cbx_secondary_field.setLayer
+                )
+
+            if hasattr(self, "cbx_statistic"):
+                self.cbx_statistic.currentIndexChanged.connect(
+                    self.update_statistic_controls
+                )
+                self.cbx_statistic.currentIndexChanged.connect(self.update_help_text)
+
             # LISA categories with colors and labels
             self.lisa = {
                 1: ("#b92815", "High - High"),
@@ -270,6 +299,9 @@ class CommonAutocorrelationDialog(QDialog):
                     self.label_library_info.setText(
                         tr("Required libraries not available")
                     )
+
+            self.update_statistic_controls()
+            self.update_help_text()
 
         except Exception as e:
             display_message_bar(
@@ -339,12 +371,20 @@ class CommonAutocorrelationDialog(QDialog):
             field = self.cbx_indicator_field.currentField()
             self.statistic_type = self.get_statistic_type()
             population_field = None
+            secondary_field = None
             if self.statistic_type == STAT_MORAN_RATE:
                 if hasattr(self, "cbx_population_field"):
                     population_field = self.cbx_population_field.currentField()
                 if not population_field:
                     raise GeoPublicHealthException(
                         msg=tr("Population field is required for Moran Rate.")
+                    )
+            if self.statistic_type in (STAT_MORAN_BV_GLOBAL, STAT_MORAN_BV_LOCAL):
+                if hasattr(self, "cbx_secondary_field"):
+                    secondary_field = self.cbx_secondary_field.currentField()
+                if not secondary_field:
+                    raise GeoPublicHealthException(
+                        msg=tr("Second field is required for bivariate Moran.")
                     )
 
             # Get the layer from the project
@@ -407,6 +447,34 @@ class CommonAutocorrelationDialog(QDialog):
                 )
                 sig_q = rate_local.q * (rate_local.p_sim <= 0.05)
                 self.create_output_features(file_writer, rate_local, sig_q)
+            elif self.statistic_type == STAT_MORAN_GLOBAL:
+                moran_global = self.calculate_moran_global(y, w)
+                QgsMessageLog.logMessage(
+                    f"Moran I: {moran_global.I:.4f}, p={moran_global.p_sim:.4f}",
+                    "GeoPublicHealth",
+                    Qgis.Info,
+                )
+                self.create_output_features(file_writer, moran_global)
+            elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
+                if GEOPANDAS_AVAILABLE:
+                    y_secondary = self.get_indicator_values_modern(secondary_field)
+                else:
+                    y_secondary = self.get_indicator_values_legacy(secondary_field)
+                moran_bv = self.calculate_moran_bv_global(y, y_secondary, w)
+                QgsMessageLog.logMessage(
+                    f"Moran BV I: {moran_bv.I:.4f}, p={moran_bv.p_sim:.4f}",
+                    "GeoPublicHealth",
+                    Qgis.Info,
+                )
+                self.create_output_features(file_writer, moran_bv)
+            elif self.statistic_type == STAT_MORAN_BV_LOCAL:
+                if GEOPANDAS_AVAILABLE:
+                    y_secondary = self.get_indicator_values_modern(secondary_field)
+                else:
+                    y_secondary = self.get_indicator_values_legacy(secondary_field)
+                moran_bv_local = self.calculate_moran_bv_local(y, y_secondary, w)
+                sig_q = moran_bv_local.q * (moran_bv_local.p_sim <= 0.05)
+                self.create_output_features(file_writer, moran_bv_local, sig_q)
             del file_writer
 
             # Create output layer and add symbology
@@ -471,6 +539,12 @@ class CommonAutocorrelationDialog(QDialog):
                 return STAT_G_LOCAL
             if "rate" in stat_text:
                 return STAT_MORAN_RATE
+            if "bivariate" in stat_text and "global" in stat_text:
+                return STAT_MORAN_BV_GLOBAL
+            if "bivariate" in stat_text and "local" in stat_text:
+                return STAT_MORAN_BV_LOCAL
+            if "global" in stat_text:
+                return STAT_MORAN_GLOBAL
         return STAT_MORAN
 
     def get_output_field_names(self):
@@ -482,6 +556,12 @@ class CommonAutocorrelationDialog(QDialog):
             return ["GEARY_G", "GEARY_P", "GEARY_S"]
         if self.statistic_type == STAT_G_LOCAL:
             return ["G_LOC", "G_Z", "G_P", "G_HOT"]
+        if self.statistic_type == STAT_MORAN_GLOBAL:
+            return ["MORAN_I", "MORAN_Z", "MORAN_P"]
+        if self.statistic_type == STAT_MORAN_BV_GLOBAL:
+            return ["MBV_I", "MBV_Z", "MBV_P"]
+        if self.statistic_type == STAT_MORAN_BV_LOCAL:
+            return ["MBV_P", "MBV_Z", "MBV_Q", "MBV_I", "MBV_C"]
         return ["LISA_P", "LISA_Z", "LISA_Q", "LISA_I", "LISA_C"]
 
     def get_output_layer_prefix(self):
@@ -493,6 +573,12 @@ class CommonAutocorrelationDialog(QDialog):
             return "GEARY"
         if self.statistic_type == STAT_G_LOCAL:
             return "GLOCAL"
+        if self.statistic_type == STAT_MORAN_GLOBAL:
+            return "MORAN"
+        if self.statistic_type == STAT_MORAN_BV_GLOBAL:
+            return "MBV"
+        if self.statistic_type == STAT_MORAN_BV_LOCAL:
+            return "MBVL"
         return "LISA"
 
     def get_output_layer_title(self, field):
@@ -504,7 +590,61 @@ class CommonAutocorrelationDialog(QDialog):
             return f"Local Geary - {field}"
         if self.statistic_type == STAT_G_LOCAL:
             return f"Getis-Ord G - {field}"
+        if self.statistic_type == STAT_MORAN_GLOBAL:
+            return f"Moran Global - {field}"
+        if self.statistic_type == STAT_MORAN_BV_GLOBAL:
+            return f"Moran BV Global - {field}"
+        if self.statistic_type == STAT_MORAN_BV_LOCAL:
+            return f"Moran BV Local - {field}"
         return f"LISA Moran's I - {field}"
+
+    def update_statistic_controls(self):
+        stat_type = self.get_statistic_type()
+        is_rate = stat_type == STAT_MORAN_RATE
+        is_bivariate = stat_type in (STAT_MORAN_BV_GLOBAL, STAT_MORAN_BV_LOCAL)
+
+        if hasattr(self, "cbx_population_field"):
+            self.cbx_population_field.setEnabled(is_rate)
+        if hasattr(self, "label_population"):
+            self.label_population.setEnabled(is_rate)
+
+        if hasattr(self, "cbx_secondary_field"):
+            self.cbx_secondary_field.setEnabled(is_bivariate)
+        if hasattr(self, "label_secondary_field"):
+            self.label_secondary_field.setEnabled(is_bivariate)
+
+        if hasattr(self, "label_statistic_hint"):
+            hint = tr("(Local)")
+            if stat_type in (STAT_MORAN_GLOBAL, STAT_MORAN_BV_GLOBAL):
+                hint = tr("(Global)")
+            self.label_statistic_hint.setText(hint)
+
+    def update_help_text(self):
+        stat_type = self.get_statistic_type()
+        help_map = {
+            STAT_MORAN: "moran",
+            STAT_GEARY: "geary",
+            STAT_G_LOCAL: "g_local",
+            STAT_MORAN_RATE: "moran_rate",
+            STAT_MORAN_GLOBAL: "moran_global",
+            STAT_MORAN_BV_GLOBAL: "moran_bv_global",
+            STAT_MORAN_BV_LOCAL: "moran_bv_local",
+        }
+        help_key = help_map.get(stat_type, "moran")
+        if hasattr(self, "label_stat_help"):
+            short_help = {
+                "moran": tr("Moran (LISA): local clusters."),
+                "geary": tr("Local Geary: local dissimilarity."),
+                "g_local": tr("Getis-Ord G: hot/cold spots."),
+                "moran_rate": tr("Moran Rate: case/population."),
+                "moran_global": tr("Moran (Global): overall autocorrelation."),
+                "moran_bv_global": tr("Moran BV (Global): two-field association."),
+                "moran_bv_local": tr("Moran BV (Local): co-location clusters."),
+            }
+            self.label_stat_help.setText(short_help.get(help_key, ""))
+
+        help_html = help_autocorrelation(help_key)
+        self.signalHelpChanged.emit(help_html)
 
     @staticmethod
     def _hotspot_class(z_value, p_value):
@@ -541,6 +681,20 @@ class CommonAutocorrelationDialog(QDialog):
             fields.append(QgsField("G_Z", 6, "Real", 10, 6))
             fields.append(QgsField("G_P", 6, "Real", 10, 6))
             fields.append(QgsField("G_HOT", 2, "Integer", 1, 0))
+        elif self.statistic_type == STAT_MORAN_GLOBAL:
+            fields.append(QgsField("MORAN_I", 6, "Real", 10, 6))
+            fields.append(QgsField("MORAN_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("MORAN_P", 6, "Real", 10, 6))
+        elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
+            fields.append(QgsField("MBV_I", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_P", 6, "Real", 10, 6))
+        elif self.statistic_type == STAT_MORAN_BV_LOCAL:
+            fields.append(QgsField("MBV_P", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_Z", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_Q", 2, "Integer", 1, 0))
+            fields.append(QgsField("MBV_I", 6, "Real", 10, 6))
+            fields.append(QgsField("MBV_C", 2, "Integer", 1, 0))
 
     def prepare_file_writer(self, fields, crs_admin_layer):
         """Prepare the output file writer."""
@@ -859,6 +1013,30 @@ class CommonAutocorrelationDialog(QDialog):
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
             raise
 
+    def calculate_moran_global(self, y, w):
+        try:
+            return Moran(y, w, transformation="r", permutations=999)
+        except Exception as e:
+            error_msg = tr("Error calculating Global Moran's I:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def calculate_moran_bv_global(self, x, y, w):
+        try:
+            return Moran_BV(x, y, w, transformation="r", permutations=999)
+        except Exception as e:
+            error_msg = tr("Error calculating Bivariate Moran's I:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
+    def calculate_moran_bv_local(self, x, y, w):
+        try:
+            return Moran_Local_BV(x, y, w, transformation="r", permutations=999)
+        except Exception as e:
+            error_msg = tr("Error calculating Bivariate Local Moran's I:")
+            display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
+            raise
+
     def calculate_geary_local(self, y, w):
         try:
             return Geary_Local(
@@ -931,6 +1109,20 @@ class CommonAutocorrelationDialog(QDialog):
                     attributes.append(float(stats.Zs[i]))
                     attributes.append(float(stats.p_sim[i]))
                     attributes.append(self._hotspot_class(stats.Zs[i], stats.p_sim[i]))
+                elif self.statistic_type == STAT_MORAN_GLOBAL:
+                    attributes.append(float(stats.I))
+                    attributes.append(float(stats.z_sim))
+                    attributes.append(float(stats.p_sim))
+                elif self.statistic_type == STAT_MORAN_BV_GLOBAL:
+                    attributes.append(float(stats.I))
+                    attributes.append(float(stats.z_sim))
+                    attributes.append(float(stats.p_sim))
+                elif self.statistic_type == STAT_MORAN_BV_LOCAL:
+                    attributes.append(float(stats.p_sim[i]))
+                    attributes.append(float(stats.z_sim[i]))
+                    attributes.append(int(stats.q[i]))
+                    attributes.append(float(stats.Is[i]))
+                    attributes.append(int(sig_q[i]))
 
                 new_feature = QgsFeature()
                 new_geom = QgsGeometry(feature.geometry())
@@ -984,6 +1176,10 @@ class CommonAutocorrelationDialog(QDialog):
     def add_symbology(self):
         """Add symbology to the output layer."""
         try:
+            if self.statistic_type in (STAT_MORAN_GLOBAL, STAT_MORAN_BV_GLOBAL):
+                self.output_layer.triggerRepaint()
+                return
+
             if self.statistic_type == STAT_GEARY:
                 categories = []
                 for value, (color, label) in {
@@ -1076,6 +1272,9 @@ class CommonAutocorrelationDialog(QDialog):
             if self.statistic_type == STAT_MORAN_RATE:
                 quadrant_field = "RATE_Q"
                 sig_field = "RATE_C"
+            if self.statistic_type == STAT_MORAN_BV_LOCAL:
+                quadrant_field = "MBV_Q"
+                sig_field = "MBV_C"
 
             renderer = QgsCategorizedSymbolRenderer(quadrant_field, categories)
             self.output_layer.setRenderer(renderer)

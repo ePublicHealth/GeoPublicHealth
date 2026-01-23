@@ -7,7 +7,7 @@ author=Manuel Vidaurre, Pai (Supharerk Thawillarp), Dr. Carlos Castillo-Salgado
 qgisMinimumVersion=3.0
 description=A comprehensive QGIS plugin for epidemiology and public health GIS analysis. Provides spatial statistics, disease mapping, incidence/density calculations, autocorrelation analysis, and data blurring tools designed specifically for public health professionals and researchers.
 about=GeoPublicHealth is a specialized QGIS plugin developed for epidemiologists and public health professionals. Built upon the GeoHealth Plugin by Etienne Trimaille, it integrates advanced spatial analysis methods from SIGEpi (developed by Dr. Carlos Castillo-Salgado at Johns Hopkins Bloomberg School of Public Health and PAHO/WHO). Features include: spatial autocorrelation (Moran's I, LISA), disease incidence and density mapping, data blurring for privacy protection, composite index creation, and comprehensive statistical tools. Compatible with QGIS 3.42+. Optional matplotlib support for enhanced visualization. Actively maintained with regular updates.
-version=version 0.2.17
+version=version 0.2.18
 tracker=https://github.com/ePublicHealth/GeoPublicHealth/issues
 repository=https://github.com/ePublicHealth/GeoPublicHealth
 ; end of mandatory metadata
@@ -15,6 +15,9 @@ repository=https://github.com/ePublicHealth/GeoPublicHealth
 ; start of optional metadata
 category=Vector
 changelog=Version History:
+    0.2.18 (2026-01-23) - Moran global and bivariate
+        • Add Moran global and bivariate (global/local) options
+        • Update help panel based on statistic selection
     0.2.17 (2026-01-23) - Getis-Ord stability
         • Disable multiprocessing in Getis-Ord and Geary stats
     0.2.16 (2026-01-23) - Autocorrelation help text
