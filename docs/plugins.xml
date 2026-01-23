@@ -13,7 +13,7 @@
         <download_url><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/raw/main/installation/geopublichealth.zip]]></download_url>
         <uploaded_by><![CDATA[mvidaurre]]></uploaded_by>
         <create_date>2016-04-24T15:31:19.824333</create_date>
-        <update_date>2026-01-22T23:20:00.000000</update_date>
+        <update_date>2026-01-22T23:40:00.000000</update_date>
         <experimental>True</experimental>
         <deprecated>False</deprecated>
         <tracker><![CDATA[https://github.com/ePublicHealth/GeoPublicHealth/issues]]></tracker>

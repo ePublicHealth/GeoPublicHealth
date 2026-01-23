@@ -23,11 +23,18 @@
 
 from builtins import object
 from os.path import dirname, join, exists
-from qgis.core import QgsProcessingRegistry,QgsProcessingProvider,QgsApplication
+
+from qgis.core import (
+    QgsApplication,
+    QgsMessageLog,
+    QgsProcessingProvider,
+    QgsProcessingRegistry,
+    Qgis,
+)
 from qgis.PyQt.QtCore import QSettings, QTranslator, qVersion, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
-#from processing.core.Processing import Processing
+# from processing.core.Processing import Processing
 
 from geopublichealth.src.gui.main_window import MainDialog
 from geopublichealth.src.processing_geopublichealth.provider import Provider
@@ -35,23 +42,22 @@ from geopublichealth.src.utilities.resources import resource
 
 
 class GeoPublicHealthPlugin(object):
-
     def __init__(self, iface):
-        self.provider=None
+        self.provider = None
         self.iface = iface
         self.plugin_dir = dirname(__file__)
+        self._ensure_proj_data_dir()
         # initialize locale
         locale = QSettings().value("locale/userLocale")[0:2]
         locale_path = join(
-            self.plugin_dir,
-            'i18n',
-            'GeoPublicHealth_{}.qm'.format(locale))
+            self.plugin_dir, "i18n", "GeoPublicHealth_{}.qm".format(locale)
+        )
 
         if exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
+            if qVersion() > "4.3.3":
                 # noinspection PyCallByClass,PyTypeChecker,PyArgumentList
                 QCoreApplication.installTranslator(self.translator)
 
@@ -64,10 +70,41 @@ class GeoPublicHealthPlugin(object):
         self.density_action = None
         self.histogram_action = None
 
+    @staticmethod
+    def _ensure_proj_data_dir():
+        try:
+            from pyproj import datadir
+        except ImportError:
+            return
 
+        try:
+            current_dir = datadir.get_data_dir()
+        except Exception:
+            current_dir = None
+
+        if current_dir and exists(current_dir):
+            return
+
+        prefix_path = QgsApplication.prefixPath()
+        candidate_paths = [
+            join(prefix_path, "Resources", "proj"),
+            join(dirname(prefix_path), "Resources", "proj"),
+            join(prefix_path, "share", "proj"),
+            join(dirname(prefix_path), "share", "proj"),
+        ]
+
+        for candidate in candidate_paths:
+            if exists(candidate):
+                datadir.set_data_dir(candidate)
+                QgsMessageLog.logMessage(
+                    f"Set PROJ data directory to {candidate}",
+                    "GeoPublicHealth",
+                    Qgis.Info,
+                )
+                return
 
     def initProcessing(self):
-        self.provider=Provider()
+        self.provider = Provider()
         QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
@@ -75,17 +112,16 @@ class GeoPublicHealthPlugin(object):
         self.plugin_menu = self.iface.pluginMenu()
 
         # Main window
-        icon = QIcon(resource('icon-32.png'))
-        self.main_action = QAction(icon, 'GeoPublicHealth', self.iface.mainWindow())
+        icon = QIcon(resource("icon-32.png"))
+        self.main_action = QAction(icon, "GeoPublicHealth", self.iface.mainWindow())
         self.plugin_menu.addAction(self.main_action)
         # noinspection PyUnresolvedReferences
         self.main_action.triggered.connect(self.open_main_window)
-        self.iface.addPluginToMenu("GeoPublicHealth",self.main_action)
-
+        self.iface.addPluginToMenu("GeoPublicHealth", self.main_action)
 
     def unload(self):
         self.plugin_menu.removeAction(self.main_action)
-        self.iface.removePluginMenu("GeoPublicHealth",self.main_action)
+        self.iface.removePluginMenu("GeoPublicHealth", self.main_action)
         QgsApplication.processingRegistry().removeProvider(self.provider)
 
     @staticmethod
