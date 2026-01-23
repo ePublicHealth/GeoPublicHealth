@@ -60,6 +60,7 @@ from qgis.core import (
 from qgis.gui import QgsFieldComboBox, QgsMapLayerComboBox
 
 import numpy as np
+import pandas as pd
 
 
 def _ensure_proj_data_dir():
@@ -507,6 +508,7 @@ class CommonAutocorrelationDialog(QDialog):
 
         try:
             gdf = gpd.read_file(layer_path, **read_kwargs)
+            return self._ensure_geopandas_geometry(gdf)
         except Exception as exc:
             if "expected bytes, str found" not in str(exc):
                 raise
@@ -517,9 +519,14 @@ class CommonAutocorrelationDialog(QDialog):
                 Qgis.Warning,
             )
 
+        try:
             gdf = gpd.read_file(layer_path, engine="fiona", **read_kwargs)
+            return self._ensure_geopandas_geometry(gdf)
+        except ValueError as exc:
+            if "without a geometry column" not in str(exc):
+                raise
 
-        return self._ensure_geopandas_geometry(gdf)
+            return self._read_fiona_without_geometry(layer_path, layer_name)
 
     def _ensure_geopandas_geometry(self, gdf):
         if getattr(gdf, "geometry", None) is not None and not gdf.geometry.isna().all():
@@ -550,6 +557,33 @@ class CommonAutocorrelationDialog(QDialog):
             if layer_crs and layer_crs.isValid():
                 crs_value = layer_crs.authid() or layer_crs.toWkt()
                 gdf.set_crs(crs_value, inplace=True)
+
+        return gdf
+
+    def _read_fiona_without_geometry(self, layer_path, layer_name):
+        try:
+            import fiona
+            from shapely.geometry import shape
+        except ImportError as exc:
+            raise ImportError(
+                "Fiona is required to read GeoPackage layers without geometry."
+            ) from exc
+
+        rows = []
+        geometries = []
+        with fiona.open(layer_path, layer=layer_name) as source:
+            for feature in source:
+                rows.append(feature.get("properties") or {})
+                geom = feature.get("geometry")
+                geometries.append(shape(geom) if geom else None)
+
+            crs_value = source.crs_wkt or source.crs
+
+        gdf = gpd.GeoDataFrame(pd.DataFrame(rows), geometry=geometries)
+        gdf = self._ensure_geopandas_geometry(gdf)
+
+        if gdf.crs is None and crs_value:
+            gdf.set_crs(crs_value, inplace=True)
 
         return gdf
 
