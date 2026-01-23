@@ -20,41 +20,44 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from os.path import splitext, basename
 from qgis.core import QgsProject, QgsVectorLayer
 
-from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QFileDialog
+from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox
 from qgis.PyQt.QtCore import pyqtSignal
 
-from geopublichealth.src.core.tools import tr
+from geopublichealth.src.core.tools import get_open_file_path, tr
 from geopublichealth.src.utilities.resources import get_ui_class
 
-FORM_CLASS = get_ui_class('import_ui', 'open_shapefile.ui')
+FORM_CLASS = get_ui_class("import_ui", "open_shapefile.ui")
 
 
 class OpenXlsDbfFileWidget(QWidget, FORM_CLASS):
-
-    signalAskCloseWindow = pyqtSignal(int, name='signalAskCloseWindow')
-    signalStatus = pyqtSignal(int, str, name='signalStatus')
+    signalAskCloseWindow = pyqtSignal(int, name="signalAskCloseWindow")
+    signalStatus = pyqtSignal(int, str, name="signalStatus")
 
     def __init__(self, parent=None):
         self.parent = parent
         super(OpenXlsDbfFileWidget, self).__init__()
         self.setupUi(self)
 
-        self.buttonBox.button(QDialogButtonBox.Open).clicked.connect(
-            self.open_table)
+        self.buttonBox.button(QDialogButtonBox.Open).clicked.connect(self.open_table)
         self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
+            self.signalAskCloseWindow.emit
+        )
         # noinspection PyUnresolvedReferences
         self.bt_browse.clicked.connect(self.open_file_browser)
 
     def open_file_browser(self):
         # noinspection PyArgumentList
-        shapefile, __ = QFileDialog.getOpenFileName(
+        shapefile, __ = get_open_file_path(
             parent=self.parent,
-            caption=tr('Select table'),
-            filter='Table (*.xls *.xlsx *.dbf)')
+            title=tr("Select table"),
+            directory="",
+            file_filter="Table (*.xls *.xlsx *.dbf)",
+            prompt=tr("Input table path (.xls, .xlsx, .dbf):"),
+        )
         self.le_shapefile.setText(shapefile)
 
     def open_table(self):
@@ -64,7 +67,7 @@ class OpenXlsDbfFileWidget(QWidget, FORM_CLASS):
             return
 
         name = basename(splitext(path)[0])
-        layer = QgsVectorLayer(path, name, 'ogr')
+        layer = QgsVectorLayer(path, name, "ogr")
         # noinspection PyArgumentList
         QgsProject.instance().addMapLayer(layer)
-        self.signalStatus.emit(3, tr('Successful import from %s' % path))
+        self.signalStatus.emit(3, tr("Successful import from %s" % path))

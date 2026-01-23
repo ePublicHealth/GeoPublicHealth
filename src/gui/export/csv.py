@@ -23,77 +23,74 @@
 
 from builtins import str
 import codecs
-from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QFileDialog
+from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox
 from qgis.PyQt.QtCore import pyqtSignal
 
 from qgis.core import QgsMapLayerProxyModel
 
-from geopublichealth.src.core.tools import tr
+from geopublichealth.src.core.tools import get_save_file_path, tr
 from geopublichealth.src.utilities.resources import get_ui_class
 
-FORM_CLASS = get_ui_class('export', 'export_csv.ui')
+FORM_CLASS = get_ui_class("export", "export_csv.ui")
 
 
 class CsvExport(QWidget, FORM_CLASS):
-
-    signalAskCloseWindow = pyqtSignal(int, name='signalAskCloseWindow')
-    signalStatus = pyqtSignal(int, str, name='signalStatus')
+    signalAskCloseWindow = pyqtSignal(int, name="signalAskCloseWindow")
+    signalStatus = pyqtSignal(int, str, name="signalStatus")
 
     def __init__(self, parent=None):
         self.parent = parent
         super(CsvExport, self).__init__()
         self.setupUi(self)
 
-        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(
-            self.save_csv)
+        self.buttonBox.button(QDialogButtonBox.Save).clicked.connect(self.save_csv)
         self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
+            self.signalAskCloseWindow.emit
+        )
         # noinspection PyUnresolvedReferences
         self.bt_browse.clicked.connect(self.open_file_browser)
 
-        self.delimiters = {
-            'tab': '    ',
-            'pipe': '|',
-            'comma': ',',
-            'semicolon': ';'
-        }
+        self.delimiters = {"tab": "    ", "pipe": "|", "comma": ",", "semicolon": ";"}
 
         self.cbx_layer.setFilters(QgsMapLayerProxyModel.VectorLayer)
 
     def open_file_browser(self):
         # noinspection PyArgumentList
-        output_file, __ = QFileDialog.getSaveFileName(
+        output_file, __ = get_save_file_path(
             parent=self.parent,
-            caption=tr('Export as CSV'),
-            filter='CSV (*.csv)')
-        self.le_output.setText(output_file[0])
+            title=tr("Export as CSV"),
+            directory="",
+            file_filter="CSV (*.csv)",
+            prompt=tr("Output file path (.csv):"),
+        )
+        self.le_output.setText(output_file)
 
     def save_csv(self):
         path = self.le_output.text()
         layer = self.cbx_layer.currentLayer()
 
         if self.tab_delimiter.isChecked():
-            delimiter = self.delimiters['tab']
+            delimiter = self.delimiters["tab"]
         elif self.pipe_delimiter.isChecked():
-            delimiter = self.delimiters['pipe']
+            delimiter = self.delimiters["pipe"]
         elif self.semicolon_delimiter.isChecked():
-            delimiter = self.delimiters['semicolon']
+            delimiter = self.delimiters["semicolon"]
         else:
-            delimiter = self.delimiters['comma']
+            delimiter = self.delimiters["comma"]
 
-        csv_file = codecs.open(path, 'w', 'utf-8')
+        csv_file = codecs.open(path, "w", "utf-8")
 
         provider = layer.dataProvider()
         fields = provider.fieldNameMap()
 
-        header = u'%s\n' % delimiter.join(fields)
+        header = "%s\n" % delimiter.join(fields)
         csv_file.write(header)
 
         for feature in layer.getFeatures():
             attributes = feature.attributes()
-            line = u'%s\n' % delimiter.join([str(i) for i in attributes])
+            line = "%s\n" % delimiter.join([str(i) for i in attributes])
             csv_file.write(line)
 
         csv_file.close()
 
-        self.signalStatus.emit(3, tr('Successful export to %s' % path))
+        self.signalStatus.emit(3, tr("Successful export to %s" % path))

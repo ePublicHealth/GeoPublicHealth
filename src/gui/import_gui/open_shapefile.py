@@ -20,22 +20,22 @@
  *                                                                         *
  ***************************************************************************/
 """
+
 from os.path import splitext, basename
 from qgis.core import QgsProject, QgsVectorLayer
 
-from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox, QFileDialog
+from qgis.PyQt.QtWidgets import QWidget, QDialogButtonBox
 from qgis.PyQt.QtCore import pyqtSignal
 
-from geopublichealth.src.core.tools import tr
+from geopublichealth.src.core.tools import get_open_file_path, tr
 from geopublichealth.src.utilities.resources import get_ui_class
 
-FORM_CLASS = get_ui_class('import_ui', 'open_shapefile.ui')
+FORM_CLASS = get_ui_class("import_ui", "open_shapefile.ui")
 
 
 class OpenShapefileWidget(QWidget, FORM_CLASS):
-
-    signalAskCloseWindow = pyqtSignal(int, name='signalAskCloseWindow')
-    signalStatus = pyqtSignal(int, str, name='signalStatus')
+    signalAskCloseWindow = pyqtSignal(int, name="signalAskCloseWindow")
+    signalStatus = pyqtSignal(int, str, name="signalStatus")
 
     def __init__(self, parent=None):
         self.parent = parent
@@ -43,18 +43,23 @@ class OpenShapefileWidget(QWidget, FORM_CLASS):
         self.setupUi(self)
 
         self.buttonBox.button(QDialogButtonBox.Open).clicked.connect(
-            self.open_shapefile)
+            self.open_shapefile
+        )
         self.buttonBox.button(QDialogButtonBox.Cancel).clicked.connect(
-            self.signalAskCloseWindow.emit)
+            self.signalAskCloseWindow.emit
+        )
         # noinspection PyUnresolvedReferences
         self.bt_browse.clicked.connect(self.open_file_browser)
 
     def open_file_browser(self):
         # noinspection PyArgumentList
-        shapefile, __ = QFileDialog.getOpenFileName(
+        shapefile, __ = get_open_file_path(
             parent=self.parent,
-            caption=tr('Select shapefile'),
-            filter='Shapefile (*.shp)')
+            title=tr("Select shapefile"),
+            directory="",
+            file_filter="Shapefile (*.shp)",
+            prompt=tr("Input shapefile path (.shp):"),
+        )
         self.le_shapefile.setText(shapefile)
 
     def open_shapefile(self):
@@ -64,7 +69,7 @@ class OpenShapefileWidget(QWidget, FORM_CLASS):
             return
 
         name = basename(splitext(path)[0])
-        layer = QgsVectorLayer(path, name, 'ogr')
+        layer = QgsVectorLayer(path, name, "ogr")
         # noinspection PyArgumentList
         QgsProject.instance().addMapLayer(layer)
-        self.signalStatus.emit(3, tr('Successful import from %s' % path))
+        self.signalStatus.emit(3, tr("Successful import from %s" % path))

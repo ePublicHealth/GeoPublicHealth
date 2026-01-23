@@ -26,7 +26,6 @@
 import traceback
 import tempfile
 import os
-import sys
 from typing import Dict, List, Optional, Union, Any
 
 # Third-Party Imports
@@ -44,8 +43,6 @@ from qgis.PyQt.QtWidgets import (
     QDialogButtonBox,
     QTableWidgetItem,
     QApplication,
-    QFileDialog,
-    QInputDialog,
     QMessageBox,
     QVBoxLayout,
     QCheckBox,
@@ -94,7 +91,11 @@ from qgis.utils import iface
 
 # Plugin-Specific Imports
 from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
-from geopublichealth.src.core.tools import display_message_bar, tr
+from geopublichealth.src.core.tools import (
+    display_message_bar,
+    get_save_file_path,
+    tr,
+)
 from geopublichealth.src.core.exceptions import (
     GeoPublicHealthException,
     NoLayerProvidedException,
@@ -806,23 +807,13 @@ class IncidenceDensityDialog(QDialog):
 
         last_dir = QSettings().value("GeoPublicHealth/lastDir", os.path.expanduser("~"))
         try:
-            if sys.platform == "darwin":
-                output_file, ok = QInputDialog.getText(
-                    self,
-                    tr("Save Output Layer"),
-                    tr("Output file path (.gpkg or .shp):"),
-                    text=last_dir,
-                )
-                if not ok:
-                    return
-                selected_filter = ""
-            else:
-                output_file, selected_filter = QFileDialog.getSaveFileName(
-                    self,
-                    tr("Save Output Layer"),
-                    last_dir,
-                    tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
-                )
+            output_file, selected_filter = get_save_file_path(
+                self,
+                tr("Save Output Layer"),
+                last_dir,
+                tr("GeoPackage (*.gpkg);;ESRI Shapefiles (*.shp)"),
+                prompt=tr("Output file path (.gpkg or .shp):"),
+            )
         except Exception as exc:
             QgsMessageLog.logMessage(
                 f"Output file dialog failed: {exc}",

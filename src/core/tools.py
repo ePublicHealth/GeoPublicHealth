@@ -22,9 +22,11 @@
 """
 
 from builtins import str
+import sys
 from uuid import uuid4
+
 from qgis.PyQt.QtCore import QSettings
-from qgis.PyQt.QtWidgets import QApplication
+from qgis.PyQt.QtWidgets import QApplication, QFileDialog, QInputDialog
 from qgis.utils import iface
 from qgis.gui import QgsMessageBar
 from qgis.core import (
@@ -155,6 +157,38 @@ def set_last_input_path(directory):
 def tr(msg):
     # noinspection PyCallByClass,PyArgumentList
     return QApplication.translate("GeoPublicHealth", msg)
+
+
+def get_save_file_path(parent, title, directory, file_filter, prompt=None):
+    if sys.platform == "darwin":
+        prompt_text = prompt or tr("Output file path:")
+        output_file, ok = QInputDialog.getText(
+            parent,
+            title,
+            prompt_text,
+            text=directory,
+        )
+        if not ok:
+            return "", ""
+        return output_file, ""
+
+    return QFileDialog.getSaveFileName(parent, title, directory, file_filter)
+
+
+def get_open_file_path(parent, title, directory, file_filter, prompt=None):
+    if sys.platform == "darwin":
+        prompt_text = prompt or tr("Input file path:")
+        input_file, ok = QInputDialog.getText(
+            parent,
+            title,
+            prompt_text,
+            text=directory,
+        )
+        if not ok:
+            return "", ""
+        return input_file, ""
+
+    return QFileDialog.getOpenFileName(parent, title, directory, file_filter)
 
 
 def display_message_bar(title=None, msg=None, level=Qgis.Info, duration=5):

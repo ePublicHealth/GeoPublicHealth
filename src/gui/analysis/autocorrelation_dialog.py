@@ -32,7 +32,7 @@ import traceback
 from tempfile import NamedTemporaryFile
 from typing import Dict, List, Optional, Union, Any, Tuple
 
-from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QApplication, QFileDialog
+from qgis.PyQt.QtWidgets import QDialog, QDialogButtonBox, QApplication
 from qgis.PyQt.QtCore import QVariant, Qt, pyqtSignal, QSettings
 from qgis.PyQt.QtGui import QColor
 
@@ -134,7 +134,11 @@ except ImportError:
     GEOPANDAS_AVAILABLE = False
 
 from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
-from geopublichealth.src.core.tools import display_message_bar, tr
+from geopublichealth.src.core.tools import (
+    display_message_bar,
+    get_save_file_path,
+    tr,
+)
 from geopublichealth.src.core.exceptions import (
     GeoPublicHealthException,
     NoLayerProvidedException,
@@ -263,17 +267,22 @@ class CommonAutocorrelationDialog(QDialog):
         # Get the last directory from QSettings if available
         last_dir = QSettings().value("GeoPublicHealth/lastDir", os.path.expanduser("~"))
 
-        output_file, selected_filter = QFileDialog.getSaveFileName(
+        output_file, selected_filter = get_save_file_path(
             self.parent,
             tr("Save Output Layer"),
             last_dir,
             tr("ESRI Shapefile (*.shp);;GeoPackage (*.gpkg)"),
+            prompt=tr("Output file path (.shp or .gpkg):"),
         )
 
         if output_file:
             # Apply correct extension based on filter
-            is_shp = "(*.shp)" in selected_filter
-            is_gpkg = "(*.gpkg)" in selected_filter
+            is_shp = "(*.shp)" in selected_filter or output_file.lower().endswith(
+                ".shp"
+            )
+            is_gpkg = "(*.gpkg)" in selected_filter or output_file.lower().endswith(
+                ".gpkg"
+            )
             base, ext = os.path.splitext(output_file)
 
             if is_shp and not ext.lower() == ".shp":

@@ -31,7 +31,6 @@ from qgis.PyQt.QtWidgets import (
     QDialogButtonBox,
     QApplication,
     QTableWidgetItem,
-    QFileDialog,
 )
 from qgis.PyQt.QtCore import pyqtSignal, QSize
 
@@ -45,6 +44,7 @@ from geopublichealth.src.core.stats import Stats
 from geopublichealth.src.core.tools import (
     tr,
     display_message_bar,
+    get_save_file_path,
     get_last_input_path,
     set_last_input_path,
 )
@@ -237,11 +237,12 @@ class StatsWidget(QWidget, FORM_CLASS):
         last_directory = get_last_input_path()
 
         # noinspection PyArgumentList
-        output_file, __ = QFileDialog.getSaveFileName(
+        output_file, __ = get_save_file_path(
             parent=self,
-            caption=tr("Select file"),
+            title=tr("Select file"),
             directory=last_directory,
-            filter="CSV (*.csv)",
+            file_filter="CSV (*.csv)",
+            prompt=tr("Output file path (.csv):"),
         )
 
         if output_file:
@@ -264,11 +265,12 @@ class StatsWidget(QWidget, FORM_CLASS):
 
         last_directory = get_last_input_path()
         # noinspection PyArgumentList
-        output_file, __ = QFileDialog.getSaveFileName(
+        output_file, __ = get_save_file_path(
             parent=self,
-            caption=tr("Select file"),
+            title=tr("Select file"),
             directory=last_directory,
-            filter="CSV (*.csv)",
+            file_filter="CSV (*.csv)",
+            prompt=tr("Output file path (.csv):"),
         )
 
         if output_file:
