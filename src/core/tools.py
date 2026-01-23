@@ -23,6 +23,7 @@
 
 from builtins import str
 import sys
+import os
 from uuid import uuid4
 
 from qgis.PyQt.QtCore import QSettings
@@ -170,9 +171,18 @@ def get_save_file_path(parent, title, directory, file_filter, prompt=None):
         )
         if not ok:
             return "", ""
+        output_file = _normalize_path(output_file)
+        if not _validate_output_path(output_file):
+            return "", ""
         return output_file, ""
 
-    return QFileDialog.getSaveFileName(parent, title, directory, file_filter)
+    output_file, selected_filter = QFileDialog.getSaveFileName(
+        parent, title, directory, file_filter
+    )
+    output_file = _normalize_path(output_file)
+    if output_file and not _validate_output_path(output_file):
+        return "", ""
+    return output_file, selected_filter
 
 
 def get_open_file_path(parent, title, directory, file_filter, prompt=None):
@@ -186,9 +196,38 @@ def get_open_file_path(parent, title, directory, file_filter, prompt=None):
         )
         if not ok:
             return "", ""
+        input_file = _normalize_path(input_file)
+        if input_file and not os.path.exists(input_file):
+            display_message_bar(tr("Input path does not exist."), level=Qgis.Warning)
+            return "", ""
         return input_file, ""
 
-    return QFileDialog.getOpenFileName(parent, title, directory, file_filter)
+    input_file, selected_filter = QFileDialog.getOpenFileName(
+        parent, title, directory, file_filter
+    )
+    input_file = _normalize_path(input_file)
+    return input_file, selected_filter
+
+
+def _normalize_path(path):
+    if not path:
+        return path
+    return os.path.normpath(os.path.expanduser(path))
+
+
+def _validate_output_path(output_file):
+    if not output_file:
+        return False
+
+    directory = os.path.dirname(output_file)
+    if not directory:
+        return True
+
+    if not os.path.isdir(directory):
+        display_message_bar(tr("Output directory does not exist."), level=Qgis.Critical)
+        return False
+
+    return True
 
 
 def display_message_bar(title=None, msg=None, level=Qgis.Info, duration=5):
