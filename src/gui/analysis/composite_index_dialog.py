@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QApplication,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QVariant
+from PyQt5.QtCore import Qt, pyqtSignal, QVariant, QSettings
 from qgis.utils import Qgis
 from qgis.core import (
     QgsField,
