@@ -97,14 +97,34 @@ After installation, install Python dependencies via Python Console (see macOS in
 4.  **Install Dependencies (PySAL, Numba):** QGIS on macOS requires manual installation of Python packages within its own environment.
     * Start QGIS
     * Open the **Python Console** (Plugins Menu -> Python Console)
-    * Execute the following commands one by one in the console prompt (`>>>`):
+    * Execute the following commands **one at a time** in the console prompt (`>>>`), pressing Enter after each line:
         ```python
         import pip
+        ```
+        ```python
         pip.main(['install', 'pip', '--upgrade'])
-        pip.main(['install', 'libpysal==4.3.0'])  # Install specific required version
-        pip.main(['install', 'numba', '--upgrade'])
+        ```
+        ```python
+        pip.main(['install', 'numpy'])
+        ```
+        ```python
+        pip.main(['install', 'scipy'])
+        ```
+        ```python
+        pip.main(['install', 'pandas'])
+        ```
+        ```python
+        pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+        ```
+        ```python
+        pip.main(['install', 'numba'])
         ```
     * Close and restart QGIS after installing these packages
+    * **Verify installation:** After restarting, open Python Console and run:
+        ```python
+        import libpysal, esda
+        print(f"libpysal {libpysal.__version__}, esda {esda.__version__} installed!")
+        ```
 
 **Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
 
@@ -169,20 +189,27 @@ Then restart QGIS and enable the plugin in the Plugin Manager.
 
 matplotlib is optional but enables graphing and plotting features in analysis dialogs. To install:
 
-**Using QGIS Python Console (Easiest):**
+**Using QGIS Python Console:**
 
 1. Open QGIS
 2. Go to **Plugins** → **Python Console**
-3. Paste this code and press Enter:
+3. Run these commands **one at a time** (press Enter after each):
    ```python
-   import subprocess, sys
-   subprocess.run([sys.executable, "-m", "pip", "install", "--user", "matplotlib"])
+   import pip
+   ```
+   ```python
+   pip.main(['install', 'matplotlib'])
    ```
 4. Restart QGIS
+5. **Verify installation:**
+   ```python
+   import matplotlib
+   print(f"matplotlib {matplotlib.__version__} installed!")
+   ```
 
-**Alternative:** Use the provided installation script `install_matplotlib_in_qgis.py` from the repository.
+**Note:** Do not paste multiple lines at once in the Python Console. Run each command separately.
 
-See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for more installation options.
+See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for more installation options and troubleshooting.
 
 ## Troubleshooting
 
@@ -216,7 +243,18 @@ If the plugin doesn't appear after installation:
 If you see errors about missing modules:
 
 - **matplotlib**: Optional - see [installation instructions above](#optional-install-matplotlib-for-plotting-features)
-- **libpysal, numba**: Required - see [Step 1: Install QGIS and Dependencies](#step-1-install-qgis-and-dependencies)
+- **libpysal, esda, numba**: Required - see [Step 1: Install QGIS and Dependencies](#step-1-install-qgis-and-dependencies)
+
+### Python Console Installation Issues
+
+**Important:** When using the QGIS Python Console:
+- Run commands **one line at a time** (press Enter after each line)
+- Do NOT paste multiple lines at once - this will cause `SyntaxError: multiple statements found`
+- Wait for each command to complete before running the next one
+- If installation fails with build errors, use the `--no-build-isolation` flag:
+  ```python
+  pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+  ```
 
 ### Other Issues
 
