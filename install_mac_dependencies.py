@@ -1,18 +1,42 @@
+# -*- coding: utf-8 -*-
 """
+/***************************************************************************
+
+                                 GeoPublicHealth
+                                 A QGIS plugin
+
+                              -------------------
+        begin                : 2026-01-24
+        copyright            : (C) 2026 by Manuel Vidaurre
+        email                : manuel.vidaurre@gmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 Installation script for GeoPublicHealth dependencies on macOS.
 
-This script installs all required dependencies for the GeoPublicHealth QGIS plugin.
+This script installs all required dependencies for the GeoPublicHealth QGIS
+plugin.
 
 IMPORTANT: This script MUST be run using QGIS's Python, not your system Python.
            QGIS has its own isolated Python environment separate from:
            - macOS system Python (/usr/bin/python3)
-           - Homebrew Python (/opt/homebrew/bin/python3 or /usr/local/bin/python3)
+           - Homebrew Python (/opt/homebrew/bin/python3 or
+             /usr/local/bin/python3)
            - Anaconda/Miniconda Python
            - Any other Python installation
 
 USAGE:
 
-Method 1 - Run from QGIS Python Console (RECOMMENDED - Always uses correct Python):
+Method 1 - Run from QGIS Python Console (RECOMMENDED - Always uses correct
+Python):
 1. Open QGIS
 2. Go to Plugins > Python Console
 3. Click the "Show Editor" button (icon in console toolbar)
@@ -21,7 +45,8 @@ Method 1 - Run from QGIS Python Console (RECOMMENDED - Always uses correct Pytho
 6. Restart QGIS when complete
 
 Method 2 - Run from Terminal (ONLY if you use the full QGIS Python path):
-   /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+   /Applications/QGIS.app/Contents/MacOS/bin/python3
+   install_mac_dependencies.py
 
    Optional arguments:
    --python-path PATH    Override Python executable path
@@ -30,9 +55,11 @@ Method 2 - Run from Terminal (ONLY if you use the full QGIS Python path):
    --log PATH            Log file path (default: auto-generated)
 
    Example for automation:
-   /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
+   /Applications/QGIS.app/Contents/MacOS/bin/python3
+   install_mac_dependencies.py --yes --log /tmp/install.log
 
-   WARNING: Do NOT run with just "python3" or "python" - this will use the wrong Python!
+   WARNING: Do NOT run with just "python3" or "python".
+   This will use the wrong Python.
 
 Method 3 - Paste into QGIS Python Console:
    Copy and paste the entire script into the console
@@ -40,7 +67,6 @@ Method 3 - Paste into QGIS Python Console:
 
 import subprocess
 import sys
-import os
 import argparse
 import datetime
 from pathlib import Path
@@ -64,32 +90,35 @@ Examples:
   /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
 
   # Non-interactive mode for automation:
-  /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
+  /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+  --yes --log /tmp/install.log
 
   # Override QGIS Python path:
-  python3 install_mac_dependencies.py --python-path /Applications/QGIS-LTR.app/Contents/MacOS/bin/python3
-        """
+  python3 install_mac_dependencies.py --python-path
+  /Applications/QGIS-LTR.app/Contents/MacOS/bin/python3
+        """,
     )
 
     parser.add_argument(
         "--python-path",
         help="Path to Python executable to use (default: current Python)",
-        default=sys.executable
+        default=sys.executable,
     )
     parser.add_argument(
-        "--yes", "-y",
+        "--yes",
+        "-y",
         action="store_true",
-        help="Skip interactive prompts (assume yes)"
+        help="Skip interactive prompts (assume yes)",
     )
     parser.add_argument(
         "--timeout",
         type=int,
         default=None,
-        help="Timeout in seconds for each pip install (default: none)"
+        help="Timeout in seconds for each pip install (default: none)",
     )
     parser.add_argument(
         "--log",
-        help="Path to log file (default: ./geopublichealth_install_TIMESTAMP.log)"
+        help=("Log file path (default: geopublichealth_install_<ts>.log)"),
     )
 
     return parser.parse_args()
@@ -98,7 +127,8 @@ Examples:
 def install_dependencies():
     """Install all required dependencies for GeoPublicHealth on macOS."""
 
-    # Parse arguments (only when run from command line, not when pasted in console)
+    # Parse arguments (only when run from command line, not when pasted in
+    # console)
     try:
         args = parse_args()
         python_exe = args.python_path
@@ -115,7 +145,8 @@ def install_dependencies():
     # Determine log file path
     if not log_file:
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        log_path = Path(f"./geopublichealth_install_{timestamp}.log").absolute()
+        log_filename = f"geopublichealth_install_{timestamp}.log"
+        log_path = Path(f"./{log_filename}").absolute()
     else:
         log_path = Path(log_file).absolute()
 
@@ -136,18 +167,18 @@ def install_dependencies():
         print("\n" + "!" * 70)
         print("⚠️  WARNING: This may NOT be QGIS's Python!")
         print("!" * 70)
-        print("\nYou appear to be running with system/Homebrew/Anaconda Python.")
+        print("\nYou appear to be running system/Homebrew/Anaconda Python.")
         print("Dependencies installed here will NOT be available in QGIS.")
         print("\nQGIS Python is usually located at:")
         print("  /Applications/QGIS.app/Contents/MacOS/bin/python3")
-        print("\nRECOMMENDED: Run this script from QGIS Python Console instead.")
+        print("\nRECOMMENDED: Run this from QGIS Python Console.")
         print("See installation instructions in README.md or INSTALL_MAC.md")
         print("\n" + "!" * 70)
 
         if not non_interactive:
             response = input("\nContinue anyway? (yes/no): ").strip().lower()
-            if response not in ['yes', 'y']:
-                print("\nInstallation cancelled. Please run from QGIS Python Console.")
+            if response not in ["yes", "y"]:
+                print("\nInstallation cancelled. Use QGIS Python Console.")
                 return False
         print("\nProceeding with current Python (you have been warned)...")
 
@@ -182,7 +213,12 @@ def install_dependencies():
     failed = []
 
     for name, packages, description in dependencies:
-        print(f"\n[{len(installed) + len(failed) + 1}/{len(dependencies)}] Installing {name}...")
+        print(
+            (
+                f"\n[{len(installed) + len(failed) + 1}/{len(dependencies)}] "
+                f"Installing {name}..."
+            )
+        )
         print("-" * 70)
 
         try:
@@ -193,16 +229,16 @@ def install_dependencies():
 
             # Write to log
             with open(log_path, "a", encoding="utf-8") as log:
-                log.write(f"\n{'='*70}\n")
+                log.write(f"\n{'=' * 70}\n")
                 log.write(f">>> {' '.join(cmd)}\n")
-                log.write(f"{'='*70}\n")
+                log.write(f"{'=' * 70}\n")
 
             # Run pip install
             result = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
-                timeout=timeout
+                timeout=timeout,
             )
 
             # Write full output to log
@@ -232,7 +268,7 @@ def install_dependencies():
                 failed.append(name)
 
         except subprocess.TimeoutExpired:
-            error_msg = f"✗ {name} installation timed out (exceeded {timeout} seconds)"
+            error_msg = f"✗ {name} installation timed out (> {timeout}s)"
             print(error_msg)
             with open(log_path, "a", encoding="utf-8") as log:
                 log.write(f"\n{error_msg}\n")
@@ -269,26 +305,40 @@ def install_dependencies():
     critical = {
         "libpysal": "Spatial analysis",
         "esda": "Exploratory spatial data analysis",
-        "numba": "Performance optimization"
+        "numba": "Performance optimization",
     }
+
+    def check_module(module_name):
+        cmd = [
+            python_exe,
+            "-c",
+            (
+                "import importlib; "
+                f"module = importlib.import_module('{module_name}'); "
+                "print(getattr(module, '__version__', 'unknown'))"
+            ),
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode == 0:
+            return True, result.stdout.strip()
+        return False, result.stderr.strip()
 
     all_critical_ok = True
     for module, description in critical.items():
-        try:
-            __import__(module)
-            print(f"✓ {module} is available - {description}")
-        except ImportError:
+        ok, version = check_module(module)
+        if ok:
+            print(f"✓ {module} {version} is available - {description}")
+        else:
             print(f"✗ {module} is NOT available - {description}")
             all_critical_ok = False
 
     # Check optional dependencies
     print("\nOptional dependencies:")
-    try:
-        import matplotlib
-
-        print(f"✓ matplotlib is available (version {matplotlib.__version__})")
-    except ImportError:
-        print("○ matplotlib is not available (plotting features will be disabled)")
+    ok, version = check_module("matplotlib")
+    if ok:
+        print(f"✓ matplotlib is available (version {version})")
+    else:
+        print("○ matplotlib not available (plotting disabled)")
 
     # Final message
     print("\n" + "=" * 70)
@@ -303,7 +353,8 @@ def install_dependencies():
     elif all_critical_ok:
         print("PARTIAL SUCCESS - Core dependencies are installed.")
         print(
-            "\nSome optional packages failed, but the plugin should work for basic features."
+            "\nSome optional packages failed, but the plugin should work for "
+            "basic features."
         )
         print("\nNext steps:")
         print("1. Restart QGIS for changes to take effect")
@@ -312,15 +363,19 @@ def install_dependencies():
         exit_code = 0
     else:
         print("INSTALLATION INCOMPLETE")
-        print(
-            "\nSome required dependencies failed to install."
-        )
+        print("\nSome required dependencies failed to install.")
         print(f"\nFull installation log: {log_path}")
-        print("\nPlease try running install_dependencies_console.py from QGIS Python Console")
-        print("Or see INSTALL_MAC.md and MAC_INSTALL_TECHNICAL.md for troubleshooting.")
+        print(
+            "\nPlease try running install_dependencies_console.py from QGIS "
+            "Python Console"
+        )
+        print("See INSTALL_MAC.md and MAC_INSTALL_TECHNICAL.md for help.")
         print("\nIf reporting an issue, please attach:")
         print(f"  - Log file: {log_path}")
-        print(f"  - QGIS version: (run in QGIS console: from qgis.core import QgsApplication; print(QgsApplication.version()))")
+        print(
+            "  - QGIS version: (run in QGIS console: from qgis.core import "
+            "QgsApplication; print(QgsApplication.version()))"
+        )
         print(f"  - macOS version: (run in terminal: sw_vers)")
         exit_code = 1
 

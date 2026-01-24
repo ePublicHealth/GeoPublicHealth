@@ -1,10 +1,32 @@
+# -*- coding: utf-8 -*-
 """
+/***************************************************************************
+
+                                 GeoPublicHealth
+                                 A QGIS plugin
+
+                              -------------------
+        begin                : 2026-01-24
+        copyright            : (C) 2026 by Manuel Vidaurre
+        email                : manuel.vidaurre@gmail.com
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 GeoPublicHealth Dependency Installer for QGIS Python Console
 
 RECOMMENDED INSTALLATION METHOD - Run this from QGIS Python Console.
 
-This script is designed to be run directly in the QGIS Python Console, which
-automatically ensures dependencies are installed to the correct Python environment.
+This script is designed to be run directly in the QGIS Python Console,
+which automatically ensures dependencies are installed to the correct
+Python environment.
 
 USAGE:
 1. Open QGIS
@@ -15,7 +37,8 @@ USAGE:
 6. Wait for installation to complete
 7. Restart QGIS
 
-Or paste the code directly into the console (copy everything below the instructions).
+Or paste the code directly into the console (copy everything below the
+instructions).
 
 Why this method is best:
 - Automatically uses QGIS's Python (no environment confusion)
@@ -58,21 +81,22 @@ def run_pip_install(packages, timeout=None):
     Run pip install using subprocess for stability.
 
     Note: We use subprocess.run with sys.executable instead of pip.main()
-    because pip.main() is not a stable public API and can break with pip upgrades.
+    because pip.main() is not a stable public API and can break with pip
+    upgrades.
     """
     cmd = [sys.executable, "-m", "pip", "install"] + packages
 
     with open(log_path, "a", encoding="utf-8") as log:
-        log.write(f"\n{'='*70}\n")
+        log.write(f"\n{'=' * 70}\n")
         log.write(f">>> {' '.join(cmd)}\n")
-        log.write(f"{'='*70}\n")
+        log.write(f"{'=' * 70}\n")
 
         try:
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
-                timeout=timeout
+                timeout=timeout,
             )
 
             # Write full output to log
@@ -127,7 +151,7 @@ failed = []
 for name, pip_args, desc, required in packages:
     print(f"Installing {name}...", end=" ", flush=True)
 
-    rc, stdout, stderr = run_pip_install(pip_args, timeout=600)  # 10 minute timeout
+    rc, stdout, stderr = run_pip_install(pip_args, timeout=600)
 
     if rc == 0:
         print("✓")
@@ -186,9 +210,10 @@ print()
 # Check optional
 try:
     import matplotlib
+
     print(f"✓ matplotlib {matplotlib.__version__} - Plotting (optional)")
 except ImportError:
-    print("○ matplotlib not installed - Plotting features will be disabled (optional)")
+    print("matplotlib not installed - plotting disabled (optional)")
 
 print()
 print("=" * 70)
@@ -222,8 +247,9 @@ else:
     print("   https://github.com/ePublicHealth/GeoPublicHealth/issues")
     print()
     print("NOTE: Installation incomplete. Please address the issues above.")
-    # Note: We don't call sys.exit() here because when run in QGIS Python Console,
-    # it would raise SystemExit and show a stack trace, confusing users.
+    # Note: We don't call sys.exit() here because when run in QGIS Python
+    # Console it would raise SystemExit and show a stack trace that confuses
+    # users.
     # The script simply finishes with the error message above.
 
 print("=" * 70)
