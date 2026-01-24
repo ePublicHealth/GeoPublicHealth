@@ -102,7 +102,7 @@ bash install_mac_dependencies.sh
 **Option 3 - Single Command (All dependencies):**
 
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
 ```
 
 **Option 4 - Manual (Individual packages):**
