@@ -118,11 +118,11 @@ Open the QGIS Python Console and run:
 
 ```python
 import sys
+import libpysal, esda, numba
+
 print(f"Python: {sys.executable}")
 print("(Should contain 'QGIS.app')\n")
-
-import libpysal, esda, numba
-print(f"✓ All dependencies installed!")
+print("✓ All dependencies installed!")
 print(f"  libpysal {libpysal.__version__}")
 print(f"  esda {esda.__version__}")
 print(f"  numba {numba.__version__}")
@@ -137,7 +137,6 @@ If you see version numbers, you're ready to go! 🎉
 **If it doesn't work:**
 - See the Troubleshooting section below
 - For detailed technical information: [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md)
-
 ## Troubleshooting
 
 ### "ModuleNotFoundError: No module named 'libpysal'"

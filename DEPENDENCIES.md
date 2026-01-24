@@ -87,16 +87,34 @@ subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Option
 
 **Alternative: Terminal Methods** (advanced users only)
 
-**Option 3 - Single Terminal Command:**
+**Option 1 - Automated Script:**
 
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
 ```
 
-**Option 4 - Shell Script:**
+**Option 2 - Shell Script:**
 
 ```bash
 bash install_mac_dependencies.sh
+```
+
+**Option 3 - Single Command (All dependencies):**
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+```
+
+**Option 4 - Manual (Individual packages):**
+
+```bash
+# Using QGIS Python
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install scipy
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install pandas
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal esda --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numba
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install matplotlib  # Optional
 ```
 
 **Automation / CI / QGIS-LTR:**
