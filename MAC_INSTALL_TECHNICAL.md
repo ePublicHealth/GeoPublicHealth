@@ -118,22 +118,25 @@ Note: The exact paths may vary slightly between QGIS versions.
 - ✓ Consistent across all macOS versions
 
 **How it works:**
-When you run code in QGIS Python Console, it uses QGIS's bundled Python interpreter automatically. The `pip.main()` function calls pip within the same Python environment that's currently running.
+When you run code in QGIS Python Console, it uses QGIS's bundled Python interpreter automatically. We use `subprocess.run([sys.executable, "-m", "pip", ...])` to invoke pip, which is more stable than the deprecated `pip.main()` API.
 
 **Two approaches:**
 
 **A. Automated Script** (`install_dependencies_console.py`):
 - Opens a script file in QGIS editor
 - Click "Run Script"
-- Handles all installations automatically
+- Handles all installations automatically using subprocess
+- Creates timestamped log file
 - Shows progress and verifies success
 
 **B. Manual Commands:**
 ```python
-import pip
-pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
-pip.main(['install', 'numba'])
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
 ```
+
+**Important:** We use `subprocess.run` with `sys.executable -m pip` instead of `pip.main()` because `pip.main()` is not a stable public API and can break with pip upgrades.
 
 **Why this is better than Terminal:**
 - No risk of typos in Python path
@@ -150,12 +153,28 @@ Some packages (like libpysal and esda) have build-time dependencies that need to
 
 **Advantages:**
 - ✓ Installs all dependencies automatically
+- ✓ CLI arguments for automation (`--yes`, `--timeout`, `--log`, `--python-path`)
+- ✓ Full logging to timestamped file
 - ✓ Shows progress and verifies installation
-- ✓ Handles errors gracefully
+- ✓ Handles errors gracefully with detailed logs
 - ✓ Warns if using wrong Python
+- ✓ Non-interactive mode for CI/CD
+- ✓ Exit codes for automation (0=success, 1=failure)
 
 **How it works:**
-Uses `subprocess` to call `pip` as a separate process, ensuring proper installation even in complex environments.
+Uses `subprocess` to call `pip` as a separate process. All output is logged to a file for debugging. Supports overriding QGIS Python path and non-interactive execution.
+
+**Examples:**
+```bash
+# Basic usage
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+
+# Non-interactive with custom log path
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
+
+# Override QGIS path for QGIS-LTR
+python3 install_mac_dependencies.py --python-path /Applications/QGIS-LTR.app/Contents/MacOS/bin/python3 --yes
+```
 
 ### Method 3: Shell Script
 
@@ -163,17 +182,41 @@ Uses `subprocess` to call `pip` as a separate process, ensuring proper installat
 
 **Advantages:**
 - ✓ Terminal-based automation
-- ✓ Explicitly uses QGIS Python path
+- ✓ Strict error handling (`set -euo pipefail`)
+- ✓ Automatic QGIS installation discovery
+- ✓ Environment variable override support
+- ✓ Full logging to timestamped file
 - ✓ Comprehensive error checking
-- ✓ Good for scripted installations
+- ✓ Exit codes for automation (0=success, 1=failure)
+- ✓ Good for CI/CD and scripted installations
 
 **How it works:**
 ```bash
-QGIS_PYTHON="/Applications/QGIS.app/Contents/MacOS/bin/python3"
+# Default path
+QGIS_PYTHON="${QGIS_PYTHON:-/Applications/QGIS.app/Contents/MacOS/bin/python3}"
+
+# Auto-discovery if not found
+if [ ! -x "$QGIS_PYTHON" ]; then
+    # Search for QGIS*.app in /Applications
+    ...
+fi
+
 $QGIS_PYTHON -m pip install libpysal esda --no-build-isolation
 ```
 
-The script sets a variable to the QGIS Python path and uses it explicitly.
+The script discovers QGIS automatically or uses env var override. All output is logged to a timestamped file.
+
+**Examples:**
+```bash
+# Basic usage (auto-discovers QGIS)
+bash install_mac_dependencies.sh
+
+# Override QGIS path for QGIS-LTR
+QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
+
+# Custom log directory
+LOG_DIR=/tmp bash install_mac_dependencies.sh
+```
 
 ### Method 4: Terminal One-Liner
 
@@ -331,6 +374,62 @@ You have both QGIS LTR and QGIS Latest installed (or older versions).
    - Solution: Fully restart QGIS (not just close/reopen)
    - Clear Python cache: `rm -rf ~/Library/Application\ Support/QGIS/QGIS3/profiles/default/python/__pycache__`
 
+### Reporting Installation Issues
+
+If you need to report an installation problem, please include the following information:
+
+**Required Information:**
+1. **Installation log file** (created automatically by scripts)
+   - Location: `./geopublichealth_install_YYYYMMDD_HHMMSS.log`
+   - Attach the entire log file to your issue report
+
+2. **QGIS version:**
+   ```python
+   # Run in QGIS Python Console:
+   from qgis.core import QgsApplication
+   print(QgsApplication.version())
+   ```
+
+3. **macOS version:**
+   ```bash
+   # Run in Terminal:
+   sw_vers
+   ```
+
+4. **Python version:**
+   ```python
+   # Run in QGIS Python Console:
+   import sys
+   print(sys.version)
+   print(sys.executable)
+   ```
+
+**Where to report:**
+- GitHub Issues: https://github.com/ePublicHealth/GeoPublicHealth/issues
+
+**Issue template:**
+```markdown
+### Installation Problem
+
+**Environment:**
+- macOS version: [output of sw_vers]
+- QGIS version: [output from QGIS console]
+- Python path: [sys.executable from QGIS console]
+
+**Installation method used:**
+- [ ] QGIS Python Console script
+- [ ] QGIS Python Console manual commands
+- [ ] Terminal Python script
+- [ ] Shell script
+- [ ] Terminal one-liner
+
+**Problem description:**
+[Describe what happened]
+
+**Log file:**
+[Attach geopublichealth_install_*.log file]
+```
+
 ---
 
 ## Advanced Scenarios
@@ -426,11 +525,11 @@ brew install geos proj
 
 | Method | Complexity | Reliability | Environment Safety | Recommended For |
 |--------|------------|-------------|-------------------|-----------------|
-| **QGIS Console (pip.main)** | **Easy** | **Highest** | **100% Safe** | **Everyone - PRIMARY METHOD** |
+| **QGIS Console (subprocess.run)** | **Easy** | **Highest** | **100% Safe** | **Everyone - PRIMARY METHOD** |
 | QGIS Console Script | Easy | Highest | 100% Safe | Everyone who prefers automation |
 | Terminal One-liner | Medium | Medium | Requires exact path | Advanced users comfortable with Terminal |
-| Shell Script | Medium | Medium | Requires exact path | Terminal users, scripted deployments |
-| Terminal + subprocess script | Medium | Medium | Has environment check | Advanced troubleshooting |
+| Shell Script | Medium | High | Requires exact path (autodiscovery available) | Terminal users, CI/CD, scripted deployments |
+| Terminal Python script | Medium | High | Has environment check, CLI args | Automation with logging, non-interactive mode |
 
 **Recommendation Priority:**
 1. 🥇 **QGIS Python Console** (manual commands or script) - Use this unless you have a specific reason not to

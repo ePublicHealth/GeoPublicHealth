@@ -51,15 +51,17 @@ This is the most reliable method because QGIS Python Console automatically uses 
 3. Copy and paste these commands **one at a time** (press Enter after each):
 
 ```python
-import pip
-pip.main(['install', 'pip', '--upgrade'])
-pip.main(['install', 'numpy'])
-pip.main(['install', 'scipy'])
-pip.main(['install', 'pandas'])
-pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
-pip.main(['install', 'numba'])
-pip.main(['install', 'matplotlib'])  # Optional - for plotting
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
+subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
+subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
+subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
 ```
+
+**Note:** We use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) because it's more stable across pip versions.
 
 4. Restart QGIS
 
@@ -83,6 +85,16 @@ pip.main(['install', 'matplotlib'])  # Optional - for plotting
 ```bash
 cd /path/to/GeoPublicHealth
 bash install_mac_dependencies.sh
+```
+
+**For automation / CI / QGIS-LTR:**
+
+```bash
+# Non-interactive mode with logging
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
+
+# Override QGIS path for QGIS-LTR
+QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
 ```
 
 </details>

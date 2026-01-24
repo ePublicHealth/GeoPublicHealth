@@ -25,23 +25,25 @@ Why this method is best:
 - Can't accidentally install to wrong Python
 """
 
+import subprocess
+import sys
+import os
+import datetime
+from pathlib import Path
+
+# Create log file
+timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+log_path = Path(f"./geopublichealth_install_{timestamp}.log").absolute()
+
 print("=" * 70)
 print("GeoPublicHealth Dependency Installer")
 print("=" * 70)
 print()
 print("Installing dependencies for QGIS Python environment...")
+print(f"Log file: {log_path}")
 print()
 
-# Import pip
-try:
-    import pip
-except ImportError:
-    print("ERROR: pip not found. This should not happen in QGIS.")
-    print("Please report this issue.")
-    raise
-
 # Check Python environment
-import sys
 print(f"Python: {sys.executable}")
 if "QGIS.app" in sys.executable or "qgis" in sys.executable.lower():
     print("✓ Running in QGIS Python environment (correct!)")
@@ -49,6 +51,45 @@ else:
     print("⚠️  Warning: This may not be QGIS Python")
     print("   Recommended: Run this from QGIS Python Console instead")
 print()
+
+
+def run_pip_install(packages, timeout=None):
+    """
+    Run pip install using subprocess for stability.
+
+    Note: We use subprocess.run with sys.executable instead of pip.main()
+    because pip.main() is not a stable public API and can break with pip upgrades.
+    """
+    cmd = [sys.executable, "-m", "pip", "install"] + packages
+
+    with open(log_path, "a", encoding="utf-8") as log:
+        log.write(f"\n{'='*70}\n")
+        log.write(f">>> {' '.join(cmd)}\n")
+        log.write(f"{'='*70}\n")
+
+        try:
+            proc = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout
+            )
+
+            # Write full output to log
+            log.write(proc.stdout or "")
+            log.write(proc.stderr or "")
+
+            return proc.returncode, proc.stdout, proc.stderr
+
+        except subprocess.TimeoutExpired as e:
+            error_msg = f"Timeout after {timeout} seconds\n"
+            log.write(error_msg)
+            return 1, "", error_msg
+        except Exception as e:
+            error_msg = f"Error: {str(e)}\n"
+            log.write(error_msg)
+            return 1, "", error_msg
+
 
 # Define packages to install
 # Format: (name, pip_args, description, required)
@@ -80,30 +121,21 @@ print()
 
 installed = []
 failed = []
-skipped = []
 
 for name, pip_args, desc, required in packages:
-    print(f"Installing {name}...", end=" ")
+    print(f"Installing {name}...", end=" ", flush=True)
 
-    try:
-        # Use pip.main() to install - this is the most reliable method
-        # when running inside QGIS Python Console
-        result = pip.main(["install"] + pip_args)
+    rc, stdout, stderr = run_pip_install(pip_args, timeout=600)  # 10 minute timeout
 
-        if result == 0:
-            print("✓")
-            installed.append(name)
-        else:
-            print("✗")
-            failed.append(name)
-            if required:
-                print(f"  Warning: {name} is required for the plugin to work")
-
-    except Exception as e:
-        print(f"✗ Error: {e}")
+    if rc == 0:
+        print("✓")
+        installed.append(name)
+    else:
+        print(f"✗")
         failed.append(name)
         if required:
             print(f"  Warning: {name} is required for the plugin to work")
+        print(f"  See log for details: {log_path}")
 
 print()
 print("=" * 70)
@@ -121,6 +153,8 @@ if failed:
     print(f"✗ Failed to install ({len(failed)}):")
     for name in failed:
         print(f"  • {name}")
+    print()
+    print(f"Full installation log: {log_path}")
     print()
 
 # Verify critical dependencies
@@ -150,7 +184,6 @@ print()
 # Check optional
 try:
     import matplotlib
-
     print(f"✓ matplotlib {matplotlib.__version__} - Plotting (optional)")
 except ImportError:
     print("○ matplotlib not installed - Plotting features will be disabled (optional)")
@@ -170,15 +203,23 @@ if all_critical_ok:
     print("   - Search for 'geopublichealth'")
     print("   - Click Install")
     print("3. Start using GeoPublicHealth!")
+    print()
+    print(f"Installation log saved to: {log_path}")
 else:
     print("INSTALLATION INCOMPLETE")
     print()
     print("Some required dependencies failed to install.")
     print()
+    print(f"Full installation log: {log_path}")
+    print()
     print("Troubleshooting:")
     print("1. Try running this script again")
     print("2. Close and restart QGIS, then run the script again")
     print("3. See MAC_INSTALL_TECHNICAL.md for advanced troubleshooting")
-    print("4. Report the issue: https://github.com/ePublicHealth/GeoPublicHealth/issues")
+    print("4. Report the issue with the log file:")
+    print("   https://github.com/ePublicHealth/GeoPublicHealth/issues")
+    print()
+    # Exit with error code so automation can detect failure
+    sys.exit(1)
 
 print("=" * 70)

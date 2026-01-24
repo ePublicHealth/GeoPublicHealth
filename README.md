@@ -135,15 +135,17 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     Run these commands **one at a time** in QGIS Python Console (press Enter after each):
 
     ```python
-    import pip
-    pip.main(['install', 'pip', '--upgrade'])
-    pip.main(['install', 'numpy'])
-    pip.main(['install', 'scipy'])
-    pip.main(['install', 'pandas'])
-    pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
-    pip.main(['install', 'numba'])
-    pip.main(['install', 'matplotlib'])  # Optional - for plotting
+    import subprocess, sys
+    subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
     ```
+
+    **Note:** We use `subprocess.run([sys.executable, "-m", "pip", ...])` instead of `pip.main()` because `pip.main()` is not a stable public API.
 
     Then restart QGIS.
 
@@ -165,6 +167,16 @@ These methods require Terminal and are more error-prone. **The QGIS Python Conso
 ```bash
 cd /path/to/GeoPublicHealth
 bash install_mac_dependencies.sh
+```
+
+**For QGIS-LTR or other QGIS installations:**
+
+```bash
+# Shell script with custom QGIS path
+QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
+
+# Python script non-interactive mode
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
 ```
 
 </details>
