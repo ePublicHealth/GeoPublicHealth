@@ -97,40 +97,72 @@ After installation, install Python dependencies via Python Console (see macOS in
 
 #### macOS
 
+> **Quick Start:** For a simplified guide, see [INSTALL_MAC.md](INSTALL_MAC.md)
+
 1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
 2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
 3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies (PySAL, Numba):** QGIS on macOS requires manual installation of Python packages within its own environment.
-    * Start QGIS
-    * Open the **Python Console** (Plugins Menu -> Python Console)
-    * Execute the following commands **one at a time** in the console prompt (`>>>`), pressing Enter after each line:
-        ```python
-        import pip
-        ```
-        ```python
-        pip.main(['install', 'pip', '--upgrade'])
-        ```
-        ```python
-        pip.main(['install', 'numpy'])
-        ```
-        ```python
-        pip.main(['install', 'scipy'])
-        ```
-        ```python
-        pip.main(['install', 'pandas'])
-        ```
-        ```python
-        pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
-        ```
-        ```python
-        pip.main(['install', 'numba'])
-        ```
-    * Close and restart QGIS after installing these packages
-    * **Verify installation:** After restarting, open Python Console and run:
-        ```python
-        import libpysal, esda
-        print(f"libpysal {libpysal.__version__}, esda {esda.__version__} installed!")
-        ```
+4.  **Install Dependencies:** Choose one of the following methods (Option A is simplest):
+
+##### Option A: Automated Script (Recommended - Easiest)
+
+Run the automated installer script from QGIS:
+
+1.  Start QGIS
+2.  Go to **Plugins → Python Console**
+3.  Click the **"Show Editor"** button (icon in console toolbar)
+4.  Click **"Open Script"** and select `install_mac_dependencies.py` from where you downloaded/cloned GeoPublicHealth
+5.  Click **"Run Script"** button
+6.  Wait for installation to complete
+7.  Restart QGIS
+
+##### Option B: Terminal One-Liner (Fast)
+
+For users comfortable with Terminal:
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+```
+
+Then restart QGIS.
+
+##### Option C: Shell Script
+
+1.  Download or clone this repository
+2.  Open Terminal
+3.  Navigate to the GeoPublicHealth folder
+4.  Run:
+    ```bash
+    bash install_mac_dependencies.sh
+    ```
+5.  Restart QGIS
+
+##### Option D: Manual Installation (Most Control)
+
+If you prefer to install packages manually one-by-one:
+
+1.  Start QGIS
+2.  Open **Python Console** (Plugins Menu → Python Console)
+3.  Run these commands **one at a time** (press Enter after each):
+    ```python
+    import pip
+    pip.main(['install', 'pip', '--upgrade'])
+    pip.main(['install', 'numpy'])
+    pip.main(['install', 'scipy'])
+    pip.main(['install', 'pandas'])
+    pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+    pip.main(['install', 'numba'])
+    pip.main(['install', 'matplotlib'])  # Optional
+    ```
+4.  Restart QGIS
+
+**Verify Installation:**
+
+After restarting QGIS, open Python Console and run:
+```python
+import libpysal, esda, numba
+print(f"✓ libpysal {libpysal.__version__}, esda {esda.__version__}, numba {numba.__version__}")
+```
 
 **Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
 
@@ -436,12 +468,18 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 
 ## Documentation
 
+### Installation
+- [INSTALL_MAC.md](INSTALL_MAC.md) - Quick Mac installation guide
+- [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
+- [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) - Complete plugin reinstallation guide
+- [install_mac_dependencies.py](install_mac_dependencies.py) - Automated Mac dependency installer
+- [install_mac_dependencies.sh](install_mac_dependencies.sh) - Shell script for Mac dependencies
+- [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Script to install matplotlib in QGIS
+
+### Development
 - [AGENTS.md](AGENTS.md) - Development guide for AI coding agents
 - [RELEASE.md](RELEASE.md) - Release process and versioning
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
-- [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) - Complete plugin reinstallation guide
-- [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Script to install matplotlib in QGIS
 
 ## Support
 

@@ -60,9 +60,36 @@ python3 -m pip install libpysal numba matplotlib
 
 ### macOS
 
+**Option 1 - Automated Script (Recommended):**
+
+Run `install_mac_dependencies.py` from QGIS Python Console (see README for details) or:
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+```
+
+**Option 2 - Shell Script:**
+
+```bash
+bash install_mac_dependencies.sh
+```
+
+**Option 3 - Single Command (All dependencies):**
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+```
+
+**Option 4 - Manual (Individual packages):**
+
 ```bash
 # Using QGIS Python
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal numba matplotlib
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install scipy
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install pandas
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal esda --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numba
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install matplotlib  # Optional
 ```
 
 ### Linux
