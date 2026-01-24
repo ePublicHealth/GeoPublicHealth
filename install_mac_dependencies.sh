@@ -4,6 +4,10 @@
 #
 # This script installs all required dependencies for the GeoPublicHealth QGIS plugin on macOS.
 #
+# IMPORTANT: This script installs to QGIS's Python, NOT your system Python.
+#            QGIS has its own isolated Python separate from Homebrew/Anaconda/system Python.
+#            This is correct - dependencies must be installed to QGIS's Python to work.
+#
 # USAGE:
 #   1. Open Terminal
 #   2. Navigate to this directory: cd /path/to/GeoPublicHealth
@@ -16,6 +20,9 @@
 echo "======================================================================"
 echo "GeoPublicHealth macOS Dependency Installer"
 echo "======================================================================"
+echo ""
+echo "This script will install dependencies to QGIS's Python environment."
+echo "This is separate from your system/Homebrew/Anaconda Python."
 echo ""
 
 # QGIS Python path

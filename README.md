@@ -99,10 +99,24 @@ After installation, install Python dependencies via Python Console (see macOS in
 
 > **Quick Start:** For a simplified guide, see [INSTALL_MAC.md](INSTALL_MAC.md)
 
+**⚠️ Important: Understanding Python Environments on Mac**
+
+QGIS includes its own Python environment (located at `/Applications/QGIS.app/Contents/MacOS/bin/python3`). This is **separate** from:
+- macOS system Python (`/usr/bin/python3`)
+- Homebrew Python (`/opt/homebrew/bin/python3` or `/usr/local/bin/python3`)
+- Anaconda/Miniconda Python
+- Any other Python installation
+
+**You MUST install dependencies into QGIS's Python, NOT your system Python.** Installing to the wrong Python means QGIS won't find the packages.
+
+The methods below ensure dependencies are installed in the correct location. For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
+
+**Installation Steps:**
+
 1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
 2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
 3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies:** Choose one of the following methods (Option A is simplest):
+4.  **Install Dependencies:** Choose one of the following methods (Option A is recommended as it automatically uses the correct Python):
 
 ##### Option A: Automated Script (Recommended - Easiest)
 
@@ -118,11 +132,13 @@ Run the automated installer script from QGIS:
 
 ##### Option B: Terminal One-Liner (Fast)
 
-For users comfortable with Terminal:
+For users comfortable with Terminal, copy and paste this **exact command** (note the full path to QGIS Python):
 
 ```bash
 /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
 ```
+
+⚠️ **Important:** Use the full QGIS Python path shown above. Do NOT use just `python3` or `pip install` - those will install to the wrong Python!
 
 Then restart QGIS.
 
@@ -470,6 +486,7 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 
 ### Installation
 - [INSTALL_MAC.md](INSTALL_MAC.md) - Quick Mac installation guide
+- [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) - Technical guide: Python environments, advanced troubleshooting
 - [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
 - [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) - Complete plugin reinstallation guide
 - [install_mac_dependencies.py](install_mac_dependencies.py) - Automated Mac dependency installer

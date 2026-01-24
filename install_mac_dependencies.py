@@ -3,9 +3,16 @@ Installation script for GeoPublicHealth dependencies on macOS.
 
 This script installs all required dependencies for the GeoPublicHealth QGIS plugin.
 
+IMPORTANT: This script MUST be run using QGIS's Python, not your system Python.
+           QGIS has its own isolated Python environment separate from:
+           - macOS system Python (/usr/bin/python3)
+           - Homebrew Python (/opt/homebrew/bin/python3 or /usr/local/bin/python3)
+           - Anaconda/Miniconda Python
+           - Any other Python installation
+
 USAGE:
 
-Method 1 - Run from QGIS Python Console (Recommended):
+Method 1 - Run from QGIS Python Console (RECOMMENDED - Always uses correct Python):
 1. Open QGIS
 2. Go to Plugins > Python Console
 3. Click the "Show Editor" button (icon in console toolbar)
@@ -13,8 +20,10 @@ Method 1 - Run from QGIS Python Console (Recommended):
 5. Click "Run Script" button
 6. Restart QGIS when complete
 
-Method 2 - Run from Terminal:
+Method 2 - Run from Terminal (ONLY if you use the full QGIS Python path):
    /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+
+   WARNING: Do NOT run with just "python3" or "python" - this will use the wrong Python!
 
 Method 3 - Paste into QGIS Python Console:
    Copy and paste the entire script into the console
@@ -22,6 +31,17 @@ Method 3 - Paste into QGIS Python Console:
 
 import subprocess
 import sys
+import os
+
+
+def verify_qgis_python():
+    """Verify we're running with QGIS Python, not system Python."""
+    python_exe = sys.executable
+
+    # Check if this looks like QGIS Python
+    is_qgis_python = "QGIS.app" in python_exe or "qgis" in python_exe.lower()
+
+    return is_qgis_python, python_exe
 
 
 def install_dependencies():
@@ -31,10 +51,33 @@ def install_dependencies():
     print("GeoPublicHealth macOS Dependency Installer")
     print("=" * 70)
 
-    # Get the current Python executable
-    python_exe = sys.executable
-    print(f"\nUsing Python: {python_exe}")
-    print(f"Python version: {sys.version}")
+    # Verify we're using QGIS Python
+    is_qgis_python, python_exe = verify_qgis_python()
+
+    print(f"\nPython executable: {python_exe}")
+    print(f"Python version: {sys.version.split()[0]}")
+
+    if is_qgis_python:
+        print("✓ Running with QGIS Python (correct!)")
+    else:
+        print("\n" + "!" * 70)
+        print("⚠️  WARNING: This may NOT be QGIS's Python!")
+        print("!" * 70)
+        print("\nYou appear to be running with system/Homebrew/Anaconda Python.")
+        print("Dependencies installed here will NOT be available in QGIS.")
+        print("\nQGIS Python is usually located at:")
+        print("  /Applications/QGIS.app/Contents/MacOS/bin/python3")
+        print("\nRECOMMENDED: Run this script from QGIS Python Console instead.")
+        print("See installation instructions in README.md or INSTALL_MAC.md")
+        print("\n" + "!" * 70)
+
+        response = input("\nContinue anyway? (yes/no): ").strip().lower()
+        if response not in ['yes', 'y']:
+            print("\nInstallation cancelled. Please run from QGIS Python Console.")
+            return False
+        print("\nProceeding with current Python (you have been warned)...")
+
+    print("\n" + "=" * 70)
 
     # Define dependencies to install
     # Order matters: install base packages first, then those that depend on them

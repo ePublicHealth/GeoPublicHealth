@@ -2,6 +2,25 @@
 
 This is a simplified installation guide specifically for macOS users.
 
+## 🔑 Important: Understanding Python Environments
+
+**QGIS has its own Python** - it's completely separate from any other Python on your Mac.
+
+If you have multiple Python installations (Homebrew, Anaconda, system Python), **don't worry** - they won't interfere. But you need to install the plugin dependencies specifically into **QGIS's Python**, not your other Python installations.
+
+**Where is QGIS's Python?**
+- Location: `/Applications/QGIS.app/Contents/MacOS/bin/python3`
+- This is different from `/usr/bin/python3` (macOS system Python)
+- This is different from `/opt/homebrew/bin/python3` (Homebrew Python)
+- This is different from conda/anaconda Python
+
+**Why does this matter?**
+If you accidentally install dependencies to the wrong Python, QGIS won't be able to find them and the plugin won't work.
+
+**The good news:** The installation methods below automatically use the correct Python, so you don't have to worry about it! Just follow the steps. 🎉
+
+---
+
 ## Step 1: Install QGIS
 
 1. Download: [QGIS for macOS](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)
@@ -59,6 +78,10 @@ Then restart QGIS.
 Open the QGIS Python Console and run:
 
 ```python
+import sys
+print(f"Python: {sys.executable}")
+print("(Should contain 'QGIS.app')\n")
+
 import libpysal, esda, numba
 print(f"✓ All dependencies installed!")
 print(f"  libpysal {libpysal.__version__}")
@@ -66,7 +89,15 @@ print(f"  esda {esda.__version__}")
 print(f"  numba {numba.__version__}")
 ```
 
+**What to check:**
+- The Python path should contain `QGIS.app` (confirms you're using QGIS's Python)
+- You should see version numbers for all three packages
+
 If you see version numbers, you're ready to go! 🎉
+
+**If it doesn't work:**
+- See the Troubleshooting section below
+- For detailed technical information: [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md)
 
 ## Troubleshooting
 
@@ -93,6 +124,19 @@ Install XQuartz: https://www.xquartz.org/
 
 ## Need More Help?
 
+- **Technical details and advanced troubleshooting**: [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md)
 - See full documentation: [README.md](README.md)
 - Dependency details: [DEPENDENCIES.md](DEPENDENCIES.md)
 - Report issues: [GitHub Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
+
+---
+
+## For Advanced Users
+
+If you want to understand:
+- Why QGIS has its own Python
+- How Python environments work on Mac
+- Detailed installation methods and troubleshooting
+- Development workflows
+
+See the complete technical guide: **[MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md)**
