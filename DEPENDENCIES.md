@@ -70,6 +70,7 @@ python3 -m pip install libpysal numba matplotlib
 2. Click "Show Editor" → "Open Script"
 3. Select `install_dependencies_console.py`
 4. Click "Run Script"
+5. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
 **Option 2 - QGIS Console Manual Commands:**
 

@@ -133,6 +133,7 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     5.  Click **"Run Script"** button
     6.  Wait for installation to complete (you'll see progress in the console)
     7.  **🔄 Restart QGIS** (required for new packages to load)
+    8.  **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
     **Method 2: Manual Console Commands** (More control)
 

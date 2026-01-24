@@ -47,6 +47,7 @@ This is the most reliable method because QGIS Python Console automatically uses 
 6. Click **"Run Script"**
 7. Watch the progress in the console
 8. **🔄 Restart QGIS when complete** (required for new packages to load)
+9. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
 ### Method 2: Manual Console Commands (More Control)
 
