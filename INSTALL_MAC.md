@@ -42,7 +42,7 @@ This is the most reliable method because QGIS Python Console automatically uses 
 5. Click **"Open Script"** (📂 folder icon) and select `install_dependencies_console.py`
 6. Click **"Run Script"** (▶️ play button)
 7. Watch the progress in the console
-8. Restart QGIS when complete
+8. **⚠️ CRITICAL: Completely close and restart QGIS when complete** (dependencies won't be available until you do!)
 
 **Important:** Use the toolbar buttons to open and run the script. Do NOT type the filename directly in the console.
 
@@ -71,7 +71,7 @@ install("matplotlib")
 
 **Note:** This uses `subprocess.run()` (not `pip.main()`) which is stable across pip versions.
 
-5. Restart QGIS
+5. **⚠️ CRITICAL: Completely close and restart QGIS** (dependencies won't be available until you do!)
 
 ---
 
@@ -112,7 +112,7 @@ QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install
 1. Open QGIS
 2. Go to **Plugins → Manage and Install Plugins**
 3. Go to **Settings** tab
-4. Check **"Show also experimental plugins"**
+4. **⚠️ CRITICAL:** Check **"Show also experimental plugins"** (plugin won't appear without this!)
 5. Click **Add** button:
    - Name: `epublichealth`
    - URL: `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`

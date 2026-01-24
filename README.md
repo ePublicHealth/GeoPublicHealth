@@ -128,7 +128,7 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     4.  Click **"Open Script"** (📂 folder icon) and select `install_dependencies_console.py`
     5.  Click **"Run Script"** (▶️ play button in the editor)
     6.  Wait for installation to complete (you'll see progress in the console)
-    7.  Restart QGIS
+    7.  **⚠️ CRITICAL: Completely close and restart QGIS** (dependencies won't be available until you do!)
 
     **Important:** Use the GUI buttons to open and run the script. Do NOT type the filename in the console.
 
@@ -155,7 +155,7 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
     **Note:** This uses `subprocess.run()` (not `pip.main()`) which is the stable API.
 
-    Then restart QGIS.
+    Then **⚠️ CRITICAL: Completely close and restart QGIS** (dependencies won't be available until you do!).
 
 <details>
 <summary><b>Alternative Methods (Advanced Users Only)</b></summary>
@@ -239,7 +239,7 @@ You have three options to install the plugin:
 1.  Start QGIS (ensure dependencies from Step 1 are installed, especially on macOS).
 2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
 3.  Go to the **Settings** tab.
-4.  Ensure the **[x] Show also experimental plugins** checkbox is checked.
+4.  **⚠️ CRITICAL:** Ensure the **[x] Show also experimental plugins** checkbox is checked (plugin won't appear without this!).
 5.  Click the **Add…** button to add a new repository.
 6.  Set the **Name** to `epipublichealth` (or similar).
 7.  Set the **URL** to `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`.
