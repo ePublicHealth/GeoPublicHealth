@@ -39,11 +39,14 @@ This is the most reliable method because QGIS Python Console automatically uses 
 
 ### Method 1: Automated Script (Easiest - Just Click Run!)
 
-1. Download `install_dependencies_console.py` from this repository
+1. Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it
+   - The file you need is inside that folder: `install_dependencies_console.py`
 2. Open QGIS
 3. Go to **Plugins → Python Console**
 4. Click **"Show Editor"** button (toolbar icon)
 5. Click **"Open Script"** and select `install_dependencies_console.py`
+   - If you can’t find it, use **Cmd+Shift+G** and paste the folder path (e.g. `~/Downloads/GeoPublicHealth`)
+   - You can also use Finder search for `install_dependencies_console.py`
 6. Click **"Run Script"**
 7. Watch the progress in the console
 8. **🔄 Restart QGIS when complete** (required for new packages to load)

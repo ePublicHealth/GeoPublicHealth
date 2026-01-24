@@ -126,14 +126,18 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
     **Method 1: Automated Script** (Easiest - just click "Run")
 
-    1.  Start QGIS
-    2.  Go to **Plugins → Python Console**
-    3.  Click the **"Show Editor"** button (icon in console toolbar)
-    4.  Click **"Open Script"** and select `install_dependencies_console.py`
-    5.  Click **"Run Script"** button
-    6.  Wait for installation to complete (you'll see progress in the console)
-    7.  **🔄 Restart QGIS** (required for new packages to load)
-    8.  **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
+    1.  Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it
+        - The file you need is inside that folder: `install_dependencies_console.py`
+    2.  Start QGIS
+    3.  Go to **Plugins → Python Console**
+    4.  Click the **"Show Editor"** button (icon in console toolbar)
+    5.  Click **"Open Script"** and select `install_dependencies_console.py`
+        - If you can’t find it, use **Cmd+Shift+G** and paste the folder path (e.g. `~/Downloads/GeoPublicHealth`)
+        - You can also use Finder search for `install_dependencies_console.py`
+    6.  Click **"Run Script"** button
+    7.  Wait for installation to complete (you'll see progress in the console)
+    8.  **🔄 Restart QGIS** (required for new packages to load)
+    9.  **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
     **Method 2: Manual Console Commands** (More control)
 
