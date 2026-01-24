@@ -60,37 +60,44 @@ python3 -m pip install libpysal numba matplotlib
 
 ### macOS
 
-**Option 1 - Automated Script (Recommended):**
+**RECOMMENDED: Use QGIS Python Console** (most reliable - impossible to use wrong Python)
 
-Run `install_mac_dependencies.py` from QGIS Python Console (see README for details) or:
+**Option 1 - QGIS Console Script (Easiest):**
 
-```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
+1. Open QGIS → Plugins → Python Console
+2. Click "Show Editor" → "Open Script"
+3. Select `install_dependencies_console.py`
+4. Click "Run Script"
+
+**Option 2 - QGIS Console Manual Commands:**
+
+Run in QGIS Python Console (one at a time):
+
+```python
+import pip
+pip.main(['install', 'numpy'])
+pip.main(['install', 'scipy'])
+pip.main(['install', 'pandas'])
+pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+pip.main(['install', 'numba'])
+pip.main(['install', 'matplotlib'])  # Optional
 ```
 
-**Option 2 - Shell Script:**
+**Alternative: Terminal Methods** (advanced users only)
 
-```bash
-bash install_mac_dependencies.sh
-```
-
-**Option 3 - Single Command (All dependencies):**
+**Option 3 - Single Terminal Command:**
 
 ```bash
 /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
 ```
 
-**Option 4 - Manual (Individual packages):**
+**Option 4 - Shell Script:**
 
 ```bash
-# Using QGIS Python
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install scipy
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install pandas
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal esda --no-build-isolation
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numba
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install matplotlib  # Optional
+bash install_mac_dependencies.sh
 ```
+
+**Note:** Terminal methods require using the exact QGIS Python path. Using just `python3` will install to the wrong Python!
 
 ### Linux
 

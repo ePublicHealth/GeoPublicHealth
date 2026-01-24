@@ -29,36 +29,63 @@ If you accidentally install dependencies to the wrong Python, QGIS won't be able
 
 ## Step 2: Install Dependencies
 
-Choose the method that works best for you:
+**✅ RECOMMENDED: Use QGIS Python Console**
 
-### 🌟 Easiest: Automated Script (Recommended)
+This is the most reliable method because QGIS Python Console automatically uses the correct Python environment - there's no way to accidentally use the wrong Python!
 
-1. Download this repository (or just `install_mac_dependencies.py`)
+### Method 1: Automated Script (Easiest - Just Click Run!)
+
+1. Download `install_dependencies_console.py` from this repository
 2. Open QGIS
 3. Go to **Plugins → Python Console**
 4. Click **"Show Editor"** button (toolbar icon)
-5. Click **"Open Script"** and select `install_mac_dependencies.py`
+5. Click **"Open Script"** and select `install_dependencies_console.py`
 6. Click **"Run Script"**
-7. Wait for completion
-8. Restart QGIS
+7. Watch the progress in the console
+8. Restart QGIS when complete
 
-### ⚡ Fastest: Terminal One-Liner
+### Method 2: Manual Console Commands (More Control)
 
-Open Terminal and paste:
+1. Open QGIS
+2. Go to **Plugins → Python Console**
+3. Copy and paste these commands **one at a time** (press Enter after each):
+
+```python
+import pip
+pip.main(['install', 'pip', '--upgrade'])
+pip.main(['install', 'numpy'])
+pip.main(['install', 'scipy'])
+pip.main(['install', 'pandas'])
+pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+pip.main(['install', 'numba'])
+pip.main(['install', 'matplotlib'])  # Optional - for plotting
+```
+
+4. Restart QGIS
+
+---
+
+### Alternative Methods (For Advanced Users)
+
+<details>
+<summary>Click to expand Terminal-based methods</summary>
+
+**⚠️ Warning:** These require using the exact QGIS Python path. The console methods above are more reliable.
+
+**Terminal One-Liner:**
 
 ```bash
 /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
 ```
 
-Then restart QGIS.
+**Shell Script:**
 
-### 🔧 Alternative: Shell Script
+```bash
+cd /path/to/GeoPublicHealth
+bash install_mac_dependencies.sh
+```
 
-1. Download this repository
-2. Open Terminal
-3. Navigate to the folder: `cd /path/to/GeoPublicHealth`
-4. Run: `bash install_mac_dependencies.sh`
-5. Restart QGIS
+</details>
 
 ## Step 3: Install the Plugin
 

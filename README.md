@@ -109,57 +109,31 @@ QGIS includes its own Python environment (located at `/Applications/QGIS.app/Con
 
 **You MUST install dependencies into QGIS's Python, NOT your system Python.** Installing to the wrong Python means QGIS won't find the packages.
 
-The methods below ensure dependencies are installed in the correct location. For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
+**✅ RECOMMENDED: Use QGIS Python Console** - This is the most reliable method because it automatically uses the correct Python environment with no possibility of error. The alternative methods below are provided for advanced users.
+
+For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
 **Installation Steps:**
 
 1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
 2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
 3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies:** Choose one of the following methods (Option A is recommended as it automatically uses the correct Python):
+4.  **Install Dependencies using QGIS Python Console (RECOMMENDED):**
 
-##### Option A: Automated Script (Recommended - Easiest)
+    **Method 1: Automated Script** (Easiest - just click "Run")
 
-Run the automated installer script from QGIS:
+    1.  Start QGIS
+    2.  Go to **Plugins → Python Console**
+    3.  Click the **"Show Editor"** button (icon in console toolbar)
+    4.  Click **"Open Script"** and select `install_dependencies_console.py`
+    5.  Click **"Run Script"** button
+    6.  Wait for installation to complete (you'll see progress in the console)
+    7.  Restart QGIS
 
-1.  Start QGIS
-2.  Go to **Plugins → Python Console**
-3.  Click the **"Show Editor"** button (icon in console toolbar)
-4.  Click **"Open Script"** and select `install_mac_dependencies.py` from where you downloaded/cloned GeoPublicHealth
-5.  Click **"Run Script"** button
-6.  Wait for installation to complete
-7.  Restart QGIS
+    **Method 2: Manual Console Commands** (More control)
 
-##### Option B: Terminal One-Liner (Fast)
+    Run these commands **one at a time** in QGIS Python Console (press Enter after each):
 
-For users comfortable with Terminal, copy and paste this **exact command** (note the full path to QGIS Python):
-
-```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
-```
-
-⚠️ **Important:** Use the full QGIS Python path shown above. Do NOT use just `python3` or `pip install` - those will install to the wrong Python!
-
-Then restart QGIS.
-
-##### Option C: Shell Script
-
-1.  Download or clone this repository
-2.  Open Terminal
-3.  Navigate to the GeoPublicHealth folder
-4.  Run:
-    ```bash
-    bash install_mac_dependencies.sh
-    ```
-5.  Restart QGIS
-
-##### Option D: Manual Installation (Most Control)
-
-If you prefer to install packages manually one-by-one:
-
-1.  Start QGIS
-2.  Open **Python Console** (Plugins Menu → Python Console)
-3.  Run these commands **one at a time** (press Enter after each):
     ```python
     import pip
     pip.main(['install', 'pip', '--upgrade'])
@@ -168,9 +142,32 @@ If you prefer to install packages manually one-by-one:
     pip.main(['install', 'pandas'])
     pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
     pip.main(['install', 'numba'])
-    pip.main(['install', 'matplotlib'])  # Optional
+    pip.main(['install', 'matplotlib'])  # Optional - for plotting
     ```
-4.  Restart QGIS
+
+    Then restart QGIS.
+
+<details>
+<summary><b>Alternative Methods (Advanced Users Only)</b></summary>
+
+These methods require Terminal and are more error-prone. **The QGIS Python Console methods above are recommended.**
+
+**Terminal One-Liner:**
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+```
+
+⚠️ **Critical:** Must use the exact QGIS Python path shown. Do NOT use just `python3` - that uses the wrong Python!
+
+**Shell Script:**
+
+```bash
+cd /path/to/GeoPublicHealth
+bash install_mac_dependencies.sh
+```
+
+</details>
 
 **Verify Installation:**
 
@@ -489,9 +486,12 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 - [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) - Technical guide: Python environments, advanced troubleshooting
 - [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
 - [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) - Complete plugin reinstallation guide
-- [install_mac_dependencies.py](install_mac_dependencies.py) - Automated Mac dependency installer
-- [install_mac_dependencies.sh](install_mac_dependencies.sh) - Shell script for Mac dependencies
-- [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Script to install matplotlib in QGIS
+
+**Installation Scripts:**
+- [install_dependencies_console.py](install_dependencies_console.py) - **RECOMMENDED:** Console-first installer (paste/run in QGIS)
+- [install_mac_dependencies.py](install_mac_dependencies.py) - Advanced: Terminal/Console hybrid installer
+- [install_mac_dependencies.sh](install_mac_dependencies.sh) - Advanced: Shell script for Terminal
+- [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Optional: Install matplotlib only
 
 ### Development
 - [AGENTS.md](AGENTS.md) - Development guide for AI coding agents

@@ -2,6 +2,8 @@
 
 This document provides detailed technical information about installing GeoPublicHealth dependencies on macOS, including Python environment management, troubleshooting, and advanced scenarios.
 
+> **TL;DR - Best Practice:** Use QGIS Python Console to run installation commands. This eliminates all Python environment confusion and is the most reliable method. See [Method 1: QGIS Python Console](#method-1-qgis-python-console-recommended---most-reliable) below.
+
 ## Table of Contents
 
 - [Understanding Python Environments](#understanding-python-environments)
@@ -103,23 +105,41 @@ Note: The exact paths may vary slightly between QGIS versions.
 
 ## Installation Methods Explained
 
-### Method 1: QGIS Python Console (Recommended)
+### Method 1: QGIS Python Console (RECOMMENDED - Most Reliable)
+
+**This is the recommended method for all users.**
 
 **Advantages:**
-- ✓ Always uses correct Python
+- ✓ **Impossible to use wrong Python** - console is already running in QGIS's Python
 - ✓ No Terminal knowledge required
-- ✓ Can't accidentally use wrong Python
+- ✓ No need to know or type QGIS Python path
 - ✓ Works even with restrictive permissions
+- ✓ Simplest and most foolproof method
+- ✓ Consistent across all macOS versions
 
 **How it works:**
-When you run code in QGIS Python Console, it uses QGIS's bundled Python interpreter automatically. The `pip.main()` function calls pip within the same Python environment.
+When you run code in QGIS Python Console, it uses QGIS's bundled Python interpreter automatically. The `pip.main()` function calls pip within the same Python environment that's currently running.
 
-**Commands:**
+**Two approaches:**
+
+**A. Automated Script** (`install_dependencies_console.py`):
+- Opens a script file in QGIS editor
+- Click "Run Script"
+- Handles all installations automatically
+- Shows progress and verifies success
+
+**B. Manual Commands:**
 ```python
 import pip
 pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
 pip.main(['install', 'numba'])
 ```
+
+**Why this is better than Terminal:**
+- No risk of typos in Python path
+- No confusion about which `python3` command to use
+- Works regardless of PATH environment variable
+- No need to understand shell syntax
 
 **Why `--no-build-isolation`?**
 Some packages (like libpysal and esda) have build-time dependencies that need to be visible. The `--no-build-isolation` flag allows them to use already-installed packages during build, preventing errors.
@@ -404,13 +424,18 @@ brew install geos proj
 
 **Quick Reference:**
 
-| Method | Complexity | Reliability | Recommended For |
-|--------|------------|-------------|-----------------|
-| QGIS Python Console | Easy | Highest | Everyone, especially beginners |
-| Automated Script | Easy | High | Users who want automation |
-| Shell Script | Medium | High | Terminal users, automation |
-| One-liner | Medium | Medium | Advanced users, quick reinstall |
-| Manual | Hard | Medium | Troubleshooting, specific control |
+| Method | Complexity | Reliability | Environment Safety | Recommended For |
+|--------|------------|-------------|-------------------|-----------------|
+| **QGIS Console (pip.main)** | **Easy** | **Highest** | **100% Safe** | **Everyone - PRIMARY METHOD** |
+| QGIS Console Script | Easy | Highest | 100% Safe | Everyone who prefers automation |
+| Terminal One-liner | Medium | Medium | Requires exact path | Advanced users comfortable with Terminal |
+| Shell Script | Medium | Medium | Requires exact path | Terminal users, scripted deployments |
+| Terminal + subprocess script | Medium | Medium | Has environment check | Advanced troubleshooting |
+
+**Recommendation Priority:**
+1. 🥇 **QGIS Python Console** (manual commands or script) - Use this unless you have a specific reason not to
+2. 🥈 Terminal methods - Only for advanced users or automation scenarios
+3. 🥉 Other methods - For specific edge cases or troubleshooting
 
 ---
 
