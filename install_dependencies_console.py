@@ -48,15 +48,22 @@ Why this method is best:
 - Can't accidentally install to wrong Python
 """
 
+import datetime
+import os
 import subprocess
 import sys
-import os
-import datetime
+import tempfile
 from pathlib import Path
 
-# Create log file
+# Create log file in a writable location
 timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-log_path = Path(f"./geopublichealth_install_{timestamp}.log").absolute()
+log_filename = f"geopublichealth_install_{timestamp}.log"
+default_log_dir = Path.home() / "GeoPublicHealth"
+try:
+    default_log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = default_log_dir / log_filename
+except OSError:
+    log_path = Path(tempfile.gettempdir()) / log_filename
 
 print("=" * 70)
 print("GeoPublicHealth Dependency Installer")
