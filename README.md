@@ -97,70 +97,83 @@ After installation, install Python dependencies via Python Console (see macOS in
 
 #### macOS
 
-> **Quick Start:** For a simplified guide, see [INSTALL_MAC.md](INSTALL_MAC.md)
+> **📘 New to Mac installation?** See the simplified guide: **[INSTALL_MAC.md](INSTALL_MAC.md)** (recommended for all users!)
+>
+> **🎓 Technical users:** See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for detailed explanations and advanced methods.
 
-**⚠️ Important: Understanding Python Environments on Mac**
+**🔑 Key Concept: QGIS Has Its Own Python**
 
-QGIS includes its own Python environment (located at `/Applications/QGIS.app/Contents/MacOS/bin/python3`). This is **separate** from:
-- macOS system Python (`/usr/bin/python3`)
-- Homebrew Python (`/opt/homebrew/bin/python3` or `/usr/local/bin/python3`)
-- Anaconda/Miniconda Python
-- Any other Python installation
+QGIS includes its own Python environment, separate from any other Python on your Mac. Think of it like QGIS bringing its own tools:
 
-**You MUST install dependencies into QGIS's Python, NOT your system Python.** Installing to the wrong Python means QGIS won't find the packages.
+```
+Your Mac:
+  📦 System Python (built into macOS)
+  📦 Homebrew/Anaconda Python (if installed)
+  📦 QGIS Python ← Must install here!
+```
 
-**✅ RECOMMENDED: Use QGIS Python Console** - This is the most reliable method because it automatically uses the correct Python environment with no possibility of error. The alternative methods below are provided for advanced users.
+**Why this matters:** Dependencies must be installed into **QGIS's Python** specifically. Installing to the wrong Python = Plugin won't work.
 
-For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
+**✅ SOLUTION: Use QGIS Python Console** - Automatically uses the correct Python. No Terminal, no mistakes!
 
 **Installation Steps:**
 
-1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
-2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
-3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies using QGIS Python Console (RECOMMENDED):**
+1.  **📥 Download QGIS:** Get the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)**
 
-    **Method 1: Automated Script** (Easiest - just click "Run")
+2.  **📲 Install QGIS:** Open the `.dmg` file and drag QGIS to Applications
 
-    1.  Start QGIS
-    2.  Go to **Plugins → Python Console**
-    3.  Click the **"Show Editor"** button (📝 icon in console toolbar)
-    4.  Click **"Open Script"** (📂 folder icon) and select `install_dependencies_console.py`
-    5.  Click **"Run Script"** (▶️ play button in the editor)
-    6.  Wait for installation to complete (you'll see progress in the console)
-    7.  **⚠️ CRITICAL: Completely close and restart QGIS** (dependencies won't be available until you do!)
+3.  **🔓 First Launch:** Right-click QGIS → "Open" (bypasses macOS security warning - one time only)
 
-    **Important:** Use the GUI buttons to open and run the script. Do NOT type the filename in the console.
+4.  **🔧 Install Python Dependencies using QGIS Console:**
 
-    **Method 2: Manual Console Commands** (More control, copy/paste each line)
+    **🎯 Method 1: Automated Script** (Easiest - recommended!)
 
-    First, set up a helper function in QGIS Python Console:
+    1.  📥 Download `install_dependencies_console.py`
+    2.  🚀 Open QGIS
+    3.  🐍 Open **Plugins → Python Console**
+    4.  📝 Click **"Show Editor"** (notepad icon in toolbar)
+    5.  📂 Click **"Open Script"** (folder icon) → select `install_dependencies_console.py`
+    6.  ▶️ Click **"Run Script"** (play icon)
+    7.  ⏳ Wait 2-5 minutes (watch progress in console)
+    8.  **🔄 Restart QGIS completely** (Cmd+Q, wait, reopen)
 
-    ```python
-    import subprocess, sys
-    def install(pkg): subprocess.run([sys.executable, "-m", "pip", "install"] + pkg.split())
-    ```
+        ⚠️ **Why restart?** Python loads libraries at startup. New libraries won't work until you restart!
 
-    Then run these commands **one at a time** (copy/paste each line, press Enter):
+    💡 **Tip:** Use toolbar buttons to run the script. Don't type the filename!
 
-    ```python
-    install("pip --upgrade")
-    install("numpy")
-    install("scipy")
-    install("pandas")
-    install("numba")
-    install("libpysal esda --no-build-isolation")
-    install("matplotlib")
-    ```
+    **🎛️ Method 2: Manual Console Commands** (Step-by-step control)
 
-    **Note:** This uses `subprocess.run()` (not `pip.main()`) which is the stable API.
+    1.  🚀 Open QGIS → **Plugins → Python Console**
 
-    Then **⚠️ CRITICAL: Completely close and restart QGIS** (dependencies won't be available until you do!).
+    2.  🔨 Set up helper function (copy/paste this, press Enter):
+
+        ```python
+        import subprocess, sys
+        def install(pkg): subprocess.run([sys.executable, "-m", "pip", "install"] + pkg.split())
+        ```
+
+    3.  📦 Install packages **one at a time** (copy/paste each line, press Enter, wait):
+
+        ```python
+        install("pip --upgrade")
+        install("numpy")
+        install("scipy")
+        install("pandas")
+        install("numba")
+        install("libpysal esda --no-build-isolation")
+        install("matplotlib")
+        ```
+
+        💡 Takes 30-60 seconds per package
+
+    4.  **🔄 Restart QGIS completely** (Cmd+Q, wait, reopen)
+
+        ⚠️ **Critical:** Libraries won't work until you restart!
 
 <details>
-<summary><b>Alternative Methods (Advanced Users Only)</b></summary>
+<summary><b>🎓 Alternative Methods (Advanced Users / Automation)</b></summary>
 
-These methods require Terminal and are more error-prone. **The QGIS Python Console methods above are recommended.**
+These methods use Terminal and require knowing the QGIS Python path. **The console methods above are easier and safer.**
 
 **Terminal One-Liner:**
 
@@ -204,13 +217,15 @@ subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-mac.
 
 </details>
 
-**Verify Installation:**
+**✅ Verify Installation:**
 
-After restarting QGIS, open Python Console and run:
+After restarting QGIS, test in Python Console:
 ```python
 import libpysal, esda, numba
-print(f"✓ libpysal {libpysal.__version__}, esda {esda.__version__}, numba {numba.__version__}")
+print(f"✓ All installed! libpysal {libpysal.__version__}, esda {esda.__version__}, numba {numba.__version__}")
 ```
+
+If you see version numbers, you're ready to go! 🎉
 
 **Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
 
@@ -236,20 +251,40 @@ You have three options to install the plugin:
 
 #### Option A: From QGIS Plugin Repository (Recommended)
 
-1.  Start QGIS (ensure dependencies from Step 1 are installed, especially on macOS).
-2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
-3.  Go to the **Settings** tab.
-4.  **⚠️ CRITICAL:** Ensure the **[x] Show also experimental plugins** checkbox is checked (plugin won't appear without this!).
-5.  Click the **Add…** button to add a new repository.
-6.  Set the **Name** to `epipublichealth` (or similar).
-7.  Set the **URL** to `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`.
-8.  Click **OK**.
-9.  Go to the **All** tab.
-10. In the **Search** field, type `geopublichealth`.
-11. Select the **GeoPublicHealth** plugin from the list.
-12. Click the **Install Plugin** button.
-13. Once installation is complete, click **Close**.
-14. Check that the **GeoPublicHealth** entry now appears in the **Plugins** menu in QGIS.
+1.  🚀 **Start QGIS** (ensure dependencies from Step 1 are installed)
+
+2.  🔌 **Open Plugin Manager:** `Plugins → Manage and Install Plugins`
+
+3.  ⚙️ **Go to Settings tab**
+
+4.  **⚠️ CRITICAL - Enable experimental plugins:**
+
+    Check: **☑️ Show also experimental plugins**
+
+    💡 **Why?** Plugin won't appear in the list without this!
+
+5.  **➕ Add repository:**
+
+    Click **Add** button and enter:
+    - **Name:** `epublichealth`
+    - **URL:** `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`
+
+    Click **OK**
+
+6.  **🔍 Find the plugin:**
+
+    - Go to **All** tab
+    - Search for: `geopublichealth`
+
+7.  **📥 Install:**
+
+    - Select **GeoPublicHealth**
+    - Click **Install Plugin**
+    - Wait for completion
+
+8.  **✅ Verify:**
+
+    Check that **GeoPublicHealth** appears in the **Plugins** menu!
 
 #### Option B: Install from ZIP (Direct Download)
 
