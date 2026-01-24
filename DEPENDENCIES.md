@@ -78,8 +78,8 @@ import subprocess, sys
 subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
 subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
 subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
 subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
 subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
 ```
 
@@ -90,7 +90,7 @@ subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Option
 **Option 3 - Single Terminal Command:**
 
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
 ```
 
 **Option 4 - Shell Script:**

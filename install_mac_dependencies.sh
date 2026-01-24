@@ -111,6 +111,7 @@ FAILED_PACKAGES=""
 CRITICAL_FAILED=false
 
 # Install packages (continue even if one fails to see all results)
+# IMPORTANT: Order matters! numba must be installed before libpysal/esda
 set +e  # Don't exit on error for package installations
 
 install_package "pip (upgrade)" pip --upgrade || FAILED_PACKAGES="$FAILED_PACKAGES pip"
@@ -121,13 +122,13 @@ install_package "scipy" scipy || FAILED_PACKAGES="$FAILED_PACKAGES scipy"
 
 install_package "pandas" pandas || FAILED_PACKAGES="$FAILED_PACKAGES pandas"
 
-install_package "libpysal & esda" libpysal esda --no-build-isolation || {
-    FAILED_PACKAGES="$FAILED_PACKAGES libpysal/esda"
+install_package "numba" numba || {
+    FAILED_PACKAGES="$FAILED_PACKAGES numba"
     CRITICAL_FAILED=true
 }
 
-install_package "numba" numba || {
-    FAILED_PACKAGES="$FAILED_PACKAGES numba"
+install_package "libpysal & esda" libpysal esda --no-build-isolation || {
+    FAILED_PACKAGES="$FAILED_PACKAGES libpysal/esda"
     CRITICAL_FAILED=true
 }
 

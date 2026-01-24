@@ -140,8 +140,8 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
     subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
     subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+    subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
     subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
     subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
     ```
 
@@ -157,7 +157,7 @@ These methods require Terminal and are more error-prone. **The QGIS Python Conso
 **Terminal One-Liner:**
 
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
 ```
 
 ⚠️ **Critical:** Must use the exact QGIS Python path shown. Do NOT use just `python3` - that uses the wrong Python!
@@ -178,6 +178,21 @@ QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install
 # Python script non-interactive mode
 /Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
 ```
+
+**For reproducible installations (pinned versions):**
+
+```bash
+# Use requirements file with tested, pinned versions
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements-mac.txt --no-build-isolation
+```
+
+Or from QGIS Python Console:
+```python
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-mac.txt", "--no-build-isolation"])
+```
+
+**Note:** The automated scripts install latest versions. For production or reproducible installs, use `requirements-mac.txt` which contains tested, compatible versions. See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for details.
 
 </details>
 

@@ -222,7 +222,7 @@ LOG_DIR=/tmp bash install_mac_dependencies.sh
 
 **Command:**
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
 ```
 
 **Advantages:**
@@ -459,24 +459,60 @@ If you're developing plugins and want to test with development versions of depen
 
 3. Changes to the source code are immediately reflected in QGIS (after restart).
 
-### Scenario 3: Automating for Multiple Machines
+### Scenario 3: Reproducible Installations and Version Pinning
 
-Create a requirements.txt file:
+**Question:** How do I ensure consistent dependency versions across installations?
 
-```txt
-numpy>=1.20
-scipy>=1.7
-pandas>=1.3
-libpysal>=4.3.0
-esda>=2.4.0
-numba>=0.54
-matplotlib>=3.4
-```
+**Answer:** Use the provided `requirements-mac.txt` file with pinned versions.
 
-Install on each machine:
+**Why version pinning matters:**
+- The automated scripts install **latest versions** of packages
+- Latest versions may introduce breaking changes or incompatibilities
+- For production deployments or reproducible research, pinned versions are recommended
+- Pinned versions are tested and known to work together
+
+**Using pinned versions:**
+
+Option 1 - Terminal:
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements.txt --no-build-isolation
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements-mac.txt --no-build-isolation
 ```
+
+Option 2 - QGIS Python Console:
+```python
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-mac.txt", "--no-build-isolation"])
+```
+
+**Provided file:** `requirements-mac.txt` contains tested, compatible versions.
+
+**When to use:**
+- ✅ Production deployments
+- ✅ Reproducible research
+- ✅ CI/CD pipelines
+- ✅ When you need stable, tested versions
+
+**When NOT to use:**
+- ❌ Quick testing (use automated scripts instead)
+- ❌ Development (may want latest features)
+- ❌ When you specifically need newer versions
+
+**Security note:**
+For maximum security and reproducibility, you can add hashes to requirements:
+```bash
+# Generate hashes
+pip hash <package-name>==<version>
+
+# Install with hash verification
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements-mac.txt --no-build-isolation --require-hashes
+```
+
+**Custom requirements file:**
+You can create your own based on `requirements-mac.txt`:
+1. Copy the file: `cp requirements-mac.txt my-requirements.txt`
+2. Modify versions as needed
+3. Test thoroughly before deploying
+4. Document tested QGIS/macOS versions in comments
 
 ### Scenario 4: Completely Clean Reinstall
 
@@ -494,7 +530,7 @@ If you need to start fresh:
 
 3. Reinstall:
    ```bash
-   /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install --no-cache-dir numpy scipy pandas libpysal esda numba matplotlib --no-build-isolation
+   /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install --no-cache-dir numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
    ```
 
 ### Scenario 5: Using Homebrew to Install System Dependencies

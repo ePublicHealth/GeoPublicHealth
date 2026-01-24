@@ -93,18 +93,20 @@ def run_pip_install(packages, timeout=None):
 
 # Define packages to install
 # Format: (name, pip_args, description, required)
+# IMPORTANT: Order matters! numba must be installed before libpysal/esda
+# because those packages may use numba during build/installation
 packages = [
     ("pip", ["pip", "--upgrade"], "Package installer", True),
     ("numpy", ["numpy"], "Numerical computing", True),
     ("scipy", ["scipy"], "Scientific computing", True),
     ("pandas", ["pandas"], "Data analysis", True),
+    ("numba", ["numba"], "Performance optimization", True),
     (
         "libpysal & esda",
         ["libpysal", "esda", "--no-build-isolation"],
         "Spatial analysis",
         True,
     ),
-    ("numba", ["numba"], "Performance optimization", True),
     ("matplotlib", ["matplotlib"], "Plotting and visualization", False),
 ]
 
@@ -219,7 +221,9 @@ else:
     print("4. Report the issue with the log file:")
     print("   https://github.com/ePublicHealth/GeoPublicHealth/issues")
     print()
-    # Exit with error code so automation can detect failure
-    sys.exit(1)
+    print("NOTE: Installation incomplete. Please address the issues above.")
+    # Note: We don't call sys.exit() here because when run in QGIS Python Console,
+    # it would raise SystemExit and show a stack trace, confusing users.
+    # The script simply finishes with the error message above.
 
 print("=" * 70)

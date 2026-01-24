@@ -154,18 +154,19 @@ def install_dependencies():
     print("\n" + "=" * 70)
 
     # Define dependencies to install
-    # Order matters: install base packages first, then those that depend on them
+    # IMPORTANT: Order matters! numba must be installed before libpysal/esda
+    # because those packages may use numba during build/installation
     dependencies = [
         ("pip", ["pip", "--upgrade"], "Package installer"),
         ("numpy", ["numpy"], "Numerical computing"),
         ("scipy", ["scipy"], "Scientific computing"),
         ("pandas", ["pandas"], "Data analysis"),
+        ("numba", ["numba"], "Performance optimization (Required)"),
         (
             "libpysal & esda",
             ["libpysal", "esda", "--no-build-isolation"],
             "Spatial analysis (Required)",
         ),
-        ("numba", ["numba"], "Performance optimization (Required)"),
         ("matplotlib", ["matplotlib"], "Plotting (Optional)"),
     ]
 
@@ -265,7 +266,11 @@ def install_dependencies():
     print("VERIFYING REQUIRED DEPENDENCIES")
     print("=" * 70)
 
-    critical = {"libpysal": "Spatial analysis", "numba": "Performance optimization"}
+    critical = {
+        "libpysal": "Spatial analysis",
+        "esda": "Exploratory spatial data analysis",
+        "numba": "Performance optimization"
+    }
 
     all_critical_ok = True
     for module, description in critical.items():
