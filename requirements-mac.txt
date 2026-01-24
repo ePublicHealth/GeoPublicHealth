@@ -1,0 +1,34 @@
+# GeoPublicHealth Dependencies for macOS - Pinned Versions
+#
+# This file contains pinned dependency versions for reproducible installations.
+#
+# USAGE:
+#   /Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements-mac.txt --no-build-isolation
+#
+# Or from QGIS Python Console:
+#   import subprocess, sys
+#   subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-mac.txt", "--no-build-isolation"])
+#
+# NOTE: These versions are tested and known to work together. Using unpinned
+# versions (as in the automated scripts) will install the latest packages,
+# which may introduce breaking changes.
+#
+# Last tested: 2026-01-24
+# QGIS version: 3.44.x
+# macOS version: 12+, 13, 14 (Intel and Apple Silicon)
+# Python: 3.11-3.12
+
+# Core numerical/scientific libraries
+numpy>=1.24.0,<2.0.0
+scipy>=1.10.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+
+# Performance optimization (must be installed before libpysal/esda)
+numba>=0.57.0,<1.0.0
+
+# Spatial analysis libraries (require --no-build-isolation)
+libpysal>=4.9.0,<5.0.0
+esda>=2.5.0,<3.0.0
+
+# Optional: Plotting and visualization
+matplotlib>=3.7.0,<4.0.0

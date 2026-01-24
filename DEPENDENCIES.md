@@ -60,10 +60,56 @@ python3 -m pip install libpysal numba matplotlib
 
 ### macOS
 
-```bash
-# Using QGIS Python
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal numba matplotlib
+**RECOMMENDED: Use QGIS Python Console** (most reliable - impossible to use wrong Python)
+
+**Option 1 - QGIS Console Script (Easiest):**
+
+1. Open QGIS → Plugins → Python Console
+2. Click "Show Editor" → "Open Script"
+3. Select `install_dependencies_console.py`
+4. Click "Run Script"
+
+**Option 2 - QGIS Console Manual Commands:**
+
+Run in QGIS Python Console (one at a time):
+
+```python
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
+subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
+subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
+subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
 ```
+
+**Note:** Use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) for stability.
+
+**Alternative: Terminal Methods** (advanced users only)
+
+**Option 3 - Single Terminal Command:**
+
+```bash
+/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
+```
+
+**Option 4 - Shell Script:**
+
+```bash
+bash install_mac_dependencies.sh
+```
+
+**Automation / CI / QGIS-LTR:**
+
+```bash
+# Non-interactive Python script
+/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
+
+# Shell script with custom QGIS path
+QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
+```
+
+**Note:** Terminal methods require using the exact QGIS Python path. Using just `python3` will install to the wrong Python!
 
 ### Linux
 
