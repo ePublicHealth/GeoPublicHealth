@@ -81,22 +81,12 @@ These are **required** for spatial autocorrelation and analysis features.
 2. Go to **Plugins** → **Python Console**
 3. Run these commands **one at a time** (press Enter after each line):
    ```python
-   import pip
-   ```
-   ```python
-   pip.main(['install', 'numpy'])
-   ```
-   ```python
-   pip.main(['install', 'scipy'])
-   ```
-   ```python
-   pip.main(['install', 'pandas'])
-   ```
-   ```python
-   pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
-   ```
-   ```python
-   pip.main(['install', 'numba'])
+   import subprocess, sys
+   subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
+   subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
+   subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
+   subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+   subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
    ```
 4. Restart QGIS
 5. Verify installation:
@@ -117,10 +107,8 @@ matplotlib is optional but enables graphing and plotting features. To install it
 2. Go to **Plugins** → **Python Console**
 3. Run these commands **one at a time** (press Enter after each line):
    ```python
-   import pip
-   ```
-   ```python
-   pip.main(['install', 'matplotlib'])
+   import subprocess, sys
+   subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])
    ```
 4. Restart QGIS
 5. Verify installation:

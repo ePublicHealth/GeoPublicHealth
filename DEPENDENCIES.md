@@ -62,6 +62,8 @@ python3 -m pip install libpysal numba matplotlib
 
 **RECOMMENDED: Use QGIS Python Console** (most reliable - impossible to use wrong Python)
 
+**Mental model:** The QGIS Python Console runs **Python only**. Terminal commands (anything starting with `/Applications/...` or `QGIS_PYTHON=...`) must be run in Terminal, not in the console.
+
 **Option 1 - QGIS Console Script (Easiest):**
 
 1. Open QGIS → Plugins → Python Console
@@ -71,7 +73,7 @@ python3 -m pip install libpysal numba matplotlib
 
 **Option 2 - QGIS Console Manual Commands:**
 
-Run in QGIS Python Console (one at a time):
+Run in QGIS Python Console (one at a time). Do not paste Terminal commands here:
 
 ```python
 import subprocess, sys
@@ -83,9 +85,13 @@ subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--n
 subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
 ```
 
+**🔄 Restart QGIS after installation** so the new packages are picked up.
+
 **Note:** Use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) for stability.
 
 **Alternative: Terminal Methods** (advanced users only)
+
+**⚠️ These commands are for Terminal, not the QGIS Python Console.** If you paste them into the console, they will fail.
 
 **Option 1 - Automated Script:**
 
@@ -127,7 +133,7 @@ bash install_mac_dependencies.sh
 QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
 ```
 
-**Note:** Terminal methods require using the exact QGIS Python path. Using just `python3` will install to the wrong Python!
+**Note:** Terminal methods require using the exact QGIS Python path. Using just `python3` will install to the wrong Python! For deeper troubleshooting, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
 ### Linux
 

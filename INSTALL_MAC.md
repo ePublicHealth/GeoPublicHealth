@@ -33,6 +33,10 @@ If you accidentally install dependencies to the wrong Python, QGIS won't be able
 
 This is the most reliable method because QGIS Python Console automatically uses the correct Python environment - there's no way to accidentally use the wrong Python!
 
+**Mental model:** The QGIS Python Console runs **Python only**. Terminal commands (anything starting with `/Applications/...` or `QGIS_PYTHON=...`) must be run in Terminal, not in the console.
+
+**Tip:** If you see an error like `NameError: name 'QGIS_PYTHON' is not defined`, you pasted a Terminal command into the console.
+
 ### Method 1: Automated Script (Easiest - Just Click Run!)
 
 1. Download `install_dependencies_console.py` from this repository
@@ -42,13 +46,14 @@ This is the most reliable method because QGIS Python Console automatically uses 
 5. Click **"Open Script"** and select `install_dependencies_console.py`
 6. Click **"Run Script"**
 7. Watch the progress in the console
-8. Restart QGIS when complete
+8. **🔄 Restart QGIS when complete** (required for new packages to load)
 
 ### Method 2: Manual Console Commands (More Control)
 
 1. Open QGIS
 2. Go to **Plugins → Python Console**
-3. Copy and paste these commands **one at a time** (press Enter after each):
+3. Copy and paste these commands **one at a time** (press Enter after each)
+4. **Do not paste Terminal commands here** (only Python works in the console)
 
 ```python
 import subprocess, sys
@@ -63,11 +68,15 @@ subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Option
 
 **Note:** We use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) because it's more stable across pip versions.
 
-4. Restart QGIS
+**If these commands fail:** Use Method 1 (Open Script). It avoids console copy/paste issues.
+
+5. **🔄 Restart QGIS** (required for QGIS to see new packages)
 
 ---
 
 ### Alternative Methods (For Advanced Users)
+
+**⚠️ These commands are for Terminal, not the QGIS Python Console.** If you paste them into the console, they will fail.
 
 <details>
 <summary>Click to expand Terminal-based methods</summary>
@@ -104,7 +113,7 @@ QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install
 1. Open QGIS
 2. Go to **Plugins → Manage and Install Plugins**
 3. Go to **Settings** tab
-4. Check **"Show also experimental plugins"**
+4. **🚨 Critical:** Check **"Show also experimental plugins"** (the plugin will not appear without this)
 5. Click **Add** button:
    - Name: `epublichealth`
    - URL: `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`
@@ -133,6 +142,8 @@ print(f"  numba {numba.__version__}")
 - You should see version numbers for all three packages
 
 If you see version numbers, you're ready to go! 🎉
+
+**Why the restart matters:** QGIS loads Python packages only at startup. After installing dependencies, a full restart is the reliable way to make them available (reloading plugins is not enough).
 
 **If it doesn't work:**
 - See the Troubleshooting section below

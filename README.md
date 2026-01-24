@@ -113,6 +113,10 @@ QGIS includes its own Python environment (located at `/Applications/QGIS.app/Con
 
 For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
+**Mental model:** The QGIS Python Console runs **Python only**. Terminal commands (anything starting with `/Applications/...` or `QGIS_PYTHON=...`) must be run in Terminal, not in the console.
+
+**Tip:** If you see an error like `NameError: name 'QGIS_PYTHON' is not defined`, you pasted a Terminal command into the console.
+
 **Installation Steps:**
 
 1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
@@ -128,11 +132,11 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     4.  Click **"Open Script"** and select `install_dependencies_console.py`
     5.  Click **"Run Script"** button
     6.  Wait for installation to complete (you'll see progress in the console)
-    7.  Restart QGIS
+    7.  **🔄 Restart QGIS** (required for new packages to load)
 
     **Method 2: Manual Console Commands** (More control)
 
-    Run these commands **one at a time** in QGIS Python Console (press Enter after each):
+    Run these commands **one at a time** in QGIS Python Console (press Enter after each). Do not paste Terminal commands here.
 
     ```python
     import subprocess, sys
@@ -147,7 +151,11 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
     **Note:** We use `subprocess.run([sys.executable, "-m", "pip", ...])` instead of `pip.main()` because `pip.main()` is not a stable public API.
 
-    Then restart QGIS.
+    **If these commands fail:** Use Method 1 (Open Script) instead. It avoids console copy/paste issues.
+
+    Then **restart QGIS**.
+
+**⚠️ These commands are for Terminal, not the QGIS Python Console.** If you paste them into the console, they will fail.
 
 <details>
 <summary><b>Alternative Methods (Advanced Users Only)</b></summary>
@@ -204,6 +212,8 @@ import libpysal, esda, numba
 print(f"✓ libpysal {libpysal.__version__}, esda {esda.__version__}, numba {numba.__version__}")
 ```
 
+**Why the restart matters:** QGIS loads Python packages only at startup. A full restart is the reliable way to make newly installed packages available.
+
 **Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
 
 *(Tip: If you encounter library loading errors, installing [XQuartz](https://www.xquartz.org/) may help, though this is less common with recent QGIS versions.)*
@@ -231,7 +241,7 @@ You have three options to install the plugin:
 1.  Start QGIS (ensure dependencies from Step 1 are installed, especially on macOS).
 2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
 3.  Go to the **Settings** tab.
-4.  Ensure the **[x] Show also experimental plugins** checkbox is checked.
+4.  **🚨 Critical:** Ensure the **[x] Show also experimental plugins** checkbox is checked (the plugin will not appear otherwise).
 5.  Click the **Add…** button to add a new repository.
 6.  Set the **Name** to `epipublichealth` (or similar).
 7.  Set the **URL** to `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`.
@@ -273,12 +283,10 @@ matplotlib is optional but enables graphing and plotting features in analysis di
 2. Go to **Plugins** → **Python Console**
 3. Run these commands **one at a time** (press Enter after each):
    ```python
-   import pip
+   import subprocess, sys
+   subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])
    ```
-   ```python
-   pip.main(['install', 'matplotlib'])
-   ```
-4. Restart QGIS
+4. **Restart QGIS** (required for new packages to load)
 5. **Verify installation:**
    ```python
    import matplotlib
@@ -331,7 +339,8 @@ If you see errors about missing modules:
 - Wait for each command to complete before running the next one
 - If installation fails with build errors, use the `--no-build-isolation` flag:
   ```python
-  pip.main(['install', 'libpysal', 'esda', '--no-build-isolation'])
+  import subprocess, sys
+  subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
   ```
 
 ### Other Issues
