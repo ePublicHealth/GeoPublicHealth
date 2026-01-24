@@ -130,13 +130,24 @@ When you run code in QGIS Python Console, it uses QGIS's bundled Python interpre
 - Shows progress and verifies success
 
 **B. Manual Commands:**
+
+Set up a helper function first:
 ```python
 import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
+def install(pkg): subprocess.run([sys.executable, "-m", "pip", "install"] + pkg.split())
 ```
 
-**Important:** We use `subprocess.run` with `sys.executable -m pip` instead of `pip.main()` because `pip.main()` is not a stable public API and can break with pip upgrades.
+Then install packages:
+```python
+install("numpy")
+install("scipy")
+install("pandas")
+install("numba")
+install("libpysal esda --no-build-isolation")
+install("matplotlib")
+```
+
+**Important:** We use `subprocess.run` with `sys.executable -m pip` instead of `pip.main()` because `pip.main()` is not a stable public API and can break with pip upgrades. The helper function simplifies copy/pasting individual commands.
 
 **Why this is better than Terminal:**
 - No risk of typos in Python path

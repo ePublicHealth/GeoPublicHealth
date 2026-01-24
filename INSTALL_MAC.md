@@ -38,32 +38,40 @@ This is the most reliable method because QGIS Python Console automatically uses 
 1. Download `install_dependencies_console.py` from this repository
 2. Open QGIS
 3. Go to **Plugins → Python Console**
-4. Click **"Show Editor"** button (toolbar icon)
-5. Click **"Open Script"** and select `install_dependencies_console.py`
-6. Click **"Run Script"**
+4. Click **"Show Editor"** button (📝 icon in toolbar)
+5. Click **"Open Script"** (📂 folder icon) and select `install_dependencies_console.py`
+6. Click **"Run Script"** (▶️ play button)
 7. Watch the progress in the console
 8. Restart QGIS when complete
+
+**Important:** Use the toolbar buttons to open and run the script. Do NOT type the filename directly in the console.
 
 ### Method 2: Manual Console Commands (More Control)
 
 1. Open QGIS
 2. Go to **Plugins → Python Console**
-3. Copy and paste these commands **one at a time** (press Enter after each):
+3. First, set up a helper function (copy/paste this):
 
 ```python
 import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install numba before libpysal/esda
-subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
+def install(pkg): subprocess.run([sys.executable, "-m", "pip", "install"] + pkg.split())
 ```
 
-**Note:** We use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) because it's more stable across pip versions.
+4. Then install each package **one at a time** (copy/paste each line, press Enter):
 
-4. Restart QGIS
+```python
+install("pip --upgrade")
+install("numpy")
+install("scipy")
+install("pandas")
+install("numba")
+install("libpysal esda --no-build-isolation")
+install("matplotlib")
+```
+
+**Note:** This uses `subprocess.run()` (not `pip.main()`) which is stable across pip versions.
+
+5. Restart QGIS
 
 ---
 

@@ -71,19 +71,26 @@ python3 -m pip install libpysal numba matplotlib
 
 **Option 2 - QGIS Console Manual Commands:**
 
-Run in QGIS Python Console (one at a time):
+Run in QGIS Python Console. First, set up helper function:
 
 ```python
 import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
-subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
+def install(pkg): subprocess.run([sys.executable, "-m", "pip", "install"] + pkg.split())
 ```
 
-**Note:** Use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) for stability.
+Then install packages one at a time:
+
+```python
+install("pip --upgrade")
+install("numpy")
+install("scipy")
+install("pandas")
+install("numba")
+install("libpysal esda --no-build-isolation")
+install("matplotlib")
+```
+
+**Note:** Uses `subprocess.run()` (not `pip.main()`) for stability.
 
 **Alternative: Terminal Methods** (advanced users only)
 

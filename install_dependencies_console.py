@@ -29,16 +29,24 @@ which automatically ensures dependencies are installed to the correct
 Python environment.
 
 USAGE:
+
+Method A - Using GUI (Recommended):
 1. Open QGIS
 2. Go to Plugins → Python Console
-3. Click "Show Editor" button (icon in toolbar)
-4. Click "Open Script" and select this file
-5. Click "Run Script" button
+3. Click "Show Editor" button (📝 icon in toolbar)
+4. Click "Open Script" (📂 folder icon) and select this file
+5. Click "Run Script" (▶️ play button)
 6. Wait for installation to complete
 7. Restart QGIS
 
-Or paste the code directly into the console (copy everything below the
-instructions).
+Method B - If you have the file path, run in QGIS Python Console:
+exec(open('/path/to/install_dependencies_console.py').read())
+
+Method C - Paste entire script:
+Copy everything from line 50 onwards and paste into the console.
+
+IMPORTANT: Do NOT just type the filename in the console - Python will
+interpret it as a variable name, not execute the script.
 
 Why this method is best:
 - Automatically uses QGIS's Python (no environment confusion)
