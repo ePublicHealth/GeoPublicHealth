@@ -65,8 +65,13 @@ When you run `pip install libpysal`, it installs to whichever Python's pip you'r
 ### Location
 
 ```
-/Applications/QGIS.app/Contents/MacOS/bin/python3
+/Applications/QGIS.app/Contents/MacOS/python3.12
 ```
+
+**Note:** The exact binary name depends on QGIS version:
+- QGIS 3.44: `python3.12`
+- QGIS 3.42: `python3.11`
+- Older versions may use `bin/python3` symlink
 
 ### Version
 
@@ -76,6 +81,8 @@ QGIS typically bundles Python 3.9 - 3.12 depending on the QGIS version:
 
 Check your version:
 ```bash
+/Applications/QGIS.app/Contents/MacOS/python3.12 --version
+# Or use the symlink if it exists:
 /Applications/QGIS.app/Contents/MacOS/bin/python3 --version
 ```
 
@@ -123,6 +130,9 @@ When you run code in QGIS Python Console, it uses QGIS's bundled Python interpre
 **Two approaches:**
 
 **A. Automated Script** (`install_dependencies_console.py`):
+- Direct download link: https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py
+  - Save the file locally as `install_dependencies_console.py` (recommended location: `~/Downloads/`).
+- Alternative: open the link, copy the full script, paste it into the QGIS Python editor, and save it as `install_dependencies_console.py`.
 - Opens a script file in QGIS editor
 - Click "Run Script"
 - Handles all installations automatically using subprocess
@@ -130,13 +140,32 @@ When you run code in QGIS Python Console, it uses QGIS's bundled Python interpre
 - Shows progress and verifies success
 
 **B. Manual Commands:**
+
+⚠️ **WARNING**: These simple commands don't handle all installation complexities (Shapely version conflicts, NumPy 2.x issues, Numba bin directory). **Use the automated script instead** (Option A above).
+
+If you must use manual commands, here's the minimum approach (but it will likely fail due to version conflicts):
 ```python
 import subprocess, sys
+
+# This will fail - Shapely 2.0.6 bundled with QGIS conflicts with libpysal
 subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+
+# This may pull NumPy 2.x which breaks QGIS
 subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
 ```
 
-**Important:** We use `subprocess.run` with `sys.executable -m pip` instead of `pip.main()` because `pip.main()` is not a stable public API and can break with pip upgrades.
+**Why manual commands don't work:**
+1. **Shapely conflict**: QGIS bundles Shapely 2.0.6, but libpysal needs 2.1.2+. Installing to framework site-packages doesn't override the bundled version.
+2. **NumPy 2.x issue**: Installing numba without `--no-deps` pulls NumPy 2.x, breaking QGIS's bundled modules (compiled against NumPy 1.x).
+3. **Missing bin directory**: Numba expects `/Applications/QGIS.app/Contents/bin` which doesn't exist by default.
+
+**The automated script solves all these issues** by:
+- Installing Shapely 2.1.2 to QGIS profile directory with `--target` (overrides bundled version)
+- Installing Numba with `--no-deps` to avoid NumPy upgrade
+- Creating missing bin directories
+- Using proper subprocess streaming and error handling
+
+**Important:** We use `subprocess` with `sys.executable -m pip` instead of the deprecated `pip.main()` API which can break with pip upgrades.
 
 **Why this is better than Terminal:**
 - No risk of typos in Python path
@@ -146,6 +175,59 @@ subprocess.run([sys.executable, "-m", "pip", "install", "numba"])
 
 **Why `--no-build-isolation`?**
 Some packages (like libpysal and esda) have build-time dependencies that need to be visible. The `--no-build-isolation` flag allows them to use already-installed packages during build, preventing errors.
+
+---
+
+### Understanding macOS-Specific Installation Challenges
+
+**Critical Issues on macOS:**
+
+1. **Shapely Version Conflict**
+   - QGIS 3.42-3.44 bundles Shapely 2.0.6 in framework site-packages
+   - libpysal requires Shapely 2.1.2+
+   - Standard pip install to framework doesn't override bundled version (framework loads first in sys.path)
+   - **Solution**: Install Shapely 2.1.2 to QGIS profile directory (`~/Library/Application Support/QGIS/QGIS3/profiles/default/python`)
+   - Profile directory appears before framework in sys.path, so 2.1.2 loads instead of 2.0.6
+
+2. **NumPy Compatibility Constraint**
+   - QGIS bundles NumPy 1.26.4
+   - QGIS's GDAL, PyQt5, and other bundled modules are compiled against NumPy 1.x ABI
+   - NumPy 2.0+ has breaking ABI changes
+   - Installing NumPy 2.x breaks QGIS's bundled modules with errors like: `RuntimeError: module compiled against API version 0x10 but this version of numpy is 0x11`
+   - **Solution**: Use `--no-deps` when installing packages that depend on NumPy (like numba) to prevent automatic NumPy upgrade
+
+3. **Numba Installation Issues**
+   - Numba expects `/Applications/QGIS.app/Contents/bin` directory for binaries
+   - This directory doesn't exist in default QGIS installation
+   - pip install may fail or warn about missing script directory
+   - **Solution**: Create the directory before installation, or install to profile directory with `--target`
+
+**Correct Installation Pattern:**
+
+```python
+# Framework packages (safe to install normally)
+subprocess.run([sys.executable, "-m", "pip", "install", "scipy", "pandas"])
+
+# Shapely - MUST install to profile directory to override bundled 2.0.6
+profile_python_dir = Path.home() / "Library/Application Support/QGIS/QGIS3/profiles/default/python"
+subprocess.run([sys.executable, "-m", "pip", "install", "shapely>=2.1.2", 
+                "--target", str(profile_python_dir), "--upgrade", "--no-deps"])
+
+# Numba - MUST use --no-deps to avoid NumPy 2.x
+subprocess.run([sys.executable, "-m", "pip", "install", "numba",
+                "--target", str(profile_python_dir), "--no-deps"])
+
+# libpysal/esda - can install normally after Shapely is correct version
+subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
+```
+
+**Why this pattern works:**
+1. Profile directory is first in `sys.path`, so Shapely 2.1.2 overrides bundled 2.0.6
+2. `--no-deps` prevents NumPy upgrade, keeping QGIS stable
+3. `--target` avoids bin directory issues and permission problems
+4. Framework packages can install normally without conflicts
+
+---
 
 ### Method 2: Automated Python Script
 
@@ -220,20 +302,38 @@ LOG_DIR=/tmp bash install_mac_dependencies.sh
 
 ### Method 4: Terminal One-Liner
 
-**Command:**
+⚠️ **NOT RECOMMENDED** - This method **does not work correctly** on macOS due to Shapely version conflicts and NumPy compatibility issues. Use the automated script instead.
+
+**Why this fails:**
 ```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
+# This will install packages but FAIL at runtime
+/Applications/QGIS.app/Contents/MacOS/python3.12 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
 ```
 
-**Advantages:**
-- ✓ Fast and simple
-- ✓ Good for re-installation or updates
-- ✓ Explicitly targets QGIS Python
+**Problems:**
+1. ❌ Installs to framework site-packages, doesn't override bundled Shapely 2.0.6
+2. ❌ May install NumPy 2.x (dependency of numba), breaking QGIS
+3. ❌ No handling of missing bin directory for numba
+4. ❌ No error handling or logging
+5. ❌ Imports will fail: `AttributeError: 'Geometry' object has no attribute 'exterior'` (Shapely 2.0 vs 2.1 API difference)
 
-**Disadvantages:**
-- ✗ Easy to typo the Python path
-- ✗ No error handling
-- ✗ Requires Terminal knowledge
+**If you must use Terminal**, use this pattern (but the automated script is still better):
+```bash
+QGIS_PYTHON="/Applications/QGIS.app/Contents/MacOS/python3.12"
+PROFILE_DIR="$HOME/Library/Application Support/QGIS/QGIS3/profiles/default/python"
+
+# Create profile python directory
+mkdir -p "$PROFILE_DIR"
+
+# Install Shapely to profile (overrides bundled 2.0.6)
+$QGIS_PYTHON -m pip install "shapely>=2.1.2" --target "$PROFILE_DIR" --upgrade --no-deps
+
+# Install numba to profile (avoids NumPy 2.x)
+$QGIS_PYTHON -m pip install numba --target "$PROFILE_DIR" --no-deps
+
+# Install other packages normally
+$QGIS_PYTHON -m pip install scipy pandas libpysal esda matplotlib --no-build-isolation
+```
 
 **Why `-m pip` instead of just `pip`?**
 Using `-m pip` ensures you're using the pip module for that specific Python, not a potentially different pip executable in your PATH.
@@ -254,22 +354,70 @@ which python3
 
 ### Verify Dependencies in QGIS
 
-Open QGIS Python Console and run:
+**🔄 IMPORTANT: Restart QGIS first!** QGIS only loads Python packages at startup.
+
+Then open QGIS Python Console and run:
 
 ```python
 import sys
 print("Python:", sys.executable)
 print()
 
-# Check required dependencies
-for module in ['libpysal', 'esda', 'numba', 'numpy']:
+# Check required dependencies with version requirements
+checks = [
+    ('libpysal', '4.3.0'),
+    ('esda', '2.0.0'),
+    ('numba', '0.50.0'),
+    ('numpy', '1.18.0'),
+    ('shapely', '2.1.2'),  # CRITICAL - must be 2.1.2+, not bundled 2.0.6
+    ('geopandas', '0.14.0'),  # Required for GeoPackage support
+    ('fiona', '1.9.0'),  # Required by geopandas
+]
+
+for module_name, min_version in checks:
     try:
-        mod = __import__(module)
+        mod = __import__(module_name)
         version = getattr(mod, '__version__', 'unknown')
-        print(f"✓ {module} {version}")
+        print(f"✓ {module_name} {version}", end='')
+        
+        # Special check for Shapely version
+        if module_name == 'shapely':
+            if version.startswith('2.0'):
+                print(" ⚠️  WARNING: Using bundled 2.0.x, need 2.1.2+")
+            elif version >= '2.1.2':
+                print(" ✓ (correct version)")
+        else:
+            print()
     except ImportError:
-        print(f"✗ {module} NOT FOUND")
+        print(f"✗ {module_name} NOT FOUND (required: >={min_version})")
+
+# Test GeoPackage support
+print("\nGeoPackage (.gpkg) support:")
+try:
+    import geopandas as gpd
+    import fiona
+    print("✓ GeoPandas + Fiona available - GeoPackage files supported")
+except ImportError as e:
+    print(f"✗ Missing: {e.name} - GeoPackage support disabled (shapefile-only mode)")
 ```
+
+**Expected output:**
+```
+✓ libpysal 4.12.2
+✓ esda 2.6.0
+✓ numba 0.60.0
+✓ numpy 1.26.4
+✓ shapely 2.1.2 ✓ (correct version)
+✓ geopandas 0.14.3
+✓ fiona 1.9.6
+
+GeoPackage (.gpkg) support:
+✓ GeoPandas + Fiona available - GeoPackage files supported
+```
+
+**If you see errors:**
+- `shapely 2.0.x` - Installation didn't work, you're using QGIS's bundled version. Run the automated script again.
+- `geopandas NOT FOUND` - GeoPackage files won't work in autocorrelation analysis. Run the automated script to install.
 
 ### List All Installed Packages
 

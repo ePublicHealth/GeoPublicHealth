@@ -18,6 +18,22 @@ These dependencies are **required** for the plugin to load and function:
 - **GDAL** ~3.10.2 or newer (usually bundled with QGIS)
   - Used for geospatial data reading/writing operations
 
+- **Shapely** 2.1.2 or newer
+  - Required by libpysal for geometric operations
+  - **⚠️ macOS**: QGIS bundles Shapely 2.0.6 which is incompatible - installation script automatically installs 2.1.2 to profile directory
+  - Install via: `pip install "shapely>=2.1.2"`
+
+- **Fiona** 1.9.0 or newer
+  - Required by GeoPandas for reading/writing geospatial file formats
+  - Provides engine for GeoPackage (.gpkg) file support
+  - Install via: `pip install fiona`
+
+- **GeoPandas** 0.14.0 or newer
+  - Required for GeoPackage (.gpkg) file support in autocorrelation analysis
+  - Enables modern spatial weights calculation from non-shapefile formats
+  - Falls back to legacy shapefile-only approach if not installed
+  - Install via: `pip install geopandas`
+
 ### Spatial Analysis Libraries  
 - **libpysal** ~4.3.0 or newer
   - Required for spatial statistics and analysis features
@@ -68,73 +84,72 @@ python3 -m pip install libpysal numba matplotlib
 
 1. Open QGIS → Plugins → Python Console
 2. Click "Show Editor" → "Open Script"
-3. Select `install_dependencies_console.py`
+3. Select `install_dependencies_console.py` (get it using one of these):
+   - Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it. The script is inside the folder.
+   - Or download the script directly: https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py
+     - Save the file locally as `install_dependencies_console.py` (recommended location: `~/Downloads/`).
+   - Or open the link, copy the full script, paste it into the QGIS Python editor, and save it as `install_dependencies_console.py`.
 4. Click "Run Script"
 5. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
-**Option 2 - QGIS Console Manual Commands:**
+**Option 2 - Manual Verification (After Automated Script):**
 
-Run in QGIS Python Console (one at a time). Do not paste Terminal commands here:
+⚠️ **Don't use manual `subprocess.run()` commands** - they don't handle macOS-specific issues (Shapely version conflict, NumPy 2.x compatibility, missing bin directories).
+
+After running the automated script (Option 1), verify the installation:
+
+1. **🔄 Restart QGIS first** (required for new packages to load)
+2. Run this verification script in QGIS Python Console:
 
 ```python
-import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
-subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
-subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
-subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
+import sys
+import libpysal, esda, numba, shapely, geopandas, fiona
+
+print(f"Python: {sys.executable}")
+print("(Should contain 'QGIS.app')\n")
+print("✓ All dependencies installed!")
+print(f"  libpysal {libpysal.__version__}")
+print(f"  esda {esda.__version__}")
+print(f"  numba {numba.__version__}")
+print(f"  shapely {shapely.__version__} (should be 2.1.2+)")
+print(f"  geopandas {geopandas.__version__}")
+print(f"  fiona {fiona.__version__}")
+
+# Critical checks
+if shapely.__version__.startswith('2.0'):
+    print("\n⚠️  ERROR: Shapely is 2.0.x (bundled version)")
+    print("Run install_dependencies_console.py to fix")
+elif shapely.__version__ >= '2.1.2':
+    print("\n✓ Shapely version is correct!")
+
+# Test GeoPackage support
+try:
+    import geopandas as gpd
+    print("\n✓ GeoPackage (.gpkg) support available!")
+except ImportError:
+    print("\n⚠️  WARNING: GeoPandas not available - GeoPackage support disabled")
 ```
 
-**🔄 Restart QGIS after installation** so the new packages are picked up.
-
-**Note:** Use `subprocess.run` with `sys.executable -m pip` (not `pip.main()`) for stability.
+**Why manual commands don't work on macOS:**
+- QGIS bundles Shapely 2.0.6, but libpysal needs 2.1.2+ (API incompatibility)
+- Simple `pip install` doesn't override bundled version (wrong sys.path order)
+- Must install to profile directory with `--target` flag
+- Must use `--no-deps` for numba to avoid NumPy 2.x upgrade
+- Automated script handles all these issues correctly
 
 **Alternative: Terminal Methods** (advanced users only)
 
+⚠️ **NOT RECOMMENDED** - Terminal methods don't handle macOS-specific issues correctly. Use the QGIS Console script instead (Option 1).
+
 **⚠️ These commands are for Terminal, not the QGIS Python Console.** If you paste them into the console, they will fail.
 
-**Option 1 - Automated Script:**
+**Why Terminal methods fail:**
+- Don't handle Shapely 2.0.6 → 2.1.2 upgrade (bundled version conflict)
+- May install NumPy 2.x which breaks QGIS
+- Don't create missing `/Applications/QGIS.app/Contents/bin` directory
+- No proper error handling or logging
 
-```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py
-```
-
-**Option 2 - Shell Script:**
-
-```bash
-bash install_mac_dependencies.sh
-```
-
-**Option 3 - Single Command (All dependencies):**
-
-```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
-```
-
-**Option 4 - Manual (Individual packages):**
-
-```bash
-# Using QGIS Python
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install scipy
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install pandas
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install libpysal esda --no-build-isolation
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numba
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install matplotlib  # Optional
-```
-
-**Automation / CI / QGIS-LTR:**
-
-```bash
-# Non-interactive Python script
-/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
-
-# Shell script with custom QGIS path
-QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
-```
-
-**Note:** Terminal methods require using the exact QGIS Python path. Using just `python3` will install to the wrong Python! For deeper troubleshooting, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
+**If you must use Terminal**, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for the correct `--target` + `--no-deps` pattern. But the automated console script is **strongly recommended**.
 
 ### Linux
 
@@ -145,28 +160,59 @@ python3 -m pip install --user libpysal numba matplotlib
 
 ## Checking Installed Dependencies
 
+**🔄 Restart QGIS first** before checking (QGIS only loads packages at startup).
+
 You can check which dependencies are installed by running this in the QGIS Python console:
 
 ```python
 import sys
 
-# Check required dependencies
-required = ['libpysal', 'numpy', 'numba', 'gdal']
-optional = ['matplotlib']
+# Check required dependencies with versions
+required = [
+    ('libpysal', '4.12.0'),
+    ('esda', '2.6.0'),
+    ('numpy', '1.18.0'),
+    ('numba', '0.50.0'),
+    ('shapely', '2.1.2'),
+    ('fiona', '1.9.0'),
+    ('geopandas', '0.14.0'),
+    ('gdal', '3.0.0'),
+]
+optional = [('matplotlib', '3.0.0')]
 
-for package in required:
+print("Required dependencies:")
+for package, min_ver in required:
     try:
-        __import__(package)
-        print(f"✓ {package} is installed")
+        mod = __import__(package)
+        version = getattr(mod, '__version__', 'unknown')
+        print(f"✓ {package} {version}", end='')
+        
+        # Special checks
+        if package == 'shapely':
+            if version.startswith('2.0'):
+                print(" ⚠️  WARNING: Using bundled 2.0.x - need 2.1.2+ (run install script)")
+            elif version >= min_ver:
+                print(" (OK)")
+            else:
+                print(f" ⚠️  WARNING: Need >={min_ver}")
+        elif package == 'numpy':
+            if version.startswith('2.'):
+                print(" ⚠️  ERROR: NumPy 2.x breaks QGIS - need 1.26.x")
+            else:
+                print(" (OK)")
+        else:
+            print()
     except ImportError:
-        print(f"✗ {package} is NOT installed (REQUIRED)")
+        print(f"✗ {package} NOT installed (REQUIRED: >={min_ver})")
 
-for package in optional:
+print("\nOptional dependencies:")
+for package, min_ver in optional:
     try:
-        __import__(package)
-        print(f"✓ {package} is installed")
+        mod = __import__(package)
+        version = getattr(mod, '__version__', 'unknown')
+        print(f"✓ {package} {version}")
     except ImportError:
-        print(f"○ {package} is NOT installed (optional - graphing features disabled)")
+        print(f"○ {package} NOT installed (optional - graphing features disabled)")
 ```
 
 ## Troubleshooting
@@ -203,12 +249,23 @@ If you experience numba errors:
 | Component | Minimum Version | Recommended Version | Notes |
 |-----------|----------------|---------------------|-------|
 | QGIS | 3.0 | 3.42.x - 3.44.x | Tested on 3.42-3.44 |
-| Python | 3.x | 3.12.x | Bundled with QGIS |
+| Python | 3.x | 3.11-3.12 | Bundled with QGIS |
 | GDAL | 3.0 | 3.10.2+ | Usually bundled |
-| libpysal | 4.0 | 4.3.0+ | Install separately |
-| NumPy | 1.18 | Latest | Usually bundled |
-| numba | 0.50 | Latest | Install separately |
-| matplotlib | 3.0 | Latest | Optional |
+| NumPy | 1.18 | 1.26.4 | **Must stay at 1.x** - NumPy 2.x breaks QGIS |
+| Shapely | 2.1.2 | 2.1.2+ | **macOS**: QGIS bundles 2.0.6 (incompatible) |
+| Fiona | 1.9 | 1.9.0+ | Required for GeoPackage support |
+| GeoPandas | 0.14 | 0.14.0+ | Required for GeoPackage support |
+| libpysal | 4.0 | 4.12.0+ | Install separately |
+| esda | 2.0 | 2.6.0+ | Install separately |
+| numba | 0.50 | 0.60.0+ | Install separately |
+| scipy | 1.5 | Latest | Install separately |
+| pandas | 1.0 | Latest | Install separately |
+| matplotlib | 3.0 | Latest | Optional (for plotting features) |
+
+**Critical Notes:**
+- **NumPy**: Must not upgrade to 2.x - QGIS's bundled modules (GDAL, PyQt5) are compiled against NumPy 1.x ABI
+- **Shapely (macOS)**: QGIS 3.42-3.44 bundles 2.0.6, but libpysal requires 2.1.2+ (API breaking changes). Automated script installs 2.1.2 to profile directory to override bundled version.
+- **GeoPackage Support**: Requires both Fiona and GeoPandas. Without these, the plugin will fall back to shapefile-only mode for autocorrelation analysis. GeoPackage (.gpkg) is the recommended modern format for geospatial data.
 
 ## For Plugin Developers
 

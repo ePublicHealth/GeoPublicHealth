@@ -126,8 +126,11 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
 
     **Method 1: Automated Script** (Easiest - just click "Run")
 
-    1.  Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it
-        - The file you need is inside that folder: `install_dependencies_console.py`
+    1.  Get the script (choose one):
+        - Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it. The script is inside the folder: `install_dependencies_console.py`.
+        - Or download the script directly: https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py
+          - Save the file locally as `install_dependencies_console.py` (recommended location: `~/Downloads/`).
+        - Or open the link, copy the full script, paste it into the QGIS Python editor, and save it as `install_dependencies_console.py`.
     2.  Start QGIS
     3.  Go to **Plugins → Python Console**
     4.  Click the **"Show Editor"** button (icon in console toolbar)
@@ -139,60 +142,39 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
     8.  **🔄 Restart QGIS** (required for new packages to load)
     9.  **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
-    **Method 2: Manual Console Commands** (More control)
+    **Method 2: Manual Verification** (After running Method 1)
 
-    Run these commands **one at a time** in QGIS Python Console (press Enter after each). Do not paste Terminal commands here.
+    After the automated script completes and you've restarted QGIS, verify the installation by running this test in the QGIS Python Console:
+
+    1. Go to **Plugins → Python Console**
+    2. Click **"Show Editor"** button
+    3. Copy and paste these lines:
 
     ```python
-    import subprocess, sys
-    subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "numpy"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "scipy"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "pandas"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "numba"])  # Install before libpysal/esda
-    subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
-    subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])  # Optional
+    import libpysal
+    import esda
+    import numba
+    print('All imports successful!')
     ```
 
-    **Note:** We use `subprocess.run([sys.executable, "-m", "pip", ...])` instead of `pip.main()` because `pip.main()` is not a stable public API.
+    4. Click **"Run Script"** button
 
-    **If these commands fail:** Use Method 1 (Open Script) instead. It avoids console copy/paste issues.
+    If you see "All imports successful!", the dependencies are correctly installed.
 
-    Then **restart QGIS**.
+    **If imports fail:** See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for troubleshooting.
 
-**⚠️ These commands are for Terminal, not the QGIS Python Console.** If you paste them into the console, they will fail.
+**⚠️ Important:** Do NOT run Terminal commands in the QGIS Python Console. The automated script (Method 1) handles everything correctly.
 
 <details>
-<summary><b>Alternative Methods (Advanced Users Only)</b></summary>
+<summary><b>Alternative Methods (Advanced Users Only - Not Recommended)</b></summary>
 
-These methods require Terminal and are more error-prone. **The QGIS Python Console methods above are recommended.**
+These methods are provided for reference but are **not recommended** due to potential environment conflicts and NumPy compatibility issues. **Use Method 1 (automated script) instead.**
 
-**Terminal One-Liner:**
-
-```bash
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install numpy scipy pandas numba libpysal esda matplotlib --no-build-isolation
-```
-
-⚠️ **Critical:** Must use the exact QGIS Python path shown. Do NOT use just `python3` - that uses the wrong Python!
-
-**Shell Script:**
-
-```bash
-cd /path/to/GeoPublicHealth
-bash install_mac_dependencies.sh
-```
-
-**For QGIS-LTR or other QGIS installations:**
-
-```bash
-# Shell script with custom QGIS path
-QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/bin/python3" bash install_mac_dependencies.sh
-
-# Python script non-interactive mode
-/Applications/QGIS.app/Contents/MacOS/bin/python3 install_mac_dependencies.py --yes --log /tmp/install.log
-```
-
-**For reproducible installations (pinned versions):**
+See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for advanced installation options including:
+- Terminal-based installation with shell scripts
+- Manual pip commands with proper environment setup
+- QGIS-LTR custom paths
+- Troubleshooting for complex scenarios
 
 ```bash
 # Use requirements file with tested, pinned versions

@@ -23,6 +23,12 @@ numpy>=1.24.0,<2.0.0
 scipy>=1.10.0,<2.0.0
 pandas>=2.0.0,<3.0.0
 
+# Geospatial libraries (required for GeoPackage support in plugin)
+# IMPORTANT: Install shapely 2.1.2+ to override QGIS bundled 2.0.6
+shapely>=2.1.2,<3.0.0
+fiona>=1.9.0,<2.0.0
+geopandas>=0.14.0,<1.0.0
+
 # Performance optimization (must be installed before libpysal/esda)
 numba>=0.57.0,<1.0.0
 
