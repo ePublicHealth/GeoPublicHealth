@@ -384,7 +384,9 @@ def run_pip_install(packages, timeout=None):
 # IMPORTANT: Order matters!
 # - fiona must be installed before geopandas (dependency)
 # - geopandas should be installed before libpysal (used by plugin for GeoPackage support)
+# - llvmlite must be installed before numba (dependency)
 # - numba must be installed before libpysal/esda (may use during build)
+# - shapely, llvmlite, and numba are installed to profile dir with --no-deps to avoid NumPy 2.x
 packages = [
     ("pip", ["pip", "--upgrade"], "Package installer", True, None, None),
     ("numpy", ["numpy"], "Numerical computing", True, None, None),
@@ -413,6 +415,14 @@ packages = [
         True,
         None,
         ["geopandas"],
+    ),
+    (
+        "llvmlite",
+        ["llvmlite"],
+        "LLVM compiler for numba (numba dependency)",
+        True,
+        None,
+        ["llvmlite"],
     ),
     (
         "numba",
@@ -520,7 +530,9 @@ else:
 
         print(f"Installing {name}...", end=" ", flush=True)
 
-        if name in ("shapely", "numba") and qgis_profile_python_dir:
+        # Install shapely, numba, and llvmlite to profile directory with --no-deps
+        # to avoid NumPy 2.x upgrade (these packages list numpy as dependency)
+        if name in ("shapely", "numba", "llvmlite") and qgis_profile_python_dir:
             target_dir = str(qgis_profile_python_dir)
             try:
                 qgis_profile_python_dir.mkdir(parents=True, exist_ok=True)
