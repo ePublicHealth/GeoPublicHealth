@@ -661,7 +661,7 @@ else:
             print(f"○ Experimental plugins already enabled")
 
         # Get existing repositories
-        settings.beginGroup("Qgis/plugin-repos")
+        settings.beginGroup("plugin_repositories")
         existing_repos = settings.childGroups()
 
         # Check if repository already exists
