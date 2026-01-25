@@ -1497,7 +1497,7 @@ class CommonAutocorrelationDialog(QDialog):
                 )
 
             # Set layer opacity
-            self.output_layer.setOpacity(0.4)
+            self.output_layer.setOpacity(1.0)
             QgsProject.instance().addMapLayer(new_layer)
 
             # Set categorized renderer for LISA quadrants

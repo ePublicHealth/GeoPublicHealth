@@ -1,6 +1,6 @@
 # GeoPublicHealth
 
-[![Version](https://img.shields.io/badge/version-0.2.24-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.24)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.3.0)
 [![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
@@ -41,7 +41,7 @@ Before installing the GeoPublicHealth plugin, you need:
 
 Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
 
-**Latest Version:** v0.2.24 (2026-01-25) - Incidence field selection fixes
+**Latest Version:** v0.3.0 (2026-01-25) - LISA map clarity and installer automation
 
 ## Installation
 
@@ -462,6 +462,11 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 * Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
 ## Changelog
+
+### v0.3.0 (2026-01-25)
+- Remove unintended transparency on LISA Moran's I layer
+- Reload plugin repositories and auto-install GeoPublicHealth in installer
+- Add clearer progress feedback during dependency installation
 
 ### v0.2.24 (2026-01-25)
 - **Critical Fix**: Incidence dialog field comboboxes now populate correctly
