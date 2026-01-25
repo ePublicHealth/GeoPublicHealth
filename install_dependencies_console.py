@@ -637,69 +637,151 @@ else:
     # Configure QGIS plugin repository (do this regardless of verification status)
     # Verification may fail because QGIS needs restart, but we still want to configure the repo
     print()
-    print("Configuring QGIS plugin repository...")
+    print("Configuring QGIS plugin repository settings...")
     repo_url = "https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml"
     repo_name = "GeoPublicHealth"
 
     try:
-        from qgis.PyQt.QtCore import QSettings
-        from qgis.utils import iface
+        from qgis.core import QgsSettings, QgsSettingsTree
 
-        settings = QSettings()
+        settings = QgsSettings()
 
         # Debug: Show current settings location
         print(f"Settings file: {settings.fileName()}")
 
-        # Enable experimental plugins (required to see GeoPublicHealth)
-        experimental_enabled = settings.value(
+        allow_experimental_setting = QgsSettingsTree.node(
+            "plugin-manager"
+        ).childSetting("allow-experimental")
+        python_allow_experimental = settings.value(
             "PythonPlugins/allowExperimental", False, type=bool
         )
-        if not experimental_enabled:
+        ui_experimental_setting = settings.value(
+            "QgsCollapsibleGroupBox/QgsPluginManagerBase/ckbExperimental/checked",
+            False,
+            type=bool,
+        )
+        ui_experimental_setting_alt = settings.value(
+            "QgsPluginManagerBase/ckbExperimental/checked",
+            False,
+            type=bool,
+        )
+        experimental_changed = False
+        if not allow_experimental_setting.value():
+            allow_experimental_setting.setValue(True)
+            experimental_changed = True
+        if not python_allow_experimental:
             settings.setValue("PythonPlugins/allowExperimental", True)
-            settings.sync()  # Force write to disk
-            print(f"✓ Enabled experimental plugins")
-        else:
-            print(f"○ Experimental plugins already enabled")
-
-        # Get existing repositories
-        settings.beginGroup("plugin_repositories")
-        existing_repos = settings.childGroups()
-
-        # Check if repository already exists
-        repo_exists = False
-        for repo in existing_repos:
-            settings.beginGroup(repo)
-            url = settings.value("url", "")
+            experimental_changed = True
+        if not ui_experimental_setting:
+            settings.beginGroup("QgsCollapsibleGroupBox")
+            settings.setValue(
+                "QgsPluginManagerBase/ckbExperimental/checked",
+                True,
+            )
+            settings.setValue(
+                "QgsPluginManagerBase/ckbExperimental/collapsed",
+                False,
+            )
             settings.endGroup()
+            experimental_changed = True
+        if not ui_experimental_setting_alt:
+            settings.beginGroup("QgsPluginManagerBase")
+            settings.setValue("ckbExperimental/checked", True)
+            settings.endGroup()
+            experimental_changed = True
+        if experimental_changed:
+            print("✓ Enabled experimental plugins")
+        else:
+            print("○ Experimental plugins already enabled")
+
+        try:
+            from pyplugin_installer import installer_data
+
+            repos_group = installer_data.reposGroup
+        except Exception:
+            repos_group = "app/plugin_repositories"
+
+        print(f"Using repository settings group: {repos_group}")
+        settings.beginGroup(repos_group)
+        existing_repos = settings.childGroups()
+        repo_exists = False
+        existing_repo_key = None
+        for repo in existing_repos:
+            url = settings.value(f"{repo}/url", "", type=str)
             if url == repo_url:
                 repo_exists = True
+                existing_repo_key = repo
                 break
 
         if not repo_exists:
-            # Add the repository
-            settings.beginGroup(repo_name)
-            settings.setValue("url", repo_url)
-            settings.setValue("enabled", True)
-            settings.endGroup()
-            settings.sync()  # Force write to disk
-            print(f"✓ Added GeoPublicHealth plugin repository to settings")
+            settings.setValue(f"{repo_name}/url", repo_url)
+            settings.setValue(f"{repo_name}/enabled", True)
+            settings.setValue(f"{repo_name}/valid", True)
+            print("✓ Added GeoPublicHealth plugin repository to settings")
         else:
-            print(f"○ GeoPublicHealth plugin repository already in settings")
-
+            enabled = settings.value(f"{existing_repo_key}/enabled", True, type=bool)
+            if not enabled:
+                settings.setValue(f"{existing_repo_key}/enabled", True)
+                print("✓ Re-enabled GeoPublicHealth plugin repository")
+            else:
+                print("○ Repository already configured in settings")
         settings.endGroup()
 
         # Final sync to ensure all changes are written
         settings.sync()
 
-        # Note: Plugin Manager UI refresh requires QGIS restart
-        # Programmatic refresh can cause issues with repository loading
-        print(f"   Note: Restart QGIS to see changes in Plugin Manager UI")
+        try:
+            from pyplugin_installer import installer, installer_data
+            from pyplugin_installer.qgsplugininstallerfetchingdialog import (
+                QgsPluginInstallerFetchingDialog,
+            )
+            from qgis.utils import iface
 
-        # Verify the changes were written
-        if settings.status() == QSettings.NoError:
-            print(f"✓ Settings saved successfully")
-        else:
-            print(f"⚠️  Warning: Settings save status: {settings.status()}")
+            repositories = installer_data.repositories
+            plugins = installer_data.plugins
+            repositories.load()
+            plugins.getAllInstalled()
+
+            print("Reloading plugin repositories...")
+            for repo_key in repositories.allEnabled():
+                repositories.requestFetching(repo_key, force_reload=True)
+
+            if repositories.fetchingInProgress() and iface:
+                print("Fetching repository metadata...")
+                fetch_dialog = QgsPluginInstallerFetchingDialog(iface.mainWindow())
+                fetch_dialog.exec()
+                del fetch_dialog
+                for repo_key in repositories.all():
+                    repositories.killConnection(repo_key)
+
+            print("Rebuilding plugin cache...")
+            plugins.rebuild()
+            print("✓ Repositories reloaded from network")
+
+            plugin_key = "geopublichealth"
+            if plugin_key in plugins.all():
+                print("Installing GeoPublicHealth plugin...")
+                plugin_data = plugins.all()[plugin_key]
+                is_experimental = plugin_data.get("experimental", False)
+                print("Preparing plugin installer...")
+                installer.initPluginInstaller()
+                if installer.pluginInstaller:
+                    installer.pluginInstaller.installPlugin(
+                        plugin_key, quiet=True, stable=not is_experimental
+                    )
+                    print("✓ GeoPublicHealth plugin installed")
+                else:
+                    print("○ Plugin installer not available")
+            else:
+                print("○ GeoPublicHealth plugin not found in repositories")
+
+        except Exception as refresh_error:
+            print(f"○ Repository cache refresh failed: {refresh_error}")
+            print("   You may need to restart QGIS to see the repository")
+
+        # Note: Plugin Manager UI refresh can still require a restart
+        print("   Note: Restart QGIS if GeoPublicHealth is not visible")
+        print("   Installed plugins may require a restart before loading")
 
     except Exception as e:
         print(f"⚠️  Warning: Could not configure plugin settings automatically: {e}")
@@ -721,10 +803,7 @@ else:
         print()
         print("Next steps:")
         print("1. Restart QGIS completely (close and reopen)")
-        print("2. Install the GeoPublicHealth plugin:")
-        print("   - Go to Plugins → Manage and Install Plugins")
-        print("   - Search for 'geopublichealth'")
-        print("   - Click Install")
+        print("2. Verify GeoPublicHealth is enabled in Plugins menu")
         print("3. Start using GeoPublicHealth!")
         print()
         print(f"Installation log saved to: {log_path}")

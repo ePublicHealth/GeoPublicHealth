@@ -51,12 +51,14 @@ This is the most reliable method because QGIS Python Console automatically uses 
    - If you can’t find it, use **Cmd+Shift+G** and paste the folder path (e.g. `~/Downloads/GeoPublicHealth`)
    - You can also use Finder search for `install_dependencies_console.py`
 6. Click **"Run Script"**
-7. Watch the progress in the console
+7. Watch progress messages in the console
 8. The script automatically:
    - Enables "Show also experimental plugins" setting
    - Adds GeoPublicHealth plugin repository
+   - Reloads plugin repositories from the network
    - Installs required dependencies (libpysal, esda, numba)
-9. **🔄 Restart QGIS when complete** (required for new packages and repository to appear)
+   - Installs the GeoPublicHealth plugin
+9. **🔄 Restart QGIS when complete** (required for new packages and plugin to load)
 10. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
 ### Method 2: Manual Verification (After Automated Script)
@@ -133,14 +135,16 @@ QGIS_PYTHON="/Applications/QGIS-LTR.app/Contents/MacOS/python3.11" bash install_
 
 </details>
 
-## Step 3: Install the Plugin
+## Fallback: Install the Plugin Manually
+
+Use these steps only if the automated script did not install the plugin after restarting QGIS.
 
 1. Open QGIS
 2. Go to **Plugins → Manage and Install Plugins**
 3. Go to **Settings** tab
 4. **🚨 Critical:** Check **"Show also experimental plugins"** (the plugin will not appear without this)
 5. Click **Add** button:
-   - Name: `epublichealth`
+   - Name: `GeoPublicHealth`
    - URL: `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`
 6. Go to **All** tab
 7. Search for `geopublichealth`

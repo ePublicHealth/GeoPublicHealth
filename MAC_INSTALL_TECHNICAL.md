@@ -136,8 +136,11 @@ When you run code in QGIS Python Console, it uses QGIS's bundled Python interpre
 - Opens a script file in QGIS editor
 - Click "Run Script"
 - Handles all installations automatically using subprocess
+- Reloads plugin repositories and installs GeoPublicHealth
 - Creates timestamped log file
-- Shows progress and verifies success
+- Shows progress messages and verifies success
+
+If the plugin is not installed after restarting QGIS, follow the manual fallback steps in `INSTALL_MAC.md`.
 
 **B. Manual Commands:**
 
