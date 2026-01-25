@@ -74,9 +74,63 @@ print("Installing dependencies for QGIS Python environment...")
 print(f"Log file: {log_path}")
 print()
 
+def resolve_python_executable():
+    """
+    Find the actual Python executable to use with subprocess.
+
+    When running from QGIS Python Console on macOS, sys.executable points to
+    the QGIS application bundle (/Applications/QGIS.app/Contents/MacOS/QGIS),
+    not the Python interpreter. This function finds the actual python3 binary.
+    """
+    python_exe = Path(sys.executable)
+
+    # If sys.executable already looks like Python, use it
+    if python_exe.name.lower().startswith("python"):
+        return python_exe
+
+    # Check if we're in a macOS QGIS.app bundle
+    if "QGIS.app" in str(python_exe):
+        # Try common locations for Python in QGIS.app bundle
+        qgis_app = str(python_exe)
+
+        # Extract path to QGIS.app
+        if "/Contents/MacOS" in qgis_app:
+            app_path = qgis_app.split("/Contents/MacOS")[0]
+        else:
+            app_path = qgis_app
+
+        # Try common Python locations in QGIS.app
+        candidates = [
+            Path(app_path) / "Contents" / "MacOS" / "bin" / "python3",
+            Path(app_path) / "Contents" / "Frameworks" / "Python.framework" / "Versions" / "Current" / "bin" / "python3",
+            Path(app_path) / "Contents" / "Resources" / "python" / "bin" / "python3",
+        ]
+
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+
+    # Try using sys.exec_prefix
+    exec_prefix = Path(sys.exec_prefix)
+    candidate = exec_prefix / "bin" / "python3"
+    if candidate.exists():
+        return candidate
+
+    # Try looking relative to sys.executable
+    candidate = python_exe.parent / "bin" / "python3"
+    if candidate.exists():
+        return candidate
+
+    # Last resort: return sys.executable and hope for the best
+    return python_exe
+
+
+python_executable = resolve_python_executable()
+
 # Check Python environment
-print(f"Python: {sys.executable}")
-if "QGIS.app" in sys.executable or "qgis" in sys.executable.lower():
+print(f"Console Python: {sys.executable}")
+print(f"Pip target Python: {python_executable}")
+if "QGIS.app" in str(python_executable) and python_executable.name.startswith("python"):
     print("✓ Running in QGIS Python environment (correct!)")
 else:
     print("⚠️  Warning: This may not be QGIS Python")
@@ -88,11 +142,11 @@ def run_pip_install(packages, timeout=None):
     """
     Run pip install using subprocess for stability.
 
-    Note: We use subprocess.run with sys.executable instead of pip.main()
+    Note: We use subprocess.run with python_executable instead of pip.main()
     because pip.main() is not a stable public API and can break with pip
     upgrades.
     """
-    cmd = [sys.executable, "-m", "pip", "install"] + packages
+    cmd = [str(python_executable), "-m", "pip", "install"] + packages
 
     with open(log_path, "a", encoding="utf-8") as log:
         log.write(f"\n{'=' * 70}\n")
@@ -203,24 +257,36 @@ critical_packages = {
     "numba": "Performance optimization",
 }
 
+
+def check_module(module_name):
+    """Check if a module is available in the target Python environment."""
+    cmd = [
+        str(python_executable),
+        "-c",
+        f"import importlib; module = importlib.import_module('{module_name}'); print(getattr(module, '__version__', 'unknown'))",
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode == 0:
+        return True, result.stdout.strip()
+    return False, result.stderr.strip()
+
+
 all_critical_ok = True
 for module, description in critical_packages.items():
-    try:
-        mod = __import__(module)
-        version = getattr(mod, "__version__", "unknown")
+    ok, version = check_module(module)
+    if ok:
         print(f"✓ {module} {version} - {description}")
-    except ImportError:
+    else:
         print(f"✗ {module} NOT FOUND - {description}")
         all_critical_ok = False
 
 print()
 
 # Check optional
-try:
-    import matplotlib
-
-    print(f"✓ matplotlib {matplotlib.__version__} - Plotting (optional)")
-except ImportError:
+ok, version = check_module("matplotlib")
+if ok:
+    print(f"✓ matplotlib {version} - Plotting (optional)")
+else:
     print("matplotlib not installed - plotting disabled (optional)")
 
 print()
