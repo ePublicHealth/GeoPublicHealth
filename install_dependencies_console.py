@@ -643,6 +643,7 @@ else:
 
     try:
         from qgis.PyQt.QtCore import QSettings
+        from qgis.utils import iface
 
         settings = QSettings()
 
@@ -681,14 +682,18 @@ else:
             settings.setValue("enabled", True)
             settings.endGroup()
             settings.sync()  # Force write to disk
-            print(f"✓ Added GeoPublicHealth plugin repository")
+            print(f"✓ Added GeoPublicHealth plugin repository to settings")
         else:
-            print(f"○ GeoPublicHealth plugin repository already configured")
+            print(f"○ GeoPublicHealth plugin repository already in settings")
 
         settings.endGroup()
 
         # Final sync to ensure all changes are written
         settings.sync()
+
+        # Note: Plugin Manager UI refresh requires QGIS restart
+        # Programmatic refresh can cause issues with repository loading
+        print(f"   Note: Restart QGIS to see changes in Plugin Manager UI")
 
         # Verify the changes were written
         if settings.status() == QSettings.NoError:
