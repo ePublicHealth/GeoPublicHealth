@@ -1,6 +1,6 @@
 # GeoPublicHealth
 
-[![Version](https://img.shields.io/badge/version-0.2.22-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.22)
+[![Version](https://img.shields.io/badge/version-0.2.24-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.2.24)
 [![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
@@ -41,7 +41,7 @@ Before installing the GeoPublicHealth plugin, you need:
 
 Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
 
-**Latest Version:** v0.2.22 (2026-01-23) - Autocorrelation UI improvements
+**Latest Version:** v0.2.24 (2026-01-25) - Incidence field selection fixes
 
 ## Installation
 
@@ -139,8 +139,12 @@ For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
         - You can also use Finder search for `install_dependencies_console.py`
     6.  Click **"Run Script"** button
     7.  Wait for installation to complete (you'll see progress in the console)
-    8.  **🔄 Restart QGIS** (required for new packages to load)
-    9.  **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
+    8.  The script automatically:
+        - Enables "Show also experimental plugins" setting
+        - Adds GeoPublicHealth plugin repository
+        - Installs required dependencies (libpysal, esda, numba)
+    9.  **🔄 Restart QGIS** (required for new packages and repository to appear)
+    10. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
 
     **Method 2: Manual Verification** (After running Method 1)
 
@@ -290,11 +294,15 @@ See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for more installation
 
 If the plugin doesn't appear after installation:
 
-1. **Check experimental plugins are enabled:**
+1. **Restart QGIS first:**
+   - Settings changes (experimental plugins, repositories) require a full QGIS restart
+   - After running `install_dependencies_console.py`, always restart QGIS completely
+
+2. **Check experimental plugins are enabled:**
    - Go to **Plugins** → **Manage and Install Plugins** → **Settings**
    - Ensure **[x] Show also experimental plugins** is checked
 
-2. **Clear cache and reinstall:**
+3. **Clear cache and reinstall:**
    ```bash
    # macOS
    rm -rf ~/Library/Application\ Support/QGIS/QGIS3/profiles/default/python/plugins/geopublichealth
@@ -309,7 +317,7 @@ If the plugin doesn't appear after installation:
    rmdir /s /q "%APPDATA%\QGIS\QGIS3\profiles\default\cache"
    ```
 
-3. **Restart QGIS** and reinstall the plugin
+4. **Restart QGIS** and reinstall the plugin
 
 ### ModuleNotFoundError
 
@@ -431,6 +439,13 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 * Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
 ## Changelog
+
+### v0.2.24 (2026-01-25)
+- **Critical Fix**: Incidence dialog field comboboxes now populate correctly
+- Fixed Case field and Population field combobox initialization
+- Automated plugin repository configuration in dependency installer
+- Dependency installer now automatically enables experimental plugins
+- Improved user experience with clear restart instructions
 
 ### v0.2.22 (2026-01-23)
 - Autocorrelation UI summary panel and updated layout
