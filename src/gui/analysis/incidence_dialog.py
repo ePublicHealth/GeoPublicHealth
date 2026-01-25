@@ -21,14 +21,17 @@
  * *
  ***************************************************************************/
 """
+
 import traceback
+
 # Plugin Imports
 from geopublichealth.src.gui.analysis.parent_incidence_density_dialog import (
-    IncidenceDensityDialog)
+    IncidenceDensityDialog,
+)
 from geopublichealth.src.utilities.resources import get_ui_class
 
 # Load UI from .ui file
-FORM_CLASS = get_ui_class('analysis', 'incidence.ui')
+FORM_CLASS = get_ui_class("analysis", "incidence.ui")
 
 
 class IncidenceDialog(IncidenceDensityDialog, FORM_CLASS):
@@ -36,27 +39,51 @@ class IncidenceDialog(IncidenceDensityDialog, FORM_CLASS):
     Dialog for calculating Incidence Rates using a field from a polygon layer.
     Inherits common functionality from IncidenceDensityDialog.
     """
+
     def __init__(self, parent=None):
         """Constructor."""
         # Call parent __init__ FIRST
         IncidenceDensityDialog.__init__(self, parent)
 
         # Set specific flags for this dialog mode BEFORE setup_ui
-        self.use_area = False        # We use population, not area
-        self.use_point_layer = False # We use fields, not a point layer
+        self.use_area = False  # We use population, not area
+        self.use_point_layer = False  # We use fields, not a point layer
 
         # Setup the UI defined in FORM_CLASS (loads widgets from incidence.ui)
         # Make sure 'incidence.ui' exists and is valid
         try:
-             FORM_CLASS.setupUi(self, self)
+            FORM_CLASS.setupUi(self, self)
         except Exception as e:
-             print(f"Error setting up UI for IncidenceDialog: {e}")
-             # Optionally display a message to the user or raise
-             # This might happen if incidence.ui is missing or corrupt
+            print(f"Error setting up UI for IncidenceDialog: {e}")
+            # Optionally display a message to the user or raise
+            # This might happen if incidence.ui is missing or corrupt
 
         # Call parent's setup_ui AFTER subclass UI is loaded and flags are set
         # This connects signals and configures common widgets
         self.setup_ui()
+
+        # WORKAROUND: Manually set up field comboboxes after parent setup_ui
+        # The parent's _configure_conditional_widgets may not work correctly for this dialog
+        # so we explicitly configure them here like Composite Index does
+        from qgis.core import QgsFieldProxyModel
+
+        if hasattr(self, "cbx_case_field") and hasattr(self, "cbx_aggregation_layer"):
+            self.cbx_case_field.setFilters(
+                QgsFieldProxyModel.Numeric | QgsFieldProxyModel.String
+            )
+            current_layer = self.cbx_aggregation_layer.currentLayer()
+            if current_layer:
+                self.cbx_case_field.setLayer(current_layer)
+
+        if hasattr(self, "cbx_population_field") and hasattr(
+            self, "cbx_aggregation_layer"
+        ):
+            self.cbx_population_field.setFilters(
+                QgsFieldProxyModel.Numeric | QgsFieldProxyModel.String
+            )
+            current_layer = self.cbx_aggregation_layer.currentLayer()
+            if current_layer:
+                self.cbx_population_field.setLayer(current_layer)
 
     # The run_stats method has been removed as the logic is handled
     # by the parent class's start_stats_task and the IncidenceDensityTask
