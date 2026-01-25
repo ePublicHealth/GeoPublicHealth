@@ -764,10 +764,8 @@ class IncidenceDensityDialog(QDialog):
                     widget.setFilters(filter_or_type)
                 elif is_field_combo and filter_or_type:
                     widget.setFilters(filter_or_type)
-                    current_admin_layer = self.cbx_aggregation_layer.currentLayer()
-                    widget.setLayer(current_admin_layer)
 
-                    # Connect signals robustly
+                    # Connect signals robustly (disconnect first to avoid duplicates)
                     try:
                         self.cbx_aggregation_layer.layerChanged.disconnect(
                             widget.setLayer
@@ -783,11 +781,18 @@ class IncidenceDensityDialog(QDialog):
                     except TypeError:
                         pass
 
+                    # Connect the signals
                     self.cbx_aggregation_layer.layerChanged.connect(widget.setLayer)
 
                     if reset_func:
                         self.cbx_aggregation_layer.layerChanged.connect(reset_func)
-                        reset_func()
+
+                    # Set the current layer AFTER connecting signals
+                    current_admin_layer = self.cbx_aggregation_layer.currentLayer()
+                    if current_admin_layer:
+                        widget.setLayer(current_admin_layer)
+                        if reset_func:
+                            reset_func()
 
     def reset_field_population(self):
         """Reset population field selection."""
