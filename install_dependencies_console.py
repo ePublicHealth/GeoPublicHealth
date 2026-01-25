@@ -646,12 +646,16 @@ else:
 
         settings = QSettings()
 
+        # Debug: Show current settings location
+        print(f"Settings file: {settings.fileName()}")
+
         # Enable experimental plugins (required to see GeoPublicHealth)
         experimental_enabled = settings.value(
             "PythonPlugins/allowExperimental", False, type=bool
         )
         if not experimental_enabled:
             settings.setValue("PythonPlugins/allowExperimental", True)
+            settings.sync()  # Force write to disk
             print(f"✓ Enabled experimental plugins")
         else:
             print(f"○ Experimental plugins already enabled")
@@ -676,11 +680,22 @@ else:
             settings.setValue("url", repo_url)
             settings.setValue("enabled", True)
             settings.endGroup()
+            settings.sync()  # Force write to disk
             print(f"✓ Added GeoPublicHealth plugin repository")
         else:
             print(f"○ GeoPublicHealth plugin repository already configured")
 
         settings.endGroup()
+
+        # Final sync to ensure all changes are written
+        settings.sync()
+
+        # Verify the changes were written
+        if settings.status() == QSettings.NoError:
+            print(f"✓ Settings saved successfully")
+        else:
+            print(f"⚠️  Warning: Settings save status: {settings.status()}")
+
     except Exception as e:
         print(f"⚠️  Warning: Could not configure plugin settings automatically: {e}")
         print("   You can configure manually in QGIS:")
