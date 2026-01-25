@@ -7,7 +7,25 @@
 
 **A QGIS Plugin for Epidemiology and Public Health GIS Analysis**
 
-## Overview
+## 📚 Table of Contents
+
+- [✨ Overview](#overview)
+- [✅ Prerequisites](#prerequisites)
+- [🚀 Quick Start](#quick-start)
+- [🧭 Installation](#installation)
+- [🧪 Verification](#verification)
+- [🛠️ Troubleshooting](#troubleshooting)
+- [🧭 Usage](#usage)
+- [👩‍💻 Development](#development)
+- [🤝 Contributing](#contributing)
+- [🐛 Reporting Issues](#reporting-issues)
+- [🙏 Credits and Authorship](#credits-and-authorship)
+- [🗓️ Changelog](#changelog)
+- [📖 Documentation](#documentation)
+- [💬 Support](#support)
+- [📄 License](#license)
+
+## ✨ Overview
 
 GeoPublicHealth provides a simplified interface within QGIS, tailored for users in epidemiology and public health. It builds upon the foundation laid by the [GeoHealth Plugin](https://github.com/Gustry/GeoHealth) (developed by Etienne Trimaille) and incorporates additional methods highly relevant for applying GIS in public health research and practice.
 
@@ -19,7 +37,7 @@ Key analysis tools include:
 - Composite index building and data blurring utilities
 - Autocorrelation UI with dynamic help text and summary output panel
 
-## Prerequisites
+## ✅ Prerequisites
 
 Before installing the GeoPublicHealth plugin, you need:
 
@@ -35,21 +53,20 @@ Before installing the GeoPublicHealth plugin, you need:
 
 **Note:** The installation methods below are designed to help ensure these dependencies are met. See [DEPENDENCIES.md](DEPENDENCIES.md) for detailed dependency information.
 
-## Quick Start
+## 🚀 Quick Start
 
-### Latest Release
-
-Download the latest version from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest) or install directly from QGIS.
+1. Install QGIS 3.42+ for your platform.
+2. Run `install_dependencies_console.py` from the QGIS Python Console.
+3. Restart QGIS.
+4. Open **Plugins → GeoPublicHealth**.
 
 **Latest Version:** v0.3.0 (2026-01-25) - LISA map clarity and installer automation
 
-# Installation
+## 🧭 Installation
 
-Installation involves two main steps: installing the correct QGIS version with dependencies, and then installing the GeoPublicHealth plugin itself.
+Installation has two steps: install QGIS, then run the dependency installer script.
 
-## QGIS Download Links by Version
-
-Choose the QGIS version that best fits your needs:
+### Step 1: Install QGIS
 
 | Version | Release Type | Windows | macOS | Linux |
 |---------|--------------|---------|-------|-------|
@@ -59,261 +76,95 @@ Choose the QGIS version that best fits your needs:
 
 \* *macOS users should use QGIS 3.44, which is stable and recommended for macOS.*
 
-### Step 1: Install QGIS and Dependencies
+#### 🪟 Windows (OSGeo4W recommended)
 
-#### Windows
+1. Download and run the [OSGeo4W installer](https://download.osgeo.org/osgeo4w/v2/osgeo4w-setup.exe).
+2. Choose **Advanced Install** → **Install from Internet**.
+3. Select packages:
+   - `qgis` (Desktop)
+   - `gdal` (Libs)
+   - `python3-libpysal` (Libs)
+4. Complete installation and launch QGIS once.
 
-Using the [OSGeo4W Network Installer](https://download.osgeo.org/osgeo4w/v2/osgeo4w-setup.exe) is **highly recommended** on Windows to ensure all necessary dependencies (like specific versions of GDAL and PySAL) are installed correctly.
+*Video walkthrough:* [OSGeo4W install](videos/install.qgis.gdal.pysal.win.2022.06.mp4).
 
-##### Option A: OSGeo4W Network Installer (RECOMMENDED)
+#### 🍎 macOS
 
-1.  Download the **[OSGeo4W Network Installer](https://download.osgeo.org/osgeo4w/v2/osgeo4w-setup.exe)** from the [QGIS Download Page](https://qgis.org/download/)
-2.  Run the downloaded `osgeo4w-setup.exe`
-3.  Choose **Advanced Install** and click **Next >**
-4.  Select **Install from Internet** and click **Next >**
-5.  Select the Root Install Directory (default recommended) and click **Next >**
-6.  Select Local Package Directory (default recommended) and click **Next >**
-7.  Select your Internet Connection (default recommended) and click **Next >**
-8.  Choose a Download Site (default `https://download.osgeo.org` recommended) and click **Next >**
-9.  In the "Select Packages" screen, search for and select the following packages:
-    * Search for `qgis`. Expand `Desktop`. Select `qgis: QGIS Desktop` (latest version or LTR). Change "Skip" to the version number to mark it for installation.
-    * Search for `gdal`. Expand `Libs`. Select `gdal: The GDAL/OGR library and command line tools`. Mark it for installation.
-    * Search for `pysal`. Expand `Libs`. Select `python3-libpysal: Core components of PySAL...` (version 4.3.0 or newer). Mark it for installation.
-10. Click **Next >**
-11. Review the dependencies that will be installed. Keep "Install these packages to meet dependencies" checked. Click **Next >**
-12. Accept the License Agreements if prompted and click **Next >** to begin the download and installation
-13. Once finished, launch QGIS Desktop to ensure it starts correctly
+1. Install QGIS from the [macOS installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg).
+2. Open QGIS once (right‑click → Open on first run).
+3. Use the QGIS Python Console for dependencies (do not use system Python).
 
-##### Option B: Standalone Installers
+For the full macOS walkthrough and advanced troubleshooting, see:
+- [INSTALL_MAC.md](INSTALL_MAC.md)
+- [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md)
 
-For offline installation or sharing on USB/network:
+#### 🐧 Linux
 
-- **Latest Release (3.44):** [Download QGIS 3.44.6](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.44.6-1.msi)
-- **Long Term Release (3.40 LTR):** [Download QGIS 3.40.14](https://download.qgis.org/downloads/QGIS-OSGeo4W-3.40.14-1.msi)
+Install QGIS from your distro packages and ensure `python3-gdal`, `python3-libpysal` (or `python3-pysal`), and `python3-numba` are available to QGIS.
 
-##### Windows: Run the Dependency Installer Script
+- [Debian/Ubuntu](https://qgis.org/resources/installation-guide/#debian--ubuntu)
+- [Fedora](https://qgis.org/resources/installation-guide/#fedora)
+- [Arch](https://qgis.org/resources/installation-guide/#arch-linux)
+- [Flatpak](https://qgis.org/resources/installation-guide/#flatpak)
 
-After QGIS is installed (either Option A or B), run the same script used on macOS:
+### Step 2: Run the Dependency Installer Script
 
-1. Download `install_dependencies_console.py` from the repo (ZIP/clone) or [direct link](https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py) (save the file from the browser):
-   - ```python
-     https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py
-     ```
-2. Start QGIS
-3. Go to **Plugins → Python Console**
-4. Click **"Show Editor"**
-5. Click **"Open Script"** and select `install_dependencies_console.py`
-6. Click **"Run Script"**
-7. Watch progress messages in the console
-8. The script automatically:
-   - Enables "Show also experimental plugins" setting
-   - Adds GeoPublicHealth plugin repository
-   - Reloads plugin repositories from the network
-   - Installs required dependencies (libpysal, esda, numba)
-   - Installs the GeoPublicHealth plugin
-9. **🔄 RESTART QGIS** (required for new packages and plugin to load)
-10. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `%TEMP%`)
+Run the same script on all platforms:
 
-*You can see a [video of the OSGeo4W process here](videos/install.qgis.gdal.pysal.win.2022.06.mp4) (Note: Video from 2022, interface might differ slightly).*
+1. Download `install_dependencies_console.py` from the repo or [direct link](https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py).
+2. Open **Plugins → Python Console**.
+3. Click **Show Editor** → **Open Script** → select `install_dependencies_console.py`.
+4. Click **Run Script** and watch progress messages.
+5. Restart QGIS.
 
-#### macOS
+The script will:
+- Enable experimental plugins.
+- Add the GeoPublicHealth repository.
+- Reload repositories from the network.
+- Install required dependencies (`libpysal`, `esda`, `numba`).
+- Install the GeoPublicHealth plugin.
 
-**⚠️ Important: Understanding Python Environments on Mac**
+Logs are written to `~/GeoPublicHealth/` (Windows: `%TEMP%`).
 
-QGIS includes its own Python environment (located at `/Applications/QGIS.app/Contents/MacOS/bin/python3`). This is **separate** from:
-- macOS system Python (`/usr/bin/python3`)
-- Homebrew Python (`/opt/homebrew/bin/python3` or `/usr/local/bin/python3`)
-- Anaconda/Miniconda Python
-- Any other Python installation
+### Step 3: Install the Plugin (Fallback Only)
 
-**You MUST install dependencies into QGIS's Python, NOT your system Python.** Installing to the wrong Python means QGIS won't find the packages.
+Use these steps only if the script did not install the plugin after restart.
 
-**✅ RECOMMENDED: Use QGIS Python Console** - This is the most reliable method because it automatically uses the correct Python environment with no possibility of error. The alternative methods below are provided for advanced users.
+**Option A: Repository**
+1. Open **Plugins → Manage and Install Plugins… → Settings**.
+2. Enable **Show also experimental plugins**.
+3. Add repository:
+   - Name: `GeoPublicHealth`
+   - URL: `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`
+4. Search for `geopublichealth` and install.
 
-For technical details, see [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md).
+**Option B: ZIP**
+1. Download the latest release from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest).
+2. **Plugins → Install from ZIP** → select `geopublichealth.zip`.
 
-**Mental model:** The QGIS Python Console runs **Python only**. Terminal commands (anything starting with `/Applications/...` or `QGIS_PYTHON=...`) must be run in Terminal, not in the console.
+### 🧪 Verification
 
-**Tip:** If you see an error like `NameError: name 'QGIS_PYTHON' is not defined`, you pasted a Terminal command into the console.
+After restarting QGIS, run this in the Python Console:
 
-##### Installation Steps:
-
-1.  Download the **[QGIS macOS Installer](https://download.qgis.org/downloads/macos/qgis-macos-pr.dmg)** from the [QGIS Download Page](https://qgis.org/download/)
-2.  Run the installer (`.dmg` file) and drag the QGIS icon to your Applications folder
-3.  **Important Security Note:** macOS may prevent QGIS from opening initially because it's from an unidentified developer. On first launch, **right-click (or Control-click)** the QGIS icon in Applications, choose **Open** from the menu, and then click the **Open** button in the confirmation dialog. You should only need to do this once.
-4.  **Install Dependencies using QGIS Python Console (RECOMMENDED):**
-
-    **Method 1: Automated Script** (Easiest - just click "Run")
-
-    1.  Get the script (choose one):
-        - Download the GeoPublicHealth repository (ZIP or git clone) and **unzip** it. The script is inside the folder: `install_dependencies_console.py`.
-        - Or download the script directly: https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/refs/heads/main/install_dependencies_console.py
-          - Save the file locally as `install_dependencies_console.py` (recommended location: `~/Downloads/`).
-        - Or open the link, copy the full script, paste it into the QGIS Python editor, and save it as `install_dependencies_console.py`.
-    2.  Start QGIS
-    3.  Go to **Plugins → Python Console**
-    4.  Click the **"Show Editor"** button (icon in console toolbar)
-    5.  Click **"Open Script"** browse location (recommended: `~/Downloads/`) and select `install_dependencies_console.py`
-        - If you can’t find it, use **Cmd+Shift+G** and paste the folder path (e.g. `~/Downloads/GeoPublicHealth`)
-        - You can also use Finder search for `install_dependencies_console.py`
-    6.  Click **"Run Script"** button
-    7.  Watch progress messages in the console (this takes time)
-    8.  The script automatically:
-        - Enables "Show also experimental plugins" setting
-        - Adds GeoPublicHealth plugin repository
-        - Reloads plugin repositories from the network
-        - Installs required dependencies (libpysal, esda, numba)
-        - Installs the GeoPublicHealth plugin
-    9.  **🔄 RESTART QGIS** (required for new packages and plugin to load)
-    10. **🧾 Logs:** Saved to `~/GeoPublicHealth/` (fallback: `/tmp/`)
-
-    **Method 2: Manual Verification** (After running Method 1)
-
-    After the automated script completes and you've restarted QGIS, verify the installation by running this test in the QGIS Python Console:
-
-    1. Go to **Plugins → Python Console**
-    2. Click **"Show Editor"** button
-    3. Copy and paste these lines:
-
-    ```python
-    import libpysal
-    import esda
-    import numba
-    print('All imports successful!')
-    ```
-
-    4. Click **"Run Script"** button
-
-    If you see "All imports successful!", the dependencies are correctly installed.
-
-    **If imports fail:** See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for troubleshooting.
-
-**⚠️ Important:** Do NOT run Terminal commands in the QGIS Python Console. The automated script (Method 1) handles everything correctly.
-
-<details>
-<summary><b>Alternative Methods (Advanced Users Only - Not Recommended)</b></summary>
-
-These methods are provided for reference but are **not recommended** due to potential environment conflicts and NumPy compatibility issues. **Use Method 1 (automated script) instead.**
-
-See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for advanced installation options including:
-- Terminal-based installation with shell scripts
-- Manual pip commands with proper environment setup
-- QGIS-LTR custom paths
-- Troubleshooting for complex scenarios
-
-```bash
-# Use requirements file with tested, pinned versions
-/Applications/QGIS.app/Contents/MacOS/bin/python3 -m pip install -r requirements-mac.txt --no-build-isolation
-```
-
-Or from QGIS Python Console:
-```python
-import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "-r", "requirements-mac.txt", "--no-build-isolation"])
-```
-
-**Note:** The automated scripts install latest versions. For production or reproducible installs, use `requirements-mac.txt` which contains tested, compatible versions. See [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) for details.
-
-</details>
-
-**Verify Installation:**
-
-After restarting QGIS, open Python Console and run:
 ```python
 import libpysal, esda, numba
 print(f"✓ libpysal {libpysal.__version__}, esda {esda.__version__}, numba {numba.__version__}")
 ```
 
-**Why the restart matters:** QGIS loads Python packages only at startup. A full restart is the reliable way to make newly installed packages available.
+### 🎨 Optional: Matplotlib
 
-**Note:** There are no QGIS 3.40 LTR builds available on macOS. QGIS 3.44 is recommended for macOS users.
+Matplotlib enables plots in analysis dialogs.
 
-*(Tip: If you encounter library loading errors, installing [XQuartz](https://www.xquartz.org/) may help, though this is less common with recent QGIS versions.)*
-
-*You can see a [video of the QGIS and plugin installation process for Mac here](videos/install.qgis.and.geopublichealth.mac.2022.09.mp4) (Note: Video from 2022, interface/versions might differ).*
-
-#### Linux
-
-Install QGIS using your distribution's package manager or follow the instructions for various Linux distributions on the [QGIS Download Page](https://qgis.org/download/). 
-
-Common distributions:
-- **Debian/Ubuntu**: [Installation Instructions](https://qgis.org/resources/installation-guide/#debian--ubuntu)
-- **Fedora**: [Installation Instructions](https://qgis.org/resources/installation-guide/#fedora)
-- **Arch Linux**: [Installation Instructions](https://qgis.org/resources/installation-guide/#arch-linux)
-- **Flatpak** (universal): [Installation Instructions](https://qgis.org/resources/installation-guide/#flatpak)
-
-Ensure that `python3-gdal`, `python3-pysal` (or `python3-libpysal`), and `python3-numba` are installed and accessible within the QGIS Python environment. Package names may vary slightly between distributions.
-
-### Step 2: Install the GeoPublicHealth Plugin
-
-IMPORTANT: If you ran `install_dependencies_console.py`, the plugin is installed automatically. Use the steps below only as a fallback.
-
-You have three options to install the plugin:
-
-#### Option A: From QGIS Plugin Repository (Recommended)
-
-1.  Start QGIS (use this only if the automated script did not install the plugin).
-2.  Go to the **Plugins** menu and select **Manage and Install Plugins…**.
-3.  Go to the **Settings** tab.
-4.  **🚨 Critical:** Ensure the **[x] Show also experimental plugins** checkbox is checked (the plugin will not appear otherwise).
-5.  Click the **Add…** button to add a new repository.
-6.  Set the **Name** to `GeoPublicHealth`.
-7.  Set the **URL** to `https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml`.
-8.  Click **OK**.
-9.  Go to the **All** tab.
-10. In the **Search** field, type `geopublichealth`.
-11. Select the **GeoPublicHealth** plugin from the list.
-12. Click the **Install Plugin** button.
-13. Once installation is complete, click **Close**.
-14. Check that the **GeoPublicHealth** entry now appears in the **Plugins** menu in QGIS.
-
-#### Option B: Install from ZIP (Direct Download)
-
-1.  Download the latest release from [GitHub Releases](https://github.com/ePublicHealth/GeoPublicHealth/releases/latest)
-2.  In QGIS, go to **Plugins → Manage and Install Plugins...**
-3.  Click on **Install from ZIP**
-4.  Select the downloaded `geopublichealth.zip` file
-5.  Click **Install Plugin**
-
-#### Option C: Install from GitHub (Development Version)
-
-For the latest development version:
-
-```bash
-cd ~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/
-# Or on Windows: %APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\
-git clone https://github.com/ePublicHealth/GeoPublicHealth.git
+```python
+import subprocess, sys
+subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])
 ```
 
-Then restart QGIS and enable the plugin in the Plugin Manager.
+See [DEPENDENCIES.md](DEPENDENCIES.md) and [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for advanced scenarios and cleanup.
 
-### Optional: Install matplotlib for Plotting Features
+## 🛠️ Troubleshooting
 
-matplotlib is optional but enables graphing and plotting features in analysis dialogs. To install:
-
-**Using QGIS Python Console:**
-
-1. Open QGIS
-2. Go to **Plugins** → **Python Console**
-3. Run these commands **one at a time** (press Enter after each):
-   ```python
-   import subprocess, sys
-   subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])
-   ```
-4. **Restart QGIS** (required for new packages to load)
-5. **Verify installation:**
-   ```python
-   import matplotlib
-   print(f"matplotlib {matplotlib.__version__} installed!")
-   ```
-
-**Note:** Do not paste multiple lines at once in the Python Console. Run each command separately.
-
-See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for more installation options and troubleshooting.
-
-## Troubleshooting
-
-### Plugin Not Appearing After Installation
+### 🧩 Plugin Not Appearing After Installation
 
 If the plugin doesn't appear after installation:
 
@@ -342,14 +193,14 @@ If the plugin doesn't appear after installation:
 
 4. **Restart QGIS** and reinstall the plugin
 
-### ModuleNotFoundError
+### 🧪 ModuleNotFoundError
 
 If you see errors about missing modules:
 
 - **matplotlib**: Optional - see [installation instructions above](#optional-install-matplotlib-for-plotting-features)
 - **libpysal, esda, numba**: Required - see [Step 1: Install QGIS and Dependencies](#step-1-install-qgis-and-dependencies)
 
-### Python Console Installation Issues
+### 🧰 Python Console Installation Issues
 
 **Important:** When using the QGIS Python Console:
 - Run commands **one line at a time** (press Enter after each line)
@@ -361,14 +212,14 @@ If you see errors about missing modules:
   subprocess.run([sys.executable, "-m", "pip", "install", "libpysal", "esda", "--no-build-isolation"])
   ```
 
-### Other Issues
+### 📌 Other Issues
 
 - Check the [QGIS Python Console](https://docs.qgis.org/latest/en/docs/user_manual/plugins/python_console.html) for detailed error messages
 - See [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for complete reinstallation guide
 - See [DEPENDENCIES.md](DEPENDENCIES.md) for dependency troubleshooting
 - Report issues on [GitHub Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
 
-## Usage
+## 🧭 Usage
 
 Once installed, the GeoPublicHealth plugin tools and algorithms can typically be accessed via:
 
@@ -378,15 +229,15 @@ Once installed, the GeoPublicHealth plugin tools and algorithms can typically be
 
 Refer to specific documentation or tutorials for detailed workflows using the plugin's features.
 
-## Development
+## 👩‍💻 Development
 
-### For Developers
+### 🧑‍💻 For Developers
 
 See [AGENTS.md](AGENTS.md) for development guidelines and coding standards.
 
 See [RELEASE.md](RELEASE.md) for information on the release process.
 
-### Running Tests
+### ✅ Running Tests
 
 ```bash
 # Run all tests
@@ -407,7 +258,7 @@ The plugin is automatically built and released using GitHub Actions. To manually
 # See RELEASE.md for detailed build instructions
 ```
 
-## Contributing
+## 🤝 Contributing
 
 Contributions are welcome! Please review the [Contribution Guidelines](CONTRIBUTING.md) before starting.
 
@@ -419,7 +270,7 @@ Contributions are welcome! Please review the [Contribution Guidelines](CONTRIBUT
 6.  Push to the branch: `git push origin my-new-feature`
 7.  Open a **Pull Request**
 
-## Reporting Issues
+## 🐛 Reporting Issues
 
 Found a bug? Please help us fix it by submitting a detailed issue report.
 
@@ -447,7 +298,7 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
     * Operating System (e.g., `Windows 11`, `macOS Sonoma 14.4`, `Ubuntu 22.04`)
     * GeoPublicHealth Plugin Version
 
-## Credits and Authorship
+## 🙏 Credits and Authorship
 
 **GeoPublicHealth Plugin:**
 
@@ -461,7 +312,7 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 * Original Author: Etienne Trimaille
 * Original Design: UMR Espace-DEV (IRD, UAG, UM2, UR)
 
-## Changelog
+## 🗓️ Changelog
 
 ### v0.3.0 (2026-01-25)
 - Remove unintended transparency on LISA Moran's I layer
@@ -545,9 +396,9 @@ Create an issue on the [repository issues page](https://github.com/ePublicHealth
 
 See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) for complete version history.
 
-## Documentation
+## 📖 Documentation
 
-### Installation
+### 🧭 Installation Guides
 - [INSTALL_MAC.md](INSTALL_MAC.md) - Quick Mac installation guide
 - [MAC_INSTALL_TECHNICAL.md](MAC_INSTALL_TECHNICAL.md) - Technical guide: Python environments, advanced troubleshooting
 - [DEPENDENCIES.md](DEPENDENCIES.md) - Detailed dependency information and troubleshooting
@@ -559,18 +410,18 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 - [install_mac_dependencies.sh](install_mac_dependencies.sh) - Advanced: Shell script for Terminal
 - [install_matplotlib_in_qgis.py](install_matplotlib_in_qgis.py) - Optional: Install matplotlib only
 
-### Development
+### 👩‍💻 Development
 - [AGENTS.md](AGENTS.md) - Development guide for AI coding agents
 - [RELEASE.md](RELEASE.md) - Release process and versioning
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 
-## Support
+## 💬 Support
 
 - **Issues**: [GitHub Issues](https://github.com/ePublicHealth/GeoPublicHealth/issues)
 - **Discussions**: Use GitHub Issues for questions and discussions
 - **Email**: manuel.vidaurre@gmail.com
 
-## License
+## 📄 License
 
 This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
 
