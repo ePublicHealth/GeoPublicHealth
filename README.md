@@ -153,14 +153,31 @@ print(f"✓ libpysal {libpysal.__version__}, esda {esda.__version__}, numba {num
 
 ### 🎨 Optional: Matplotlib
 
-Matplotlib enables plots in analysis dialogs.
+Matplotlib enables plots in analysis dialogs. You can also re-run `install_dependencies_console.py`, which installs it automatically.
+
+Run the snippet below **as a script in the QGIS Python Editor** (Show Editor → Run Script):
 
 ```python
-import subprocess, sys
-subprocess.run([sys.executable, "-m", "pip", "install", "matplotlib"])
+import subprocess
+from pathlib import Path
+from qgis.core import QgsApplication
+
+prefix = Path(QgsApplication.prefixPath())
+
+candidates = [
+    prefix / "Contents" / "MacOS" / "python3.12",
+    prefix / "Contents" / "MacOS" / "bin" / "python3",
+    prefix / "Contents" / "bin" / "python3",
+]
+
+python_exec = next((p for p in candidates if p.exists()), None)
+if not python_exec:
+    raise FileNotFoundError(f"No QGIS Python found in: {prefix}")
+
+subprocess.run([str(python_exec), "-m", "pip", "install", "matplotlib"])
 ```
 
-See [DEPENDENCIES.md](DEPENDENCIES.md) and [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for advanced scenarios and cleanup.
+Restart QGIS after installation. See [DEPENDENCIES.md](DEPENDENCIES.md) and [UNINSTALL_INSTRUCTIONS.md](UNINSTALL_INSTRUCTIONS.md) for advanced scenarios and cleanup.
 
 ## 🛠️ Troubleshooting
 
