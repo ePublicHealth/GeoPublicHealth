@@ -634,68 +634,70 @@ else:
     print()
     print("=" * 70)
 
+    # Configure QGIS plugin repository (do this regardless of verification status)
+    # Verification may fail because QGIS needs restart, but we still want to configure the repo
+    print()
+    print("Configuring QGIS plugin repository...")
+    repo_url = "https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml"
+    repo_name = "GeoPublicHealth"
+
+    try:
+        from qgis.PyQt.QtCore import QSettings
+
+        settings = QSettings()
+
+        # Enable experimental plugins (required to see GeoPublicHealth)
+        experimental_enabled = settings.value(
+            "PythonPlugins/allowExperimental", False, type=bool
+        )
+        if not experimental_enabled:
+            settings.setValue("PythonPlugins/allowExperimental", True)
+            print(f"✓ Enabled experimental plugins")
+        else:
+            print(f"○ Experimental plugins already enabled")
+
+        # Get existing repositories
+        settings.beginGroup("Qgis/plugin-repos")
+        existing_repos = settings.childGroups()
+
+        # Check if repository already exists
+        repo_exists = False
+        for repo in existing_repos:
+            settings.beginGroup(repo)
+            url = settings.value("url", "")
+            settings.endGroup()
+            if url == repo_url:
+                repo_exists = True
+                break
+
+        if not repo_exists:
+            # Add the repository
+            settings.beginGroup(repo_name)
+            settings.setValue("url", repo_url)
+            settings.setValue("enabled", True)
+            settings.endGroup()
+            print(f"✓ Added GeoPublicHealth plugin repository")
+        else:
+            print(f"○ GeoPublicHealth plugin repository already configured")
+
+        settings.endGroup()
+    except Exception as e:
+        print(f"⚠️  Warning: Could not configure plugin settings automatically: {e}")
+        print("   You can configure manually in QGIS:")
+        print("   1. Enable experimental plugins:")
+        print("      Settings → Options → Plugins → Check 'Show experimental plugins'")
+        print("   2. Add plugin repository:")
+        print("      Settings → Options → Plugins → Plugin Repositories → Add")
+        print(f"      URL: {repo_url}")
+        print(f"      Name: {repo_name}")
+
+    print()
+    print("=" * 70)
+
     if all_critical_ok:
         print("SUCCESS!")
         print()
         print("All required dependencies are installed.")
-        print()
-
-        # Add GeoPublicHealth plugin repository and enable experimental plugins
-        repo_url = "https://raw.githubusercontent.com/ePublicHealth/GeoPublicHealth/main/docs/plugins.xml"
-        repo_name = "GeoPublicHealth"
-
-        try:
-            from qgis.PyQt.QtCore import QSettings
-
-            settings = QSettings()
-
-            # Enable experimental plugins (required to see GeoPublicHealth)
-            experimental_enabled = settings.value(
-                "PythonPlugins/allowExperimental", False, type=bool
-            )
-            if not experimental_enabled:
-                settings.setValue("PythonPlugins/allowExperimental", True)
-                print(f"✓ Enabled experimental plugins")
-            else:
-                print(f"○ Experimental plugins already enabled")
-
-            # Get existing repositories
-            settings.beginGroup("Qgis/plugin-repos")
-            existing_repos = settings.childGroups()
-
-            # Check if repository already exists
-            repo_exists = False
-            for repo in existing_repos:
-                settings.beginGroup(repo)
-                url = settings.value("url", "")
-                settings.endGroup()
-                if url == repo_url:
-                    repo_exists = True
-                    break
-
-            if not repo_exists:
-                # Add the repository
-                settings.beginGroup(repo_name)
-                settings.setValue("url", repo_url)
-                settings.setValue("enabled", True)
-                settings.endGroup()
-                print(f"✓ Added GeoPublicHealth plugin repository")
-            else:
-                print(f"○ GeoPublicHealth plugin repository already configured")
-
-            settings.endGroup()
-        except Exception as e:
-            print(f"⚠️  Warning: Could not configure plugin settings automatically: {e}")
-            print("   You can configure manually in QGIS:")
-            print("   1. Enable experimental plugins:")
-            print(
-                "      Settings → Options → Plugins → Check 'Show experimental plugins'"
-            )
-            print("   2. Add plugin repository:")
-            print("      Settings → Options → Plugins → Plugin Repositories → Add")
-            print(f"      URL: {repo_url}")
-            print(f"      Name: {repo_name}")
-
         print()
         print("Next steps:")
         print("1. Restart QGIS completely (close and reopen)")
