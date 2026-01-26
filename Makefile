@@ -9,6 +9,9 @@ pep8:
 	@pycodestyle --version
 	@pycodestyle --repeat --ignore=E203,E121,E122,E123,E124,E125,E126,E127,E128,E402 --exclude resources_rc.py,geopublichealth/ui/  . || true
 
+test:
+	@scripts/run_tests.sh
+
 # LOCALES = space delimited list of iso codes to generate po files for
 # Please dont remove en here
 LOCALES = en fr th pt_BR
