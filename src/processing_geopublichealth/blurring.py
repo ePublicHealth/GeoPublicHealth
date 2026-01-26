@@ -23,6 +23,8 @@
  ***************************************************************************/
 """
 
+import random
+
 # Core QGIS Imports for Processing
 from qgis.core import (
     QgsProcessing,
@@ -38,8 +40,9 @@ from qgis.core import (
     QgsField,
     QgsVectorLayer,
     QgsFeature,
-    Qgis # Needed for warning levels if using feedback.reportError
+    Qgis,  # Needed for warning levels if using feedback.reportError
 )
+
 # PyQt Imports
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtCore import QVariant, QCoreApplication
@@ -50,6 +53,7 @@ from geopublichealth.src.core.blurring.layer_index import LayerIndex
 from geopublichealth.src.utilities.resources import resource
 from geopublichealth.src.core.exceptions import GeoPublicHealthException
 
+
 class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
     """
     QGIS Processing algorithm for blurring a point layer.
@@ -57,13 +61,14 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
     """
 
     # Parameter and Output constants
-    OUTPUT_LAYER = 'OUTPUT_LAYER'
-    INPUT_LAYER = 'INPUT_LAYER'
-    RADIUS_FIELD = 'RADIUS_FIELD'
-    RADIUS_EXPORT = 'RADIUS_EXPORT'
-    CENTROID_EXPORT = 'CENTROID_EXPORT'
+    OUTPUT_LAYER = "OUTPUT_LAYER"
+    INPUT_LAYER = "INPUT_LAYER"
+    RADIUS_FIELD = "RADIUS_FIELD"
+    RADIUS_EXPORT = "RADIUS_EXPORT"
+    CENTROID_EXPORT = "CENTROID_EXPORT"
     # DISTANCE_EXPORT seems unused in original code, omitting unless needed
-    ENVELOPE_LAYER = 'ENVELOPE_LAYER'
+    ENVELOPE_LAYER = "ENVELOPE_LAYER"
+    RANDOM_SEED = "RANDOM_SEED"
 
     def initAlgorithm(self, config):
         """Defines the input parameters and output specifications for the algorithm."""
@@ -72,8 +77,8 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 self.INPUT_LAYER,
-                self.tr('Point layer to blur'),
-                [QgsProcessing.TypeVectorPoint] # Accepts only point layers
+                self.tr("Point layer to blur"),
+                [QgsProcessing.TypeVectorPoint],  # Accepts only point layers
             )
         )
 
@@ -81,10 +86,10 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.RADIUS_FIELD,
-                self.tr('Radius (map units)'),
-                type=QgsProcessingParameterNumber.Double, # Specify number type
+                self.tr("Radius (map units)"),
+                type=QgsProcessingParameterNumber.Double,  # Specify number type
                 defaultValue=500.00,
-                minValue=0.0 # Radius cannot be negative
+                minValue=0.0,  # Radius cannot be negative
             )
         )
 
@@ -92,9 +97,9 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterVectorLayer(
                 self.ENVELOPE_LAYER,
-                self.tr('Envelope layer (optional mask)'),
-                [QgsProcessing.TypeVectorPolygon], # Accepts only polygon layers
-                optional=True # This parameter is not mandatory
+                self.tr("Envelope layer (optional mask)"),
+                [QgsProcessing.TypeVectorPolygon],  # Accepts only polygon layers
+                optional=True,  # This parameter is not mandatory
             )
         )
 
@@ -102,8 +107,8 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.RADIUS_EXPORT,
-                self.tr('Add radius to attribute table'),
-                defaultValue=False
+                self.tr("Add radius to attribute table"),
+                defaultValue=False,
             )
         )
 
@@ -111,8 +116,8 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterBoolean(
                 self.CENTROID_EXPORT,
-                self.tr('Add centroid coordinates (X, Y) to attribute table'),
-                defaultValue=False
+                self.tr("Add centroid coordinates (X, Y) to attribute table"),
+                defaultValue=False,
             )
         )
 
@@ -120,8 +125,18 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 self.OUTPUT_LAYER,
-                self.tr('Blurred Layer (Output)'),
-                QgsProcessing.TypeVectorPolygon # Output is always polygon
+                self.tr("Blurred Layer (Output)"),
+                QgsProcessing.TypeVectorPolygon,  # Output is always polygon
+            )
+        )
+
+        # Optional random seed for deterministic outputs
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.RANDOM_SEED,
+                self.tr("Random seed (optional)"),
+                type=QgsProcessingParameterNumber.Integer,
+                optional=True,
             )
         )
 
@@ -135,8 +150,23 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
 
         radius = self.parameterAsDouble(parameters, self.RADIUS_FIELD, context)
         export_radius = self.parameterAsBool(parameters, self.RADIUS_EXPORT, context)
-        export_centroid = self.parameterAsBool(parameters, self.CENTROID_EXPORT, context)
-        envelope_layer = self.parameterAsVectorLayer(parameters, self.ENVELOPE_LAYER, context)
+        export_centroid = self.parameterAsBool(
+            parameters, self.CENTROID_EXPORT, context
+        )
+        envelope_layer = self.parameterAsVectorLayer(
+            parameters, self.ENVELOPE_LAYER, context
+        )
+        seed_value = parameters.get(self.RANDOM_SEED)
+        if seed_value is not None:
+            try:
+                random.seed(int(seed_value))
+            except (TypeError, ValueError):
+                feedback.reportError(
+                    self.tr(
+                        "Invalid random seed; falling back to non-deterministic run."
+                    ),
+                    fatalError=False,
+                )
 
         # --- Prepare Envelope Index (if provided) ---
         vector_layer_envelope_index = None
@@ -144,13 +174,14 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
             feedback.pushInfo(self.tr("Preparing envelope index..."))
             # Check CRS compatibility
             if source.sourceCrs() != envelope_layer.crs():
-                 feedback.reportError(
-                     self.tr("Input layer and Envelope layer must have the same CRS."), fatalError=True)
-                 return {}
+                feedback.reportError(
+                    self.tr("Input layer and Envelope layer must have the same CRS."),
+                    fatalError=True,
+                )
+                return {}
             # Create spatial index for the envelope layer
             vector_layer_envelope_index = LayerIndex(envelope_layer)
             feedback.pushInfo(self.tr("Envelope index created."))
-
 
         # --- Prepare Output ---
         out_fields = QgsFields()
@@ -159,10 +190,16 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
 
         # Add new fields based on export options
         if export_radius:
-            out_fields.append(QgsField("Radius", QVariant.Double)) # Use Double for radius
+            out_fields.append(
+                QgsField("Radius", QVariant.Double)
+            )  # Use Double for radius
         if export_centroid:
-            out_fields.append(QgsField("X_centroid", QVariant.Double)) # Use Double for coordinates
-            out_fields.append(QgsField("Y_centroid", QVariant.Double)) # Use Double for coordinates
+            out_fields.append(
+                QgsField("X_centroid", QVariant.Double)
+            )  # Use Double for coordinates
+            out_fields.append(
+                QgsField("Y_centroid", QVariant.Double)
+            )  # Use Double for coordinates
 
         # Get the output sink and destination ID
         (sink, dest_id) = self.parameterAsSink(
@@ -170,20 +207,15 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
             self.OUTPUT_LAYER,
             context,
             out_fields,
-            QgsWkbTypes.Polygon, # Output geometry type is Polygon
-            source.sourceCrs() # Output CRS matches input CRS
+            QgsWkbTypes.Polygon,  # Output geometry type is Polygon
+            source.sourceCrs(),  # Output CRS matches input CRS
         )
         if sink is None:
-             raise GeoPublicHealthException(self.tr("Could not create output layer."))
+            raise GeoPublicHealthException(self.tr("Could not create output layer."))
 
         # --- Initialize Blurring Algorithm ---
         feedback.pushInfo(self.tr("Starting blurring process..."))
-        algo = Blur(
-            radius,
-            vector_layer_envelope_index,
-            export_radius,
-            export_centroid
-        )
+        algo = Blur(radius, vector_layer_envelope_index, export_radius, export_centroid)
 
         # --- Process Features ---
         total = 100.0 / source.featureCount() if source.featureCount() else 0
@@ -196,23 +228,26 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
 
             try:
                 # Perform blurring
-                blurred_feature = algo.blur(feature) # algo.blur returns a QgsFeature
+                blurred_feature = algo.blur(feature)  # algo.blur returns a QgsFeature
                 # Add the processed feature to the output sink
                 sink.addFeature(blurred_feature, QgsFeatureSink.FastInsert)
             except GeoPublicHealthException as e:
                 # Report errors encountered during blurring (e.g., point outside envelope)
-                feedback.reportError(f"Error processing feature ID {feature.id()}: {e.msg}", fatalError=False)
+                feedback.reportError(
+                    f"Error processing feature ID {feature.id()}: {e.msg}",
+                    fatalError=False,
+                )
                 # Optionally skip the feature or handle the error differently
-                continue # Skip this feature and continue with the next
+                continue  # Skip this feature and continue with the next
 
             # Update progress feedback
             feedback.setProgress(int(current * total))
 
         # Check if the process was cancelled after the loop
         if feedback.isCanceled():
-             feedback.pushInfo(self.tr("Processing cancelled."))
-             # Depending on sink type, might need cleanup or finalization steps here
-             return {} # Return empty dictionary on cancellation
+            feedback.pushInfo(self.tr("Processing cancelled."))
+            # Depending on sink type, might need cleanup or finalization steps here
+            return {}  # Return empty dictionary on cancellation
 
         feedback.pushInfo(self.tr("Blurring process completed."))
 
@@ -222,40 +257,40 @@ class BlurringGeoAlgorithm(QgsProcessingAlgorithm):
     # --- Metadata Methods ---
     def name(self):
         """Returns the unique algorithm name."""
-        return 'geopublichealth_blurring' # Use lowercase and underscores
+        return "geopublichealth_blurring"  # Use lowercase and underscores
 
     def displayName(self):
         """Returns the translated algorithm name."""
-        return self.tr('Blur Point Layer')
+        return self.tr("Blur Point Layer")
 
     def group(self):
         """Returns the group name for organization in Processing."""
-        return self.tr('GeoPublicHealth Tools')
+        return self.tr("GeoPublicHealth Tools")
 
     def groupId(self):
         """Returns the unique group ID."""
-        return 'geopublichealthtools' # Use lowercase
+        return "geopublichealthtools"  # Use lowercase
 
     def tr(self, string):
         """Translates a string using the plugin's context."""
-        return QCoreApplication.translate('BlurringGeoAlgorithm', string)
+        return QCoreApplication.translate("BlurringGeoAlgorithm", string)
 
     def createInstance(self):
         """Creates a new instance of the algorithm."""
         return BlurringGeoAlgorithm()
 
     def helpUrl(self):
-         """Provides a link to more detailed help (optional)."""
-         # Replace with an actual URL if help exists
-         return "https://github.com/ePublicHealth/GeoPublicHealth/wiki" # Example URL
+        """Provides a link to more detailed help (optional)."""
+        # Replace with an actual URL if help exists
+        return "https://github.com/ePublicHealth/GeoPublicHealth/wiki"  # Example URL
 
     def shortHelpString(self):
         """Provides a brief description for the Processing GUI."""
         return self.tr(
-            'Blurs point locations by creating polygon buffers around randomly offset points.\n'
-            'Optionally uses an envelope layer as a mask and adds radius/centroid attributes.'
+            "Blurs point locations by creating polygon buffers around randomly offset points.\n"
+            "Optionally uses an envelope layer as a mask and adds radius/centroid attributes."
         )
 
     def icon(self):
-         """Returns the icon for the algorithm."""
-         return QIcon(resource('blur.png'))
+        """Returns the icon for the algorithm."""
+        return QIcon(resource("blur.png"))

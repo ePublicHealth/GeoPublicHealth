@@ -3,10 +3,11 @@ tests:
     algorithm: geopublichealth:blurring
     params:
       INPUT_LAYER: geohealth_sample_data_en/fictional_cases.shp
-      RADIUS_FIELD: 0.0
+      RADIUS_FIELD: 0.01
       RADIUS_EXPORT: false
       CENTROID_EXPORT: false
       ENVELOPE_LAYER: null
+      RANDOM_SEED: 42
     results:
       OUTPUT_LAYER:
         type: vector

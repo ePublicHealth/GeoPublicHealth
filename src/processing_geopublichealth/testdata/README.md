@@ -16,10 +16,11 @@ To generate it:
 
 1) Run the `geopublichealth:blurring` algorithm in QGIS with:
    - INPUT_LAYER: `geohealth_sample_data_en/fictional_cases.shp`
-   - RADIUS_FIELD: 0.0
+   - RADIUS_FIELD: 0.01 (layer is in WGS84 degrees)
    - RADIUS_EXPORT: false
    - CENTROID_EXPORT: false
    - ENVELOPE_LAYER: (empty)
+   - RANDOM_SEED: 42 (ensures deterministic output)
 2) Save the output as `expected/blur_radius0.gpkg`.
 
 References:
