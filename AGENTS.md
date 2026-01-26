@@ -39,6 +39,43 @@ python -m unittest src.test.test_pep8.TestPep8.test_pep8
 python -m unittest discover -s src/test -p "test_*.py"
 ```
 
+### Test Harness
+
+**Run unit tests (script):**
+```bash
+./scripts/run_tests.sh
+```
+
+**Run unit tests (make):**
+```bash
+make test
+```
+
+### Testing Standards
+
+- Use lightweight mocks instead of full QGIS layers when possible.
+- Division by zero in rates returns `None` (not 0).
+- Null/invalid inputs in rates return `None` per feature.
+- Inequality metrics reject negative values (raise error).
+- Variance defaults to population (sample variance only when explicitly requested).
+
+### QGIS Testing Practices (Reference)
+
+- Add unit tests for new functionality and regression tests for bug fixes.
+- Keep test data small, reusable, and never modify it in place.
+- Prefer deterministic tests and isolate QGIS UI dependencies.
+- For Processing algorithms, use the YAML-based algorithm tests and expected outputs with tolerances when needed.
+
+References:
+- https://docs.qgis.org/3.40/en/docs/developers_guide/unittesting.html
+- https://docs.qgis.org/3.40/en/docs/developers_guide/processingtesting.html
+
+## Architecture & Services
+
+- New analysis logic should live in `src/core/services/`.
+- GUI dialogs should call services and avoid heavy computation.
+- Processing algorithms should wrap the same service functions for parity.
+
 ### Code Style Checking
 
 **Run PEP8 style check:**
@@ -290,6 +327,12 @@ except ImportError:
 6. Commit with descriptive message: `git commit -am 'Add some feature'`
 7. Push to branch: `git push origin my-new-feature`
 8. Open a Pull Request
+
+## Commit Messages
+
+- Use Conventional Commits (https://www.conventionalcommits.org/).
+- Format: `type(scope): short summary`
+- Examples: `feat(analysis): add inequality metrics`, `fix(core): handle null rates`, `refactor(gui): extract services`
 
 ## Release Packaging Notes
 
