@@ -118,18 +118,6 @@ try:
 
     import libpysal
     from libpysal.weights import Queen, Rook
-    from esda.moran import (
-        Moran,
-        Moran_BV,
-        Moran_Local,
-        Moran_Local_BV,
-        Moran_Rate,
-        Moran_Local_Rate,
-    )
-    from esda.getisord import G_Local
-    from esda.geary_local import Geary_Local
-    from esda.join_counts import Join_Counts
-    from esda.join_counts_local import Join_Counts_Local
 
     # Check if geopandas is available for modern approach
     try:
@@ -157,8 +145,11 @@ from geopublichealth.src.core.exceptions import (
     NotANumberException,
 )
 from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.core.services import autocorrelation as autocorrelation_service
 from geopublichealth.src.doc.help import help_autocorrelation
 from geopublichealth.src.utilities.resources import get_ui_class
+
+PYSAL_AVAILABLE = autocorrelation_service.PYSAL_AVAILABLE
 
 FORM_CLASS = get_ui_class("analysis", "autocorrelation.ui")
 
@@ -203,13 +194,14 @@ class CommonAutocorrelationDialog(QDialog):
 
         # Log dependency availability
         QgsMessageLog.logMessage(
-            f"PySAL available: {PYSAL_AVAILABLE}, GeoPandas available: {GEOPANDAS_AVAILABLE}",
+            f"PySAL available: {autocorrelation_service.PYSAL_AVAILABLE}, "
+            f"GeoPandas available: {GEOPANDAS_AVAILABLE}",
             "GeoPublicHealth",
             Qgis.Info,
         )
 
         # Check if PySAL is available
-        if not PYSAL_AVAILABLE:
+        if not autocorrelation_service.PYSAL_AVAILABLE:
             display_message_bar(
                 tr(
                     "PySAL library is required for spatial autocorrelation analysis. "
@@ -392,7 +384,7 @@ class CommonAutocorrelationDialog(QDialog):
 
     def run_stats(self):
         """Main analysis function."""
-        if not PYSAL_AVAILABLE:
+        if not autocorrelation_service.PYSAL_AVAILABLE:
             display_message_bar(
                 tr(
                     "PySAL library is required for spatial autocorrelation analysis. "
@@ -1165,7 +1157,12 @@ class CommonAutocorrelationDialog(QDialog):
             esda.moran.Moran_Local: Local Moran's I statistics
         """
         try:
-            return Moran_Local(y, w, transformation="r", permutations=999)
+            return autocorrelation_service.moran_local(
+                y,
+                w,
+                permutations=999,
+                transformation="r",
+            )
         except Exception as e:
             error_msg = tr("Error calculating Local Moran's I:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1173,7 +1170,12 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_moran_global(self, y, w):
         try:
-            return Moran(y, w, transformation="r", permutations=999)
+            return autocorrelation_service.moran_global(
+                y,
+                w,
+                permutations=999,
+                transformation="r",
+            )
         except Exception as e:
             error_msg = tr("Error calculating Global Moran's I:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1181,7 +1183,13 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_moran_bv_global(self, x, y, w):
         try:
-            return Moran_BV(x, y, w, transformation="r", permutations=999)
+            return autocorrelation_service.moran_bv_global(
+                x,
+                y,
+                w,
+                permutations=999,
+                transformation="r",
+            )
         except Exception as e:
             error_msg = tr("Error calculating Bivariate Moran's I:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1189,7 +1197,13 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_moran_bv_local(self, x, y, w):
         try:
-            return Moran_Local_BV(x, y, w, transformation="r", permutations=999)
+            return autocorrelation_service.moran_bv_local(
+                x,
+                y,
+                w,
+                permutations=999,
+                transformation="r",
+            )
         except Exception as e:
             error_msg = tr("Error calculating Bivariate Local Moran's I:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1197,7 +1211,11 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_join_counts_global(self, y, w):
         try:
-            return Join_Counts(y, w, permutations=999)
+            return autocorrelation_service.join_counts_global(
+                y,
+                w,
+                permutations=999,
+            )
         except Exception as e:
             error_msg = tr("Error calculating Join Counts:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1205,12 +1223,12 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_join_counts_local(self, y, w):
         try:
-            return Join_Counts_Local(
-                connectivity=w,
+            return autocorrelation_service.join_counts_local(
+                y,
+                w,
                 permutations=999,
                 n_jobs=1,
-                keep_simulations=False,
-            ).fit(y)
+            )
         except Exception as e:
             error_msg = tr("Error calculating Local Join Counts:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1218,12 +1236,12 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_geary_local(self, y, w):
         try:
-            return Geary_Local(
-                connectivity=w,
+            return autocorrelation_service.geary_local(
+                y,
+                w,
                 permutations=999,
                 n_jobs=1,
-                keep_simulations=False,
-            ).fit(y)
+            )
         except Exception as e:
             error_msg = tr("Error calculating Local Geary:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)
@@ -1231,13 +1249,11 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_g_local(self, y, w):
         try:
-            return G_Local(
+            return autocorrelation_service.g_local(
                 y,
                 w,
-                transform="R",
                 permutations=999,
                 n_jobs=1,
-                keep_simulations=False,
             )
         except Exception as e:
             error_msg = tr("Error calculating Getis-Ord G:")
@@ -1246,9 +1262,12 @@ class CommonAutocorrelationDialog(QDialog):
 
     def calculate_moran_rate(self, events, population, w):
         try:
-            global_rate = Moran_Rate(events, population, w, permutations=999)
-            local_rate = Moran_Local_Rate(events, population, w, permutations=999)
-            return global_rate, local_rate
+            return autocorrelation_service.moran_rate(
+                events,
+                population,
+                w,
+                permutations=999,
+            )
         except Exception as e:
             error_msg = tr("Error calculating Moran Rate:")
             display_message_bar(f"{error_msg} {str(e)}", level=Qgis.Critical)

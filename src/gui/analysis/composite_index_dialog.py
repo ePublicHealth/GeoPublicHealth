@@ -76,6 +76,7 @@ from geopublichealth.src.core.exceptions import (
     FieldException,
 )
 from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.core.services import composite_index as composite_index_service
 from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class("analysis", "composite_index.ui")
@@ -528,12 +529,12 @@ class CommonCompositeIndexDialog(QDialog):
         Returns:
             Dict[str, Stats]: Dictionary of statistics objects by indicator name
         """
-        stats = {}
+        values_by_indicator = {}
         for indicator_selected in self.selected_indicators:
-            values = self.get_feature_values(indicator_selected)
-            stats[str(indicator_selected[0])] = Stats(values)
+            name = str(indicator_selected[0])
+            values_by_indicator[name] = self.get_feature_values(indicator_selected)
 
-        return stats
+        return composite_index_service.build_indicator_stats(values_by_indicator)
 
     def get_feature_values(self, indicator_selected) -> List[float]:
         """
@@ -554,11 +555,9 @@ class CommonCompositeIndexDialog(QDialog):
             # Get the value, default to 0.0 if null
             value = 0.0
             if feature[index] not in (None, NULL):
-                try:
-                    value = float(feature[index])
-                except (ValueError, TypeError):
-                    # If conversion fails, use 0.0
-                    pass
+                parsed = composite_index_service.sanitize_value(feature[index])
+                if parsed is not None:
+                    value = parsed
 
             values.append(value)
 
@@ -578,31 +577,32 @@ class CommonCompositeIndexDialog(QDialog):
             Tuple[List[Any], float]: The feature attributes and composite index value
         """
         attributes = feature.attributes()
-        composite_index_value = 0.0
+        indicator_directions = {
+            str(indicator[0]): indicator[1] for indicator in self.selected_indicators
+        }
+        feature_values = {}
 
         for indicator in self.selected_indicators:
             name = str(indicator[0])
             index = self.admin_layer.fields().indexOf(name)
-
-            # Get value, default to 0.0 if null
             value = 0.0
             if feature[index] not in (None, NULL):
-                try:
-                    value = float(feature[index])
-                except (ValueError, TypeError):
-                    pass
+                parsed = composite_index_service.sanitize_value(feature[index])
+                if parsed is not None:
+                    value = parsed
+            feature_values[name] = value
 
-            # Calculate Z-score
-            zscore = 0.0
-            if stats[name].standard_deviation() > 0:
-                zscore = (value - stats[name].average()) / stats[
-                    name
-                ].standard_deviation()
-
-            attributes.append(float(zscore))
-            composite_index_value += self.calculate_composite_index_value(
-                indicator, zscore
+        zscores, composite_index_value = (
+            composite_index_service.compute_composite_index_values(
+                feature_values,
+                indicator_directions,
+                stats,
             )
+        )
+
+        for indicator in self.selected_indicators:
+            name = str(indicator[0])
+            attributes.append(float(zscores.get(name, 0.0)))
 
         attributes.append(float(composite_index_value))
         return attributes, composite_index_value

@@ -106,6 +106,7 @@ from geopublichealth.src.core.exceptions import (
     NotANumberException,
 )
 from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.core.services import rates
 
 
 # --------------------------------------------------------------------------
@@ -380,10 +381,11 @@ class IncidenceDensityTask(QgsTask):
                     if self.use_area_flag:
                         # Density calculation (count / area)
                         denominator = admin_geom.area()
+                        value = rates.compute_density(
+                            [count], [denominator], self.ratio
+                        )[0]
 
-                        if denominator > 1e-9:
-                            value = float(count) / denominator * self.ratio
-                        elif count != 0:
+                        if denominator <= 1e-9 and count != 0:
                             QgsMessageLog.logMessage(
                                 f"{tr('Warning:')} {feature_id_str} {tr('has zero/negligible area.')}",
                                 "GeoPublicHealth",
@@ -392,7 +394,7 @@ class IncidenceDensityTask(QgsTask):
                     else:
                         # Incidence calculation (count / population)
                         pop_val = attributes[index_population]
-                        denominator = 0.0
+                        denominator = None
 
                         if not (
                             pop_val is None
@@ -408,9 +410,13 @@ class IncidenceDensityTask(QgsTask):
                                     Qgis.Warning,
                                 )
 
-                        if denominator > 1e-9:
-                            value = float(count) / denominator * self.ratio
-                        elif count != 0:
+                        value = rates.compute_incidence(
+                            [count],
+                            [denominator],
+                            self.ratio,
+                        )[0]
+
+                        if (denominator is None or denominator <= 1e-9) and count != 0:
                             QgsMessageLog.logMessage(
                                 f"{tr('Warning:')} {feature_id_str} {tr('has zero/negligible population.')}",
                                 "GeoPublicHealth",
