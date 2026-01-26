@@ -1,1 +1,13 @@
-tests: []
+tests:
+  - name: blurring_radius_zero
+    algorithm: geopublichealth:blurring
+    params:
+      INPUT_LAYER: testdata/geohealth_sample_data_en/fictional_cases.shp
+      RADIUS_FIELD: 0.0
+      RADIUS_EXPORT: false
+      CENTROID_EXPORT: false
+      ENVELOPE_LAYER: null
+    results:
+      OUTPUT_LAYER:
+        type: vector
+        name: testdata/expected/blur_radius0.gpkg
