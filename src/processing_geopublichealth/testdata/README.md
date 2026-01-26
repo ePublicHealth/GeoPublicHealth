@@ -15,13 +15,21 @@ For example, `blurring_radius_zero` expects:
 To generate it:
 
 1) Run the `geopublichealth:blurring` algorithm in QGIS with:
-   - INPUT_LAYER: `geohealth_sample_data_en/fictional_cases.shp`
-   - RADIUS_FIELD: 0.01 (layer is in WGS84 degrees)
-   - RADIUS_EXPORT: false
-   - CENTROID_EXPORT: false
-   - ENVELOPE_LAYER: (empty)
-   - RANDOM_SEED: 42 (ensures deterministic output)
+   - Point layer: `geohealth_sample_data_en/fictional_cases.shp`
+   - Radius (map's unit): 0.01 (layer is in WGS84 degrees)
+   - Use only selected features: unchecked
+   - Add result to canvas: optional
+   - Add to the attribute table: unchecked
+     - the radius: unchecked
+     - X and Y of centroid: unchecked
+   - Use envelope: unchecked
+   - Random seed (optional): 42 (ensures deterministic output)
 2) Save the output as `expected/blur_radius0.gpkg`.
+
+Notes:
+- The radius is in layer units; this sample is WGS84 (degrees).
+- If no output is produced, pick a non-zero radius and ensure the output path
+  is writable.
 
 References:
 - https://docs.qgis.org/3.40/en/docs/developers_guide/processingtesting.html
