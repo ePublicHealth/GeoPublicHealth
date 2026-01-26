@@ -1,5 +1,5 @@
 tests:
-  - name: blurring_radius_zero
+  - name: blurring_radius_001
     algorithm: geopublichealth:blurring
     params:
       INPUT_LAYER: geohealth_sample_data_en/fictional_cases.shp
@@ -11,4 +11,4 @@ tests:
     results:
       OUTPUT_LAYER:
         type: vector
-        name: expected/blur_radius0.gpkg
+        name: expected/blur_radius001.gpkg

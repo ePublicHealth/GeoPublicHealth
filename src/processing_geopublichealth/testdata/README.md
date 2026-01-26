@@ -8,9 +8,9 @@ Processing History to generate a test definition and copy it into
 `algorithm_tests.yaml`.
 
 Current test definitions expect output files that must be generated with QGIS.
-For example, `blurring_radius_zero` expects:
+For example, `blurring_radius_001` expects:
 
-- `expected/blur_radius0.gpkg`
+- `expected/blur_radius001.gpkg`
 
 To generate it:
 
@@ -24,7 +24,7 @@ To generate it:
      - X and Y of centroid: unchecked
    - Use envelope: unchecked
    - Random seed (optional): 42 (ensures deterministic output)
-2) Save the output as `expected/blur_radius0.gpkg`.
+2) Save the output as `expected/blur_radius001.gpkg`.
 
 Notes:
 - The radius is in layer units; this sample is WGS84 (degrees).
