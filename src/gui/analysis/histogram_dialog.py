@@ -33,6 +33,7 @@ from geopublichealth.src.core.optional_deps import (
     FigureCanvas,
 )
 from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
+from geopublichealth.src.core.services import histogram as histogram_service
 from geopublichealth.src.utilities.resources import get_ui_class
 
 FORM_CLASS = get_ui_class("analysis", "histogram.ui")
@@ -73,18 +74,21 @@ class HistogramDialog(QDialog, FORM_CLASS):
 
         index = self.cbx_layer.currentIndex()
         layer = self.cbx_layer.itemData(index)
+        if not layer or not self.ax:
+            return
         render = layer.rendererV2()
+        ranges = histogram_service.renderer_ranges(render)
+        if not ranges:
+            return
 
-        for ran in render.ranges():
-            # fix_print_with_import
-            print(
-                "%f - %f: %s %s"
-                % (ran.lowerValue(), ran.upperValue(), ran.label(), str(ran.symbol()))
-            )
+        self.ax.clear()
+        positions = list(range(1, len(ranges) + 1))
+        heights = [upper - lower for lower, upper, __, ___ in ranges]
+        bar_list = self.ax.bar(positions, heights)
 
-        bar_list = self.ax.bar([1, 2, 3, 4], [1, 2, 3, 4])
-        bar_list[0].set_color("r")
-        bar_list[1].set_color("g")
-        bar_list[2].set_color("b")
+        for bar, (_, __, ___, symbol) in zip(bar_list, ranges):
+            if symbol is not None:
+                color = symbol.color()
+                bar.set_color(color.name())
 
         self.canvas.draw()

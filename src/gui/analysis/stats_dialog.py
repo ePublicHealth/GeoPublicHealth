@@ -24,7 +24,7 @@
 from builtins import str
 from builtins import range
 from os.path import dirname
-from qgis.core import Qgis, QgsFeatureRequest, QgsSpatialIndex, QgsMapLayerProxyModel
+from qgis.core import Qgis, QgsMapLayerProxyModel
 
 from qgis.PyQt.QtWidgets import (
     QWidget,
@@ -40,7 +40,7 @@ from geopublichealth.src.core.optional_deps import (
     FigureCanvas,
 )
 from geopublichealth.src.core.graph_toolbar import CustomNavigationToolbar
-from geopublichealth.src.core.stats import Stats
+from geopublichealth.src.core.services import spatial_stats
 from geopublichealth.src.core.tools import (
     tr,
     display_message_bar,
@@ -133,77 +133,51 @@ class StatsWidget(QWidget, FORM_CLASS):
 
             nb_feature_stats = stats_layer.featureCount()
             nb_feature_blurred = blurred_layer.featureCount()
-            features_stats = {}
-
-            label_preparing = tr("Preparing index on the stats layer")
             label_creating = tr("Creating index on the stats layer")
             label_calculating = tr("Calculating")
 
             if Qgis.QGIS_VERSION_INT < 20700:
-                self.label_progressStats.setText("%s 1/3" % label_preparing)
-
-                for i, feature in enumerate(stats_layer.getFeatures()):
-                    features_stats[feature.id()] = feature
-                    percent = int((i + 1) * 100 / nb_feature_stats)
-                    self.progressBar_stats.setValue(percent)
-                    # noinspection PyArgumentList
-                    QApplication.processEvents()
-
-                self.label_progressStats.setText("%s 2/3" % label_creating)
-                # noinspection PyArgumentList
-                QApplication.processEvents()
-                index = QgsSpatialIndex()
-                for i, f in enumerate(stats_layer.getFeatures()):
-                    index.insertFeature(f)
-
-                    percent = int((i + 1) * 100 / nb_feature_stats)
-                    self.progressBar_stats.setValue(percent)
-                    # noinspection PyArgumentList
-                    QApplication.processEvents()
-
-                self.label_progressStats.setText("%s 3/3" % label_calculating)
-
-            else:
-                # If QGIS >= 2.7, we can speed up the spatial index.
-                # From 1 min 15 to 7 seconds on my PC.
                 self.label_progressStats.setText("%s 1/2" % label_creating)
-                # noinspection PyArgumentList
+
+                def index_progress(current, total):
+                    percent = int(current * 100 / total)
+                    self.progressBar_stats.setValue(percent)
+                    QApplication.processEvents()
+
+                index = spatial_stats.build_spatial_index(
+                    stats_layer,
+                    progress_callback=index_progress,
+                    use_fast=False,
+                )
+                self.label_progressStats.setText("%s 2/2" % label_calculating)
+            else:
+                self.label_progressStats.setText("%s 1/2" % label_creating)
                 QApplication.processEvents()
-                index = QgsSpatialIndex(stats_layer.getFeatures())
+                index = spatial_stats.build_spatial_index(
+                    stats_layer,
+                    use_fast=True,
+                )
                 self.label_progressStats.setText("%s 2/2" % label_calculating)
 
-            # noinspection PyArgumentList
             QApplication.processEvents()
-            self.tab = []
-            for i, feature in enumerate(blurred_layer.getFeatures()):
-                count = 0
-                ids = index.intersects(feature.geometry().boundingBox())
-                for unique_id in ids:
-                    request = QgsFeatureRequest().setFilterFid(unique_id)
-                    f = next(stats_layer.getFeatures(request))
 
-                    if f.geometry().intersects(feature.geometry()):
-                        count += 1
-                self.tab.append(count)
-
-                percent = int((i + 1) * 100 / nb_feature_blurred)
+            def calc_progress(current, total):
+                percent = int(current * 100 / total)
                 self.progressBar_stats.setValue(percent)
-                # noinspection PyArgumentList
                 QApplication.processEvents()
 
-            stats = Stats(self.tab)
+            self.tab = spatial_stats.compute_intersection_counts(
+                blurred_layer,
+                stats_layer,
+                index,
+                progress_callback=calc_progress,
+            )
 
-            items_stats = [
-                "Count(blurred),%d" % nb_feature_blurred,
-                "Count(stats),%d" % nb_feature_stats,
-                "Min,%d" % stats.min(),
-                "Average,%f" % stats.average(),
-                "Max,%d" % stats.max(),
-                "Median,%f" % stats.median(),
-                "Range,%d" % stats.range(),
-                "Variance,%f" % stats.variance(),
-                "Standard deviation,%f" % stats.standard_deviation(),
-            ]
+            items_stats = spatial_stats.build_stats_items(
+                self.tab,
+                nb_feature_blurred,
+                nb_feature_stats,
+            )
 
             self.tableWidget.clear()
             self.tableWidget.setColumnCount(2)
@@ -211,10 +185,9 @@ class StatsWidget(QWidget, FORM_CLASS):
             self.tableWidget.setHorizontalHeaderLabels(labels)
             self.tableWidget.setRowCount(len(items_stats))
 
-            for i, item in enumerate(items_stats):
-                s = item.split(",")
-                self.tableWidget.setItem(i, 0, QTableWidgetItem(s[0]))
-                self.tableWidget.setItem(i, 1, QTableWidgetItem(s[1]))
+            for i, (label, value) in enumerate(items_stats):
+                self.tableWidget.setItem(i, 0, QTableWidgetItem(label))
+                self.tableWidget.setItem(i, 1, QTableWidgetItem(value))
             self.tableWidget.resizeRowsToContents()
 
             self.draw_plot(self.tab)
