@@ -10,17 +10,17 @@ Processing History to generate a test definition and copy it into
 Current test definitions expect output files that must be generated with QGIS.
 For example, `blurring_radius_zero` expects:
 
-- `testdata/expected/blur_radius0.gpkg`
+- `expected/blur_radius0.gpkg`
 
 To generate it:
 
 1) Run the `geopublichealth:blurring` algorithm in QGIS with:
-   - INPUT_LAYER: `testdata/geohealth_sample_data_en/fictional_cases.shp`
+   - INPUT_LAYER: `geohealth_sample_data_en/fictional_cases.shp`
    - RADIUS_FIELD: 0.0
    - RADIUS_EXPORT: false
    - CENTROID_EXPORT: false
    - ENVELOPE_LAYER: (empty)
-2) Save the output as `testdata/expected/blur_radius0.gpkg`.
+2) Save the output as `expected/blur_radius0.gpkg`.
 
 References:
 - https://docs.qgis.org/3.40/en/docs/developers_guide/processingtesting.html
