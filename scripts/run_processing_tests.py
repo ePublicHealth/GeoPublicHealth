@@ -64,6 +64,9 @@ def _register_provider():
     plugin_path = os.environ.get("GPH_PLUGIN_PATH")
     if plugin_path:
         sys.path.insert(0, plugin_path)
+        if os.path.basename(plugin_path) == "geopublichealth":
+            parent = os.path.dirname(plugin_path)
+            sys.path.insert(0, parent)
 
     provider_class = None
     try:
