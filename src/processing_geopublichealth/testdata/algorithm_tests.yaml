@@ -1,6 +1,6 @@
 tests:
   - name: blurring_radius_001
-    algorithm: geopublichealth:blurring
+    algorithm: GeoPublicHealth:geopublichealth_blurring
     params:
       INPUT_LAYER: geohealth_sample_data_en/fictional_cases.shp
       RADIUS_FIELD: 0.01

@@ -14,7 +14,7 @@ For example, `blurring_radius_001` expects:
 
 To generate it:
 
-1) Run the `geopublichealth:blurring` algorithm in QGIS with:
+1) Run the `GeoPublicHealth:geopublichealth_blurring` algorithm in QGIS with:
    - Point layer: `geohealth_sample_data_en/fictional_cases.shp`
    - Radius (map's unit): 0.01 (layer is in WGS84 degrees)
    - Use only selected features: unchecked

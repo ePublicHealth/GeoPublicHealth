@@ -69,6 +69,11 @@ def main():
     start_app()
 
     try:
+        _register_provider()
+    except Exception as exc:
+        sys.stderr.write(f"Provider registration warning: {exc}\n")
+
+    try:
         import processing
     except ImportError:
         return _fail("Processing framework not available in QGIS environment.")
@@ -155,3 +160,25 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+def _register_provider():
+    plugin_path = os.environ.get("GPH_PLUGIN_PATH")
+    if plugin_path:
+        sys.path.insert(0, plugin_path)
+
+    try:
+        from geopublichealth.src.processing_geopublichealth.provider import Provider
+    except ImportError:
+        return
+
+    try:
+        from qgis.core import QgsApplication
+    except ImportError:
+        return
+
+    registry = QgsApplication.processingRegistry()
+    if registry.providerById("GeoPublicHealth"):
+        return
+
+    registry.addProvider(Provider())
