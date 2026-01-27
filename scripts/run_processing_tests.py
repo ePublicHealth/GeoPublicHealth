@@ -216,7 +216,8 @@ def main():
                 from qgis.core import QgsApplication
 
                 registry = QgsApplication.processingRegistry()
-                if registry.algorithmById(algorithm) is None:
+                algo_obj = registry.algorithmById(algorithm)
+                if algo_obj is None or not getattr(algo_obj, "name", lambda: "")():
                     if algorithm.endswith(":geopublichealth_blurring"):
                         from src.processing_geopublichealth.blurring import (
                             BlurringGeoAlgorithm,
