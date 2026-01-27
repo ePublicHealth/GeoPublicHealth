@@ -65,10 +65,18 @@ def _register_provider():
     if plugin_path:
         sys.path.insert(0, plugin_path)
 
+    provider_class = None
     try:
         from geopublichealth.src.processing_geopublichealth.provider import Provider
+
+        provider_class = Provider
     except ImportError:
-        return
+        try:
+            from src.processing_geopublichealth.provider import Provider
+
+            provider_class = Provider
+        except ImportError:
+            return
 
     try:
         from qgis.core import QgsApplication
@@ -79,7 +87,7 @@ def _register_provider():
     if registry.providerById("GeoPublicHealth"):
         return
 
-    registry.addProvider(Provider())
+    registry.addProvider(provider_class())
 
 
 def main():
