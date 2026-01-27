@@ -75,7 +75,10 @@ def _register_provider():
             from src.processing_geopublichealth.provider import Provider
 
             provider_class = Provider
-        except ImportError:
+        except ImportError as exc:
+            sys.stderr.write(
+                f"Provider import failed. Plugin path: {plugin_path} ({exc})\n"
+            )
             return
 
     try:
