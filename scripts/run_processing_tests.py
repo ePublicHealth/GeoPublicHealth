@@ -136,9 +136,10 @@ def main():
         registry = QgsApplication.processingRegistry()
         provider = registry.providerById("GeoPublicHealth")
         if provider:
+            alg_ids = [alg.id() for alg in provider.algorithms()]
             sys.stdout.write(
-                "Registered GeoPublicHealth algorithms: %s\n"
-                % ", ".join(alg.id() for alg in provider.algorithms())
+                "Registered GeoPublicHealth algorithms (%d): %s\n"
+                % (len(alg_ids), ", ".join(alg_ids))
             )
         else:
             sys.stderr.write("GeoPublicHealth provider not registered.\n")
