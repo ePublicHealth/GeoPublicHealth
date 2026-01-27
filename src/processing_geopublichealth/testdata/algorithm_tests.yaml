@@ -2,7 +2,9 @@ tests:
   - name: blurring_radius_001
     algorithm: GeoPublicHealth:geopublichealth_blurring
     params:
-      INPUT_LAYER: geohealth_sample_data_en/fictional_cases.shp
+      INPUT_LAYER:
+        type: vector
+        name: geohealth_sample_data_en/fictional_cases.shp
       RADIUS_FIELD: 0.01
       RADIUS_EXPORT: false
       CENTROID_EXPORT: false
