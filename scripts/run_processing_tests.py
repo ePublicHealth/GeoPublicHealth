@@ -9,6 +9,7 @@ Requires a QGIS Python environment with processing available.
 import os
 import sys
 import tempfile
+import types
 
 
 def _fail(message):
@@ -67,6 +68,12 @@ def _register_provider():
         if os.path.basename(plugin_path) == "geopublichealth":
             parent = os.path.dirname(plugin_path)
             sys.path.insert(0, parent)
+
+        if "geopublichealth" not in sys.modules:
+            stub = types.ModuleType("geopublichealth")
+            stub.__path__ = [plugin_path]
+            stub.__file__ = os.path.join(plugin_path, "__init__.py")
+            sys.modules["geopublichealth"] = stub
 
     provider_class = None
     try:
