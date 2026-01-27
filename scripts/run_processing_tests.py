@@ -211,7 +211,22 @@ def main():
                 )
 
         try:
-            processing.run(algorithm, resolved_params)
+            algo_to_run = algorithm
+            try:
+                from qgis.core import QgsApplication
+
+                registry = QgsApplication.processingRegistry()
+                if registry.algorithmById(algorithm) is None:
+                    if algorithm.endswith(":geopublichealth_blurring"):
+                        from src.processing_geopublichealth.blurring import (
+                            BlurringGeoAlgorithm,
+                        )
+
+                        algo_to_run = BlurringGeoAlgorithm()
+            except Exception:
+                pass
+
+            processing.run(algo_to_run, resolved_params)
         except Exception as exc:
             sys.stderr.write(f"[{name}] Failed to run: {exc}\n")
             failures += 1
