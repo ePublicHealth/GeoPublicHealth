@@ -136,7 +136,14 @@ def main():
         registry = QgsApplication.processingRegistry()
         provider = registry.providerById("GeoPublicHealth")
         if provider:
-            alg_ids = [alg.id() for alg in provider.algorithms()]
+            alg_ids = []
+            for alg in provider.algorithms():
+                try:
+                    alg_ids.append(
+                        f"{alg.id()} (name={alg.name()}, provider={getattr(alg.provider(), 'id', lambda: None)() if alg.provider() else None})"
+                    )
+                except Exception:
+                    alg_ids.append("<error>")
             sys.stdout.write(
                 "Registered GeoPublicHealth algorithms (%d): %s\n"
                 % (len(alg_ids), ", ".join(alg_ids))
