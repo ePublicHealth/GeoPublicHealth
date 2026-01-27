@@ -51,6 +51,11 @@ python -m unittest discover -s src/test -p "test_*.py"
 make test
 ```
 
+**Run processing tests (make):**
+```bash
+make processing-test
+```
+
 ### Testing Standards
 
 - Use lightweight mocks instead of full QGIS layers when possible.
