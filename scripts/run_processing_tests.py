@@ -60,6 +60,28 @@ def _compare_vector_layers(expected_path, actual_path):
     return True, "ok"
 
 
+def _register_provider():
+    plugin_path = os.environ.get("GPH_PLUGIN_PATH")
+    if plugin_path:
+        sys.path.insert(0, plugin_path)
+
+    try:
+        from geopublichealth.src.processing_geopublichealth.provider import Provider
+    except ImportError:
+        return
+
+    try:
+        from qgis.core import QgsApplication
+    except ImportError:
+        return
+
+    registry = QgsApplication.processingRegistry()
+    if registry.providerById("GeoPublicHealth"):
+        return
+
+    registry.addProvider(Provider())
+
+
 def main():
     try:
         from qgis.testing import start_app
@@ -160,25 +182,3 @@ def main():
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-
-def _register_provider():
-    plugin_path = os.environ.get("GPH_PLUGIN_PATH")
-    if plugin_path:
-        sys.path.insert(0, plugin_path)
-
-    try:
-        from geopublichealth.src.processing_geopublichealth.provider import Provider
-    except ImportError:
-        return
-
-    try:
-        from qgis.core import QgsApplication
-    except ImportError:
-        return
-
-    registry = QgsApplication.processingRegistry()
-    if registry.providerById("GeoPublicHealth"):
-        return
-
-    registry.addProvider(Provider())
