@@ -84,10 +84,19 @@ def _register_provider():
         return
 
     registry = QgsApplication.processingRegistry()
-    if registry.providerById("GeoPublicHealth"):
+    existing = registry.providerById("GeoPublicHealth")
+    if existing:
         return
 
-    registry.addProvider(provider_class())
+    provider = provider_class()
+    try:
+        provider.loadAlgorithms()
+    except Exception:
+        pass
+
+    added = registry.addProvider(provider)
+    if not added:
+        raise RuntimeError("Failed to register GeoPublicHealth provider")
 
 
 def main():
@@ -107,6 +116,21 @@ def main():
         import processing
     except ImportError:
         return _fail("Processing framework not available in QGIS environment.")
+
+    try:
+        from qgis.core import QgsApplication
+
+        registry = QgsApplication.processingRegistry()
+        provider = registry.providerById("GeoPublicHealth")
+        if provider:
+            sys.stdout.write(
+                "Registered GeoPublicHealth algorithms: %s\n"
+                % ", ".join(alg.id() for alg in provider.algorithms())
+            )
+        else:
+            sys.stderr.write("GeoPublicHealth provider not registered.\n")
+    except Exception:
+        pass
 
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     testdata_dir = os.path.join(
