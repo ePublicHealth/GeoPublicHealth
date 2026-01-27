@@ -153,6 +153,16 @@ def main():
     except Exception:
         pass
 
+    try:
+        from src.processing_geopublichealth.blurring import BlurringGeoAlgorithm
+
+        alg = BlurringGeoAlgorithm()
+        sys.stdout.write(
+            f"BlurringGeoAlgorithm name: {alg.name()} displayName: {alg.displayName()}\n"
+        )
+    except Exception as exc:
+        sys.stderr.write(f"Direct algorithm import failed: {exc}\n")
+
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     testdata_dir = os.path.join(
         repo_root,
