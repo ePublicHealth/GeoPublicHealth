@@ -22,6 +22,7 @@
  ***************************************************************************/
 """
 
+import os
 from os.path import dirname, basename
 import traceback  # For debugging unexpected errors
 
@@ -106,15 +107,30 @@ class BlurWidget(QWidget, FORM_CLASS):
     def select_file(self):
         """Opens a file dialog to select the output shapefile."""
         last_folder = get_last_input_path()
-        output_file, _ = get_save_file_path(
+        output_file, selected_filter = get_save_file_path(
             self,  # Parent should be self (the widget)
             tr("Select Output Shapefile"),
             last_folder,  # Start in the last used directory
-            tr("ESRI Shapefiles (*.shp)"),  # Filter for shapefiles, translated
-            prompt=tr("Output file path (.shp):"),
+            tr("ESRI Shapefiles (*.shp);;GeoPackage (*.gpkg)"),
+            prompt=tr("Output file path (.shp or .gpkg):"),
         )
 
         if output_file:
+            is_shp = "(*.shp)" in selected_filter or output_file.lower().endswith(
+                ".shp"
+            )
+            is_gpkg = "(*.gpkg)" in selected_filter or output_file.lower().endswith(
+                ".gpkg"
+            )
+            base, ext = os.path.splitext(output_file)
+
+            if is_shp and ext.lower() != ".shp":
+                output_file = base + ".shp"
+            elif is_gpkg and ext.lower() != ".gpkg":
+                output_file = base + ".gpkg"
+            elif not ext:
+                output_file += ".shp"
+
             self.lineEdit_outputFile.setText(output_file)
             set_last_input_path(dirname(output_file))
         else:
@@ -164,9 +180,11 @@ class BlurWidget(QWidget, FORM_CLASS):
                     "geopublichealth_blur.shp"
                 )
                 self.lineEdit_outputFile.setText(file_name)
-            elif not file_name.lower().endswith(".shp"):
-                file_name = file_name + ".shp"
-                self.lineEdit_outputFile.setText(file_name)
+            else:
+                base, ext = os.path.splitext(file_name)
+                if not ext:
+                    file_name = file_name + ".shp"
+                    self.lineEdit_outputFile.setText(file_name)
 
             set_last_input_path(dirname(file_name))
 
@@ -188,7 +206,12 @@ class BlurWidget(QWidget, FORM_CLASS):
                 out_fields.append(QgsField("Y_centroid", QVariant.Double))
 
             save_options = QgsVectorFileWriter.SaveVectorOptions()
-            save_options.driverName = "ESRI Shapefile"
+            output_ext = os.path.splitext(file_name)[1].lower()
+            if output_ext == ".gpkg":
+                save_options.driverName = "GPKG"
+                save_options.layerName = os.path.splitext(basename(file_name))[0]
+            else:
+                save_options.driverName = "ESRI Shapefile"
             save_options.fileEncoding = "UTF-8"
 
             writer = QgsVectorFileWriter.create(
@@ -227,7 +250,17 @@ class BlurWidget(QWidget, FORM_CLASS):
             del writer
 
             if display_result:
-                output_layer = QgsVectorLayer(file_name, basename(file_name), "ogr")
+                if output_ext == ".gpkg":
+                    layer_name = os.path.splitext(basename(file_name))[0]
+                    layer_uri = f"{file_name}|layername={layer_name}"
+                else:
+                    layer_uri = file_name
+
+                output_layer = QgsVectorLayer(
+                    layer_uri,
+                    os.path.splitext(basename(file_name))[0],
+                    "ogr",
+                )
                 if output_layer.isValid():
                     QgsProject.instance().addMapLayer(output_layer)
                 else:
