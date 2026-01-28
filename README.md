@@ -1,6 +1,6 @@
 # GeoPublicHealth
 
-[![Version](https://img.shields.io/badge/version-0.3.0-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.3.0)
+[![Version](https://img.shields.io/badge/version-0.3.1-blue.svg)](https://github.com/ePublicHealth/GeoPublicHealth/releases/tag/v0.3.1)
 [![QGIS](https://img.shields.io/badge/QGIS-3.42%2B-green.svg)](https://qgis.org)
 [![License](https://img.shields.io/badge/license-GPL--2.0-orange.svg)](LICENSE)
 [![Test Status](https://github.com/ePublicHealth/GeoPublicHealth/actions/workflows/test.yml/badge.svg)](https://github.com/ePublicHealth/GeoPublicHealth/actions)
@@ -60,7 +60,7 @@ Before installing the GeoPublicHealth plugin, you need:
 3. Restart QGIS.
 4. Open **Plugins → GeoPublicHealth**.
 
-**Latest Version:** v0.3.0 (2026-01-25) - LISA map clarity and installer automation
+**Latest Version:** v0.3.1 (2026-01-28) - Installation stability and processing tests
 
 ## 🧭 Installation
 
