@@ -14,6 +14,7 @@ Each item is described using:
 - PySAL Giddy: https://pysal.org/giddy/
 - PySAL Segregation: https://pysal.org/segregation/
 - PySAL Spaghetti: https://pysal.org/spaghetti/
+- PySAL Spatial Regression (spreg): https://pysal.org/spreg/
 - GeoDa capabilities overview: https://geodacenter.github.io/
 - QGIS Processing algorithms: https://docs.qgis.org/3.40/en/docs/user_manual/processing_algs/qgis/index.html
 - QGIS temporal controller and animation: https://docs.qgis.org/3.40/en/docs/user_manual/map_views/map_view.html
@@ -75,6 +76,14 @@ WHAT: Small multiples for time steps, narrative map templates, and automated spa
 
 HOW: Provide layout presets and scripts that drive QGIS temporal controller and atlas export; offer standardized symbology for common metrics.
 
+## Spatial regression
+
+WHY: Model spatial dependence in health outcomes to avoid biased inference and support explanatory analysis.
+
+WHAT: Add spatial regression tools including OLS with spatial diagnostics, spatial lag/error/Durbin models, robust standard errors, and optional GWR/MGWR.
+
+HOW: Use PySAL spreg (and mgwr when feasible) in `src/core/services/`, add GUI and Processing tools, and output summaries plus residual fields.
+
 ## Processing parity and automation
 
 WHY: Ensure reproducibility and batch processing for large workflows.
@@ -103,6 +112,7 @@ Mid term (moderate integration effort, high impact):
 - Spatially constrained clustering (issue #19)
 - Health services accessibility and coverage (issue #20)
 - Visualization and communication (issue #21)
+- Spatial regression (issue #22)
 
 Longer term (external dependencies, heavier workflows):
 
@@ -117,3 +127,4 @@ Longer term (external dependencies, heavier workflows):
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/19
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/20
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/21
+- https://github.com/ePublicHealth/GeoPublicHealth/issues/22
