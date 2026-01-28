@@ -104,25 +104,66 @@ class GeoPublicHealthPlugin(object):
                 return
 
     def initProcessing(self):
-        self.provider = Provider()
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        try:
+            self.provider = Provider()
+            QgsApplication.processingRegistry().addProvider(self.provider)
+        except Exception as exc:
+            QgsMessageLog.logMessage(
+                f"Processing provider failed to load: {exc}",
+                "GeoPublicHealth",
+                Qgis.Warning,
+            )
 
     def initGui(self):
         self.initProcessing()
-        self.plugin_menu = self.iface.pluginMenu()
+        self.plugin_menu = None
+        if self.iface:
+            try:
+                self.plugin_menu = self.iface.pluginMenu()
+            except Exception:
+                self.plugin_menu = None
 
         # Main window
         icon = QIcon(resource("icon-32.png"))
-        self.main_action = QAction(icon, "GeoPublicHealth", self.iface.mainWindow())
-        self.plugin_menu.addAction(self.main_action)
+        parent = self.iface.mainWindow() if self.iface else None
+        self.main_action = QAction(icon, "GeoPublicHealth", parent)
+        if self.plugin_menu:
+            try:
+                self.plugin_menu.addAction(self.main_action)
+            except Exception as exc:
+                QgsMessageLog.logMessage(
+                    f"Failed to add action to plugin menu: {exc}",
+                    "GeoPublicHealth",
+                    Qgis.Warning,
+                )
         # noinspection PyUnresolvedReferences
         self.main_action.triggered.connect(self.open_main_window)
-        self.iface.addPluginToMenu("GeoPublicHealth", self.main_action)
+        if self.iface:
+            try:
+                self.iface.addPluginToMenu("GeoPublicHealth", self.main_action)
+            except Exception as exc:
+                QgsMessageLog.logMessage(
+                    f"Failed to add action to QGIS menu: {exc}",
+                    "GeoPublicHealth",
+                    Qgis.Warning,
+                )
 
     def unload(self):
-        self.plugin_menu.removeAction(self.main_action)
-        self.iface.removePluginMenu("GeoPublicHealth", self.main_action)
-        QgsApplication.processingRegistry().removeProvider(self.provider)
+        if self.plugin_menu and self.main_action:
+            try:
+                self.plugin_menu.removeAction(self.main_action)
+            except Exception:
+                pass
+        if self.iface and self.main_action:
+            try:
+                self.iface.removePluginMenu("GeoPublicHealth", self.main_action)
+            except Exception:
+                pass
+        if self.provider:
+            try:
+                QgsApplication.processingRegistry().removeProvider(self.provider)
+            except Exception:
+                pass
 
     @staticmethod
     def open_main_window():
