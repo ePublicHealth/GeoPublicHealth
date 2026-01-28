@@ -100,9 +100,9 @@ Short term (high value, low integration risk):
 
 Mid term (moderate integration effort, high impact):
 
-- Spatially constrained clustering
-- Health services accessibility and coverage
-- Visualization and communication
+- Spatially constrained clustering (issue #19)
+- Health services accessibility and coverage (issue #20)
+- Visualization and communication (issue #21)
 
 Longer term (external dependencies, heavier workflows):
 
@@ -114,3 +114,6 @@ Longer term (external dependencies, heavier workflows):
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/16
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/17
 - https://github.com/ePublicHealth/GeoPublicHealth/issues/18
+- https://github.com/ePublicHealth/GeoPublicHealth/issues/19
+- https://github.com/ePublicHealth/GeoPublicHealth/issues/20
+- https://github.com/ePublicHealth/GeoPublicHealth/issues/21

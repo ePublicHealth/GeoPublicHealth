@@ -431,6 +431,7 @@ See [all releases](https://github.com/ePublicHealth/GeoPublicHealth/releases) fo
 - [AGENTS.md](AGENTS.md) - Development guide for AI coding agents
 - [RELEASE.md](RELEASE.md) - Release process and versioning
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [docs/future_directions.md](docs/future_directions.md) - Roadmap ideas and future directions
 
 ## 💬 Support
 
