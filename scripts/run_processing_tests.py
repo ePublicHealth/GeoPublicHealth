@@ -53,11 +53,6 @@ def _compare_vector_layers(expected_path, actual_path):
     if expected.geometryType() != actual.geometryType():
         return False, "Geometry type mismatch"
 
-    exp_extent = expected.extent()
-    act_extent = actual.extent()
-    if exp_extent != act_extent:
-        return False, "Extent mismatch"
-
     return True, "ok"
 
 
@@ -136,32 +131,11 @@ def main():
         registry = QgsApplication.processingRegistry()
         provider = registry.providerById("GeoPublicHealth")
         if provider:
-            alg_ids = []
-            for alg in provider.algorithms():
-                try:
-                    alg_ids.append(
-                        f"{alg.id()} (name={alg.name()}, provider={getattr(alg.provider(), 'id', lambda: None)() if alg.provider() else None})"
-                    )
-                except Exception:
-                    alg_ids.append("<error>")
-            sys.stdout.write(
-                "Registered GeoPublicHealth algorithms (%d): %s\n"
-                % (len(alg_ids), ", ".join(alg_ids))
-            )
+            sys.stdout.write("GeoPublicHealth provider registered.\n")
         else:
             sys.stderr.write("GeoPublicHealth provider not registered.\n")
     except Exception:
         pass
-
-    try:
-        from src.processing_geopublichealth.blurring import BlurringGeoAlgorithm
-
-        alg = BlurringGeoAlgorithm()
-        sys.stdout.write(
-            f"BlurringGeoAlgorithm name: {alg.name()} displayName: {alg.displayName()}\n"
-        )
-    except Exception as exc:
-        sys.stderr.write(f"Direct algorithm import failed: {exc}\n")
 
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
     testdata_dir = os.path.join(

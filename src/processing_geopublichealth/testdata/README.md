@@ -26,6 +26,20 @@ To generate it:
    - Random seed (optional): 42 (ensures deterministic output)
 2) Save the output as `expected/blur_radius001.gpkg`.
 
+Second example, `blurring_radius_centroid` expects:
+
+- `expected/blur_radius001_centroid.gpkg`
+
+1) Run the `GeoPublicHealth:geopublichealth_blurring` algorithm in QGIS with:
+   - Point layer: `geohealth_sample_data_en/fictional_cases.shp`
+   - Radius (map's unit): 0.01
+   - Add to the attribute table:
+     - the radius: checked
+     - X and Y of centroid: checked
+   - Use envelope: unchecked
+   - Random seed (optional): 42
+2) Save the output as `expected/blur_radius001_centroid.gpkg`.
+
 Notes:
 - The radius is in layer units; this sample is WGS84 (degrees).
 - If no output is produced, pick a non-zero radius and ensure the output path

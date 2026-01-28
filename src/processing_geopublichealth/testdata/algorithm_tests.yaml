@@ -14,3 +14,18 @@ tests:
       OUTPUT_LAYER:
         type: vector
         name: expected/blur_radius001.gpkg
+  - name: blurring_radius_centroid
+    algorithm: GeoPublicHealth:geopublichealth_blurring
+    params:
+      INPUT_LAYER:
+        type: vector
+        name: geohealth_sample_data_en/fictional_cases.shp
+      RADIUS_FIELD: 0.01
+      RADIUS_EXPORT: true
+      CENTROID_EXPORT: true
+      ENVELOPE_LAYER: null
+      RANDOM_SEED: 42
+    results:
+      OUTPUT_LAYER:
+        type: vector
+        name: expected/blur_radius001_centroid.gpkg
