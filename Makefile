@@ -13,7 +13,7 @@ test:
 	@scripts/run_tests.sh
 
 processing-test:
-	@python3 scripts/run_processing_tests.py
+	@scripts/run_processing_tests.sh
 
 # LOCALES = space delimited list of iso codes to generate po files for
 # Please dont remove en here

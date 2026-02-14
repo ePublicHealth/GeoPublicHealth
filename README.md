@@ -257,14 +257,28 @@ See [RELEASE.md](RELEASE.md) for information on the release process.
 ### ✅ Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (QGIS Python environment required)
 python test_suite.py
 
 # Run a single test
 python -m unittest src.test.test_pep8.TestPep8.test_pep8
 
+# Run processing algorithm tests
+make processing-test
+
 # Run PEP8 style check
 make pep8
+```
+
+For macOS, `make processing-test` uses QGIS bundled Python automatically
+(default path: `/Applications/QGIS.app`).
+
+If QGIS is installed elsewhere, override paths:
+
+```bash
+QGIS_APP="/path/to/QGIS.app" make processing-test
+# or
+QGIS_PYTHON="/path/to/QGIS.app/Contents/MacOS/python3.12" make processing-test
 ```
 
 ### Building the Plugin
@@ -282,7 +296,7 @@ Contributions are welcome! Please review the [Contribution Guidelines](CONTRIBUT
 1.  **Fork** the repository on GitHub.
 2.  Create your feature branch: `git checkout -b my-new-feature`
 3.  Make your changes following the [code style guidelines](AGENTS.md)
-4.  Run tests: `python test_suite.py` and `make pep8`
+4.  Run tests: `python test_suite.py`, `make processing-test`, and `make pep8`
 5.  Commit your changes: `git commit -am 'Add some feature'`
 6.  Push to the branch: `git push origin my-new-feature`
 7.  Open a **Pull Request**
